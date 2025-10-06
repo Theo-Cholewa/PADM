@@ -1,55 +1,76 @@
 # 🏴‍☠️ Les Pirates au doigts mouillés  
-### *Un vent de révolte souffle sur les mers numériques.*
+### *Ceux qui sentent le vent avant qu’il ne tourne.*
 
 ---
 
 ## 🌊 Le manifeste
 
 Nous sommes **les Pirates au doigts mouillés**,  
-ceux qui sentent d’où vient le vent avant qu’il ne souffle.  
-Ni corsaires du pouvoir, ni marchands d’algorithmes :  
-nous naviguons à vue, le regard tourné vers l’horizon du possible.  
+ceux qui lèvent la main vers le ciel pour sentir la direction du monde.  
+Nos doigts ne cherchent pas la pluie,  
+ils cherchent les **signaux invisibles du changement**.  
 
-Ici, on ne télécharge pas des rêves,  
-on les **code, les chante et les partage**.  
-Notre pavillon n’est pas noir, il est **multicolore** :  
-fait de pixels libres, de mots indociles et de données libérées.  
+Tandis que d’autres calculent, nous **ressentons**.  
+Tandis que d’autres obéissent, nous **écoutons le vent**.  
+Nos doigts mouillés sont nos antennes,  
+nos boussoles instinctives dans les tempêtes numériques.  
+
+Ici, pas de capitaine.  
+Seulement des cœurs salés et des claviers trempés d’eau de mer.  
+Chaque ligne de code est une vague,  
+chaque mot une goutte d’océan libre.  
 
 ---
 
 ## ⚙️ Le projet
 
-**Les Pirates au doigts mouillés** est une expérience collective et créative à la croisée de l’art, de la technologie et de la résistance douce.  
-Un laboratoire d’idées, un navire atelier où se croisent :
+**Les Pirates au doigts mouillés** est un collectif vivant,  
+un navire sans port fixe, un laboratoire d’expériences indisciplinées.  
+On y mêle l’art, le code et le souffle de la révolte.  
 
-- 🧭 **Hackers poétiques** – qui détournent les lignes de code comme des vers libres.  
-- 🪶 **Artisans du verbe** – qui écrivent des tempêtes dans le calme des ports.  
-- ⚡ **Révolutionnaires numériques** – qui refusent le statu quo des algorithmes propriétaires.  
-- 🌐 **Rêveurs connectés** – qui croient encore en l’utopie du partage.
+Nos doigts mouillés pianotent sur des claviers dégoulinants d’idées,  
+ils connectent les mondes, tracent des routes entre le pixel et la poésie.  
+
+Nous sommes :
+
+- 🧭 **Les baromètres humains** – qui sentent avant tout le monde la bourrasque qui vient.  
+- 🪶 **Les scribes du vent** – qui traduisent les courants d’air en vers libres et en manifestes numériques.  
+- ⚡ **Les hackers de l’horizon** – qui court-circuitent les orages pour en faire de l’énergie libre.  
+- 🌐 **Les rêveurs trempés** – qui gardent les mains humides pour ne jamais devenir secs de cœur.
 
 ---
 
-## 🔥 La révolution pirate
+## 🔥 La révolution des doigts mouillés
 
-Nous prônons la **désobéissance créative**.  
-Nous défendons la **liberté de naviguer sans boussole imposée**.  
-Nous croyons que la **technologie peut être poétique**,  
-et que la **poésie peut être politique**.  
+Nous refusons les doigts secs,  
+ceux qui glissent sur des écrans aseptisés,  
+ceux qui tapent sans sentir.  
 
-Notre cri n’est pas celui de la guerre,  
-mais celui de la **création insoumise**.  
-Nous jetons l’ancre dans les eaux troubles du monde numérique  
-pour y tracer de nouveaux courants.  
+Nos doigts mouillés **touchent le monde**,  
+ils laissent des traces d’eau salée sur les interfaces.  
+Ils court-circuitent les machines pour leur rendre un peu d’humanité.  
+
+Nous croyons à la **sensation avant la donnée**,  
+à l’**intuition avant l’algorithme**,  
+au **geste avant la norme**.  
+
+Nos doigts mouillés sont la preuve qu’on peut encore sentir,  
+même à travers le froid du numérique.  
 
 ---
 
 ## 🚢 Rejoindre l’équipage
 
-Tu veux embarquer ?  
-Aucun mot de passe, aucun serment.  
-Seulement l’envie de **réécrire la carte du monde**  
-avec de l’encre libre et des lignes de code trempées dans la mer.  
+Pas besoin de CV, juste **des doigts un peu humides**.  
+Des doigts qui ne craignent ni la pluie ni l’encre.  
+Des doigts qui savent que la liberté colle un peu,  
+et qu’elle laisse des marques sur le clavier.  
 
-**Rejoins la flotte.**  
-Le vent est chaud, les doigts sont mouillés,  
-et la révolution commence au bout du clavier.  
+Monte à bord.  
+Mouille-toi.  
+Le vent tourne,  
+et les Pirates au doigts mouillés sont déjà partis sans carte ni boussole.  
+
+**Rejoins la marée.**  
+Les doigts au vent, les idées ruisselantes.  
+La révolution est moite, vivante, et salée.  
