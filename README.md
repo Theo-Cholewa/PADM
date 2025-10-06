@@ -53,3 +53,7 @@ avec de l’encre libre et des lignes de code trempées dans la mer.
 **Rejoins la flotte.**  
 Le vent est chaud, les doigts sont mouillés,  
 et la révolution commence au bout du clavier.  
+
+![Degrès de mouillage en diagramme](image/diag1.png)
+![Vitesse de vent perçu par les doigts mouillés](image/diag2.png)
+![Corrélation entre degré de mouillage et instinct pirate](image/diag3.png)
