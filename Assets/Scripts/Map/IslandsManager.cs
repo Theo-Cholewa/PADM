@@ -6,6 +6,9 @@ public class IslandsManager : MonoBehaviour
     public ShipController blueShip;
     public ShipController redShip;
 
+    [Header("Références aux îles")]
+    public Island[] islands; // assigner les îles dans l’inspecteur
+
     [Header("Touches actions")]
     public string blueShipSelector = "b";
     public string redShipSelector = "n";
@@ -18,8 +21,6 @@ public class IslandsManager : MonoBehaviour
 
     void Update()
     {
-        // --- Détection des touches ---
-
         // 1️⃣ Sélection du bateau
         if (Input.GetKeyDown(blueShipSelector))
         {
@@ -32,7 +33,7 @@ public class IslandsManager : MonoBehaviour
             Debug.Log("→ Bateau rouge sélectionné");
         }
 
-        // 2️⃣ Sélection de l'île (chiffre 1 à 9)
+        // 2️⃣ Sélection de l'île (1–9)
         for (int i = 1; i <= 9; i++)
         {
             if (Input.GetKeyDown(i.ToString()))
@@ -44,17 +45,11 @@ public class IslandsManager : MonoBehaviour
 
         // 3️⃣ Sélection de la ressource
         if (Input.GetKeyDown(foodKey))
-        {
             TryGiveResource("food");
-        }
         else if (Input.GetKeyDown(woodKey))
-        {
             TryGiveResource("wood");
-        }
         else if (Input.GetKeyDown(stoneKey))
-        {
             TryGiveResource("stone");
-        }
     }
 
     void TryGiveResource(string resourceType)
@@ -65,16 +60,42 @@ public class IslandsManager : MonoBehaviour
             return;
         }
 
+        Island targetIsland = GetIslandByID(currentIsland);
+        if (targetIsland == null)
+        {
+            Debug.LogWarning($"⚠ Aucune île avec l’ID {currentIsland}");
+            return;
+        }
+
+        if (!targetIsland.HasResource(resourceType))
+        {
+            Debug.Log($"❌ L'île {targetIsland.islandID} ne possède pas de {resourceType} !");
+            return;
+        }
+
         ShipController targetShip = (currentShip == "blue") ? blueShip : redShip;
         ShipData data = targetShip.GetComponent<ShipData>();
 
-        int amount = 10; // quantité fixe, tu pourras changer
-
+        int amount = 10;
         data.AddResource(resourceType, amount);
-        Debug.Log($"✅ {currentShip.ToUpper()} gagne {amount} de {resourceType} depuis l’île {currentIsland}");
 
-        // Reset de la séquence après l’action
+        Debug.Log($"✅ {currentShip.ToUpper()} gagne {amount} de {resourceType} depuis l'île {targetIsland.islandID}");
+
+        // On retire la ressource de l'île
+        targetIsland.CollectResource(resourceType);
+
         currentIsland = -1;
         currentShip = "";
+    }
+
+
+    Island GetIslandByID(int id)
+    {
+        foreach (var island in islands)
+        {
+            if (island.islandID == id)
+                return island;
+        }
+        return null;
     }
 }
