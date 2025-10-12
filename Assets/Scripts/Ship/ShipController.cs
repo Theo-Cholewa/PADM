@@ -2,50 +2,82 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
-    [Header("Infos Joueur")]
     public string playerName = "Red";
+    private ShipData data;
+    private Rigidbody rb;
 
-    [Header("Touches de contrôle (configurables en Inspector)")]
+    [Header("Déplacement du bateau")]
     public string moveForward = "z";
     public string turnLeft = "q";
     public string turnRight = "d";
+    public string anchorKey = "s";
 
-    [Header("Paramètres de mouvement")]
-    public float acceleration = 5f;      // Vitesse à laquelle le bateau accélère
-    public float maxSpeed = 8f;          // Vitesse maximale
-    public float deceleration = 2f;      // Ralentissement quand aucune touche n'est pressée
-    public float rotationSpeed = 100f;   // Vitesse de rotation
+    private bool anchorDropped = false;
 
-    private float currentSpeed = 0f;     // Vitesse actuelle du bateau
+    [Header("Statistiques du bateau")]
+    public float acceleration = 5f;
+    public float maxSpeed = 8f;
+    public float deceleration = 2f;
+    public float rotationSpeed = 100f;
+
+    private float currentSpeed = 0f;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        data = GetComponent<ShipData>();
+    }
 
     void Update()
     {
-        // Gestion de l'accélération
-        if (Input.GetKey(moveForward))
+        // --- Détection des touches ---
+        if (Input.GetKeyDown(anchorKey))
         {
-            currentSpeed += acceleration * Time.deltaTime;
-        }
-        else
-        {
-            // Si aucune touche n'est appuyée, on ralentit progressivement
-            if (currentSpeed > 0)
-                currentSpeed -= deceleration * Time.deltaTime;
-            else if (currentSpeed < 0)
-                currentSpeed += deceleration * Time.deltaTime;
-
-            // On évite les très petites valeurs
-            if (Mathf.Abs(currentSpeed) < 0.1f)
-                currentSpeed = 0;
+            anchorDropped = !anchorDropped;
+            if (anchorDropped)
+            {
+                currentSpeed = 0f;
+                rb.velocity = Vector3.zero;
+                Debug.Log($"{playerName} pose l’ancre ⚓ (le bateau est immobile)");
+            }
+            else
+            {
+                Debug.Log($"{playerName} relève l’ancre ⚓");
+            }
         }
 
-        // Clamp pour éviter de dépasser la vitesse max
+        // --- Gestion de la vitesse (accélération/décélération) ---
+        if (!anchorDropped)
+        {
+            if (Input.GetKey(moveForward))
+                currentSpeed += acceleration * Time.deltaTime;
+            else
+            {
+                if (currentSpeed > 0)
+                    currentSpeed -= deceleration * Time.deltaTime;
+                else if (currentSpeed < 0)
+                    currentSpeed += deceleration * Time.deltaTime;
+
+                if (Mathf.Abs(currentSpeed) < 0.1f)
+                    currentSpeed = 0;
+            }
+        }
+
         currentSpeed = Mathf.Clamp(currentSpeed, -maxSpeed, maxSpeed);
+    }
 
-        // Mouvement
-        transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime, Space.Self);
+    void FixedUpdate()
+    {
+        if (anchorDropped) return;
 
-        // Rotation
-        if (Input.GetKey(turnLeft)) transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime);
-        if (Input.GetKey(turnRight)) transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+        // --- Déplacement ---
+        Vector3 movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + movement);
+
+        // --- Rotation ---
+        if (Input.GetKey(turnLeft))
+            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, -rotationSpeed * Time.fixedDeltaTime, 0));
+        if (Input.GetKey(turnRight))
+            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, rotationSpeed * Time.fixedDeltaTime, 0));
     }
 }
