@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ public class Draggable : MonoBehaviour
     private Vector3 target = Vector2.zero;
     private Vector3 velocity = Vector3.zero;
     private bool dragging = false;
+
+    public Action onTake = null;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +37,7 @@ public class Draggable : MonoBehaviour
         if (plane.Raycast(ray, out float distance))
         {
             target = ray.GetPoint(distance);
+            if(!dragging && onTake!=null) onTake();
             dragging = true;
         }
     }
