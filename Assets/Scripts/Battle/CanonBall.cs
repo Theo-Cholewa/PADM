@@ -23,7 +23,7 @@ public class CanonBall : MonoBehaviour
     void FixedUpdate()
     {
         var direction = transform.forward;
-        transform.position += direction;
+        transform.position += direction * 2;
 
         age++;
         if(age>100) Destroy(transform.parent.gameObject);
