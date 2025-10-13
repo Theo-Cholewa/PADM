@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Island : MonoBehaviour
 {
@@ -11,18 +10,18 @@ public class Island : MonoBehaviour
     public bool hasWood = true;
     public bool hasStone = true;
 
-    [Header("Icônes UI (RawImages au-dessus de l'île)")]
-    public RawImage foodIcon;
-    public RawImage woodIcon;
-    public RawImage stoneIcon;
+    [Header("Plans / MeshRenderer associés aux ressources")]
+    public Renderer foodRenderer;
+    public Renderer woodRenderer;
+    public Renderer stoneRenderer;
 
     void Start()
     {
-        UpdateIcons();
+        UpdateMaterials();
     }
 
     /// <summary>
-    /// Indique si l’île possède encore cette ressource.
+    /// Vérifie si la ressource est encore disponible.
     /// </summary>
     public bool HasResource(string resourceType)
     {
@@ -36,7 +35,7 @@ public class Island : MonoBehaviour
     }
 
     /// <summary>
-    /// Retire la ressource (après récolte) et met à jour les icônes.
+    /// Retire une ressource et met à jour la visibilité des plans.
     /// </summary>
     public void CollectResource(string resourceType)
     {
@@ -53,21 +52,21 @@ public class Island : MonoBehaviour
                 break;
         }
 
-        UpdateIcons();
+        UpdateMaterials();
     }
 
     /// <summary>
-    /// Active ou désactive les RawImages selon les ressources encore disponibles.
+    /// Active ou désactive les plans (MeshRenderer) selon les ressources restantes.
     /// </summary>
-    private void UpdateIcons()
+    private void UpdateMaterials()
     {
-        if (foodIcon != null)
-            foodIcon.gameObject.SetActive(hasFood);
+        if (foodRenderer != null)
+            foodRenderer.enabled = hasFood;
 
-        if (woodIcon != null)
-            woodIcon.gameObject.SetActive(hasWood);
+        if (woodRenderer != null)
+            woodRenderer.enabled = hasWood;
 
-        if (stoneIcon != null)
-            stoneIcon.gameObject.SetActive(hasStone);
+        if (stoneRenderer != null)
+            stoneRenderer.enabled = hasStone;
     }
 }
