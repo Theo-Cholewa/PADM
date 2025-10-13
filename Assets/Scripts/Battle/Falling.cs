@@ -19,6 +19,8 @@ public class Falling : MonoBehaviour
 
     private float height = 1f;
 
+    private bool canFall = false;
+
     private void Start()
     {
         _physic = GetComponent<Physic>();
@@ -26,22 +28,32 @@ public class Falling : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_physic.velocity.magnitude < 0.2f)
+        if (canFall)
         {
-            height -= 0.01f;
-            if (height < 0f)
+            if (_physic.velocity.magnitude < 0.2f)
             {
-                var created = Instantiate(Fell, transform);
-                created.transform.localScale = new(1.5f, 1.5f, 1.5f);
-                created.transform.parent = null;
-                Destroy(gameObject);
-                return;
+                height -= 0.01f;
+                if (height < 0f)
+                {
+                    var created = Instantiate(Fell, transform);
+                    created.transform.localScale = new(1.5f, 1.5f, 1.5f);
+                    created.transform.parent = null;
+                    Destroy(gameObject);
+                    return;
+                }
+            }
+            else
+            {
+                height += 0.05f;
+                if (height > 1f) height = 1f;
             }
         }
         else
         {
-            height += 0.05f;
-            if (height > 1f) height = 1f;
+            if(_physic.velocity.magnitude > 0.001f)
+            {
+                canFall = true;
+            }
         }
         gameObject.transform.localRotation = Quaternion.Euler(0f, 0f, height*360f);
     }
