@@ -31,7 +31,6 @@ public class GameManagerReparation : MonoBehaviour
 
     void Update()
     {
-        // Handle troueBateau1 logic
         if (Input.GetKeyDown(KeyCode.Q))
         {
             Debug.Log("Touche 'Q' pressée. Tentative de gestion du trou du Bateau 1.");
@@ -102,7 +101,6 @@ public class GameManagerReparation : MonoBehaviour
             }
         }
 
-        // Action de vider l'eau avec la touche A
         if (Input.GetKeyDown(KeyCode.A))
         {
             Debug.Log("Touche 'A' pressée. Tentative de vider l'eau.");
@@ -118,7 +116,6 @@ public class GameManagerReparation : MonoBehaviour
             }
         }
 
-        // Increment timers and show water if the troue is active for 10 seconds
         if (troueBateau1.activeSelf)
         {
             troue1Timer += Time.deltaTime;
