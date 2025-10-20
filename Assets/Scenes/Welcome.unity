@@ -451,9 +451,9 @@ MonoBehaviour:
   hasFood: 0
   hasWood: 0
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &86475136
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -743,9 +743,9 @@ MonoBehaviour:
   hasFood: 1
   hasWood: 0
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &245926007
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -892,6 +892,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 272857609}
   m_CullTransparentMesh: 1
+--- !u!1001 &286307114
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6598886712082313278, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_Name
+      value: SceneManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489525942429145452, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
 --- !u!1 &302276144
 GameObject:
   m_ObjectHideFlags: 0
@@ -1827,9 +1884,9 @@ MonoBehaviour:
   hasFood: 1
   hasWood: 0
   hasStone: 0
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &485573727
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2221,9 +2278,9 @@ MonoBehaviour:
   hasFood: 0
   hasWood: 1
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &578954968
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3106,9 +3163,9 @@ MonoBehaviour:
   hasFood: 0
   hasWood: 1
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &908111333
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3531,9 +3588,9 @@ MonoBehaviour:
   hasFood: 1
   hasWood: 1
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &1113289362
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3928,9 +3985,9 @@ MonoBehaviour:
   hasFood: 1
   hasWood: 1
   hasStone: 1
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &1212353449
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5387,9 +5444,9 @@ MonoBehaviour:
   hasFood: 0
   hasWood: 0
   hasStone: 0
-  foodIcon: {fileID: 0}
-  woodIcon: {fileID: 0}
-  stoneIcon: {fileID: 0}
+  foodRenderer: {fileID: 0}
+  woodRenderer: {fileID: 0}
+  stoneRenderer: {fileID: 0}
 --- !u!135 &1718523061
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7001,3 +7058,4 @@ SceneRoots:
   - {fileID: 1294804890}
   - {fileID: 1867558776}
   - {fileID: 1780346583}
+  - {fileID: 286307114}
