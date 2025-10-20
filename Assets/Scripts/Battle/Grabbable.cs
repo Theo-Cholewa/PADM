@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Représente un objet physique attrapable et draggable
@@ -33,10 +34,11 @@ public class Grabbable : MonoBehaviour
         }
     }
 
-    void OnMouseDrag()
+    void OnTouchDrag(TouchInfo info)
     {
+        Debug.Log("Dragging "+info.fingerId+" "+info.position.ToString());
         // Raycast mouse to z=0 plane
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var ray = Camera.main.ScreenPointToRay(info.position);
         var plane = new Plane(Vector3.forward, transform.position);
         if (plane.Raycast(ray, out float distance))
         {
@@ -46,7 +48,7 @@ public class Grabbable : MonoBehaviour
         }
     }
 
-    void OnMouseUp()
+    void OnTouchDragEnd(TouchInfo info)
     {
         dragging = false;
     }
