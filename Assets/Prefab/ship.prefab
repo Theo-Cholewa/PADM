@@ -205,7 +205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4114564780500374039, guid: c21e8c6134a52ac4c935f51f1228ce52, type: 3}
       propertyPath: m_Name
-      value: canon (1)
+      value: canon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -279,7 +279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3350700823569118852, guid: adab4e11783017846aa9090fa1ed72a3, type: 3}
       propertyPath: m_Name
-      value: barrel (1)
+      value: barrel2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -375,7 +375,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3796933296463578684, guid: b330904b402396c4085336db4dfc01d7, type: 3}
       propertyPath: m_Name
-      value: box (1)
+      value: planks box
       objectReference: {fileID: 0}
     - target: {fileID: 4318447952070990017, guid: b330904b402396c4085336db4dfc01d7, type: 3}
       propertyPath: Created
@@ -453,7 +453,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3796933296463578684, guid: b330904b402396c4085336db4dfc01d7, type: 3}
       propertyPath: m_Name
-      value: box
+      value: ammunition box
       objectReference: {fileID: 0}
     - target: {fileID: 4318447952070990017, guid: b330904b402396c4085336db4dfc01d7, type: 3}
       propertyPath: Created

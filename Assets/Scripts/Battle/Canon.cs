@@ -25,7 +25,7 @@ public class Canon : MonoBehaviour
         baseWidth = background.localScale.x;
     }
 
-    void OnMouseDown()
+    void OnTouchDown(TouchInfo info)
     {
         if (isLoaded)
         {

@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 7011006924760245199}
   - component: {fileID: 7696213598520449637}
   - component: {fileID: 4248131270577915524}
+  - component: {fileID: 7961152388700595881}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -203,3 +204,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FallingResult: {fileID: 4114564780500374039, guid: c21e8c6134a52ac4c935f51f1228ce52, type: 3}
+--- !u!114 &7961152388700595881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5889192926831290897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70e970463e8c83d4ab68cf7bf6e4d957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strength: 0.05
+  speed: 10
