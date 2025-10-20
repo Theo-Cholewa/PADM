@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Blue
   - Red
+  - Chicken
   layers:
   - Default
   - TransparentFX
