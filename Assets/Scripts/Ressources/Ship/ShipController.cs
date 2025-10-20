@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShipController : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class ShipController : MonoBehaviour
     public string anchorKey = "s";
 
     private bool anchorDropped = false;
+
+    [Header("UI")]
+    [Tooltip("Image affichée quand le bateau est à l'arrêt")]
+    public RawImage stopImage;
 
     [Header("Statistiques du bateau")]
     public float acceleration = 2f;
@@ -45,10 +50,14 @@ public class ShipController : MonoBehaviour
                 currentRotationSpeed = 0f;
                 rb.velocity = Vector3.zero;
                 Debug.Log($"{playerName} pose l’ancre ⚓");
+                if (stopImage != null)
+                    stopImage.enabled = true;
             }
             else
             {
                 Debug.Log($"{playerName} relève l’ancre ⚓");
+                if (stopImage != null)
+                    stopImage.enabled = false;
             }
         }
 
@@ -61,6 +70,10 @@ public class ShipController : MonoBehaviour
             currentSpeed -= deceleration * Time.deltaTime;
 
         currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
+
+        // Mise à jour de l'image d'arrêt : visible seulement si la vitesse est nulle
+        if (stopImage != null)
+            stopImage.enabled = (Mathf.Approximately(currentSpeed, 0f) && anchorDropped);
 
         // --- Gestion de la rotation inertielle ---
         if (Input.GetKey(turnLeft))
