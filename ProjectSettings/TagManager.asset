@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Blue
   - Red
+  - Hole
   layers:
   - Default
   - TransparentFX
