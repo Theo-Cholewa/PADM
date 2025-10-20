@@ -11,11 +11,12 @@ public class ChickenNet : MonoBehaviour
     void Update()
     {
         // Déplacement simple du filet (ex : flèches ou ZQSD)
+        /*
         float h = Input.GetAxis("Vertical");
         float v = -Input.GetAxis("Horizontal");
 
         Vector3 move = new Vector3(h, 0, v) * moveSpeed * Time.deltaTime;
-        transform.position += move;
+        transform.position += move;*/
 
         // Vérifie la capture
         CheckCapture();

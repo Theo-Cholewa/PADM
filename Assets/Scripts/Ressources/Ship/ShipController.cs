@@ -18,6 +18,18 @@ public class ShipController : MonoBehaviour
     [Header("UI")]
     [Tooltip("Image affichée quand le bateau est à l'arrêt")]
     public RawImage stopImage;
+    [Tooltip("Image représentant la ressource bois (barre)")]
+    public RawImage woodImage;
+    [Tooltip("Image représentant la ressource nourriture (barre)")]
+    public RawImage foodImage;
+    [Tooltip("Image représentant la ressource pierre (barre)")]
+    public RawImage stoneImage;
+
+    [Header("Taille des barres (px)")]
+    [Tooltip("Largeur minimale (px) d'une image de ressource")]
+    public float resourceMinSize = 1f;
+    [Tooltip("Largeur maximale (px) d'une image de ressource")]
+    public float resourceMaxSize = 100f;
 
     [Header("Statistiques du bateau")]
     public float acceleration = 2f;
@@ -36,6 +48,11 @@ public class ShipController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         data = GetComponent<ShipData>();
+        // ensure UI images are hidden at start
+        if (stopImage != null) stopImage.enabled = false;
+        if (woodImage != null) woodImage.enabled = false;
+        if (foodImage != null) foodImage.enabled = false;
+        if (stoneImage != null) stoneImage.enabled = false;
     }
 
     void Update()
@@ -52,12 +69,20 @@ public class ShipController : MonoBehaviour
                 Debug.Log($"{playerName} pose l’ancre ⚓");
                 if (stopImage != null)
                     stopImage.enabled = true;
+                // show resource images when anchored
+                if (woodImage != null) woodImage.enabled = true;
+                if (foodImage != null) foodImage.enabled = true;
+                if (stoneImage != null) stoneImage.enabled = true;
             }
             else
             {
                 Debug.Log($"{playerName} relève l’ancre ⚓");
                 if (stopImage != null)
                     stopImage.enabled = false;
+                // hide resource images when not anchored
+                if (woodImage != null) woodImage.enabled = false;
+                if (foodImage != null) foodImage.enabled = false;
+                if (stoneImage != null) stoneImage.enabled = false;
             }
         }
 
@@ -74,6 +99,14 @@ public class ShipController : MonoBehaviour
         // Mise à jour de l'image d'arrêt : visible seulement si la vitesse est nulle
         if (stopImage != null)
             stopImage.enabled = (Mathf.Approximately(currentSpeed, 0f) && anchorDropped);
+
+        // si ancré, mettre à jour la taille des barres de ressources
+        if (anchorDropped)
+        {
+            UpdateResourceImageSize(woodImage, data != null ? data.wood : 0);
+            UpdateResourceImageSize(foodImage, data != null ? data.food : 0);
+            UpdateResourceImageSize(stoneImage, data != null ? data.stone : 0);
+        }
 
         // --- Gestion de la rotation inertielle ---
         if (Input.GetKey(turnLeft))
@@ -110,5 +143,17 @@ public class ShipController : MonoBehaviour
             Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
             rb.MoveRotation(rb.rotation * delta);
         }
+    }
+
+    // met à jour la taille en pixels de l'image de ressource en fonction de la quantité
+    void UpdateResourceImageSize(RawImage image, int amount)
+    {
+        if (image == null) return;
+        // mappe directement 1 unité de ressource = 1 pixel, puis clamp
+        float width = Mathf.Clamp((float)amount, resourceMinSize, resourceMaxSize);
+        RectTransform rt = image.rectTransform;
+        Vector2 size = rt.sizeDelta;
+        size.x = width;
+        rt.sizeDelta = size;
     }
 }
