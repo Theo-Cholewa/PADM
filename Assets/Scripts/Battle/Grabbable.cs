@@ -2,47 +2,53 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class Draggable : MonoBehaviour
+/// <summary>
+/// Représente un objet physique attrapable et draggable
+/// </summary>
+[RequireComponent(typeof(Physic))]
+public class Grabbable : MonoBehaviour
 {
     private Vector3 target = Vector2.zero;
-    private Vector3 velocity = Vector3.zero;
     private bool dragging = false;
 
     public Action onTake = null;
 
+    private Physic physic;
+
     // Start is called before the first frame update
     void Start()
     {
+        physic = GetComponent<Physic>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (dragging){
+        if (dragging)
+        {
             var direction = (target - transform.position).normalized;
             direction.z = 0;
-            velocity += direction*.1f;
+            physic.velocity += direction * .1f;
         }
-        transform.position += velocity;
-        velocity *= 0.98f;
-        if (velocity.magnitude < 0.01) velocity = Vector3.zero;
     }
 
-    void OnMouseDrag()
+    void OnTouchDrag(TouchInfo info)
     {
+        Debug.Log("Dragging "+info.fingerId+" "+info.position.ToString());
         // Raycast mouse to z=0 plane
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var ray = Camera.main.ScreenPointToRay(info.position);
         var plane = new Plane(Vector3.forward, transform.position);
         if (plane.Raycast(ray, out float distance))
         {
             target = ray.GetPoint(distance);
-            if(!dragging && onTake!=null) onTake();
+            if (!dragging && onTake != null) onTake();
             dragging = true;
         }
     }
 
-    void OnMouseUp()
+    void OnTouchDragEnd(TouchInfo info)
     {
         dragging = false;
     }

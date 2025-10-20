@@ -1,9 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Microsoft.Unity.VisualStudio.Editor;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class Canon : MonoBehaviour
@@ -25,7 +19,7 @@ public class Canon : MonoBehaviour
         baseWidth = background.localScale.x;
     }
 
-    void OnMouseDown()
+    void OnTouchDown(TouchInfo info)
     {
         if (isLoaded)
         {

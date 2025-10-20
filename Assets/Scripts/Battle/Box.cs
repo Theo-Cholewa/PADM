@@ -7,7 +7,9 @@ public class Box : MonoBehaviour
 
     public GameObject Created;
 
-    private  GameObject content;
+    private GameObject content;
+    
+    private int refillTime =0;
 
     void Start()
     {
@@ -23,10 +25,24 @@ public class Box : MonoBehaviour
         content.transform.localRotation = new();
         content.transform.parent = null;
 
-        content.GetComponent<Draggable>().onTake = () => {
-            content.GetComponent<Draggable>().onTake = null;
-            refill();
+        content.GetComponent<Grabbable>().onTake = () =>
+        {
+            content.GetComponent<Grabbable>().onTake = null;
+            refillTime = 1;
         };
+        refillTime = 0;
+    }
+
+    void FixedUpdate()
+    {
+        if (refillTime > 0)
+        {
+            refillTime++;
+            if (refillTime > 100)
+            {
+                refill();
+            }
+        }
     }
 
     void Update()
