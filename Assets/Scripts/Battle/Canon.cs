@@ -7,7 +7,9 @@ public class Canon : MonoBehaviour
     private Transform background;
     private float baseWidth;
 
-    public string ammunition; 
+    public string ammunition;
+
+    public float power=1f;
 
     private bool isLoaded = false;
 
@@ -30,10 +32,11 @@ public class Canon : MonoBehaviour
 
             var instance = Instantiate(projectile);
             instance.transform.parent = transform;
-            instance.transform.localScale = new(.2f,.2f,.2f);
+            instance.transform.localScale = new(.3f,.3f,.3f);
             instance.transform.localPosition = new(0f, 7f, 0f);
-            instance.transform.localRotation = new();
             instance.transform.parent = null;
+
+            instance.GetComponent<Physic>().velocity = transform.TransformVector(new(0f, 7f, 0f)).normalized * power;
 
             isLoaded = false;
             background.localScale = Vector3.Scale(background.localScale, new Vector3(1f, 1f, 1f/1.2f));

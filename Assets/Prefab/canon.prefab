@@ -152,3 +152,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectile: {fileID: 5251689240139023083, guid: aee5d2f113b5d3142bce3cd2ae7f444a, type: 3}
   ammunition: canon_ball
+  power: 2

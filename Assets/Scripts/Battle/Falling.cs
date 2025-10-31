@@ -15,9 +15,11 @@ public class Falling : MonoBehaviour
     /// </summary>
     public GameObject Fell;
 
+    public float TimeToFall = 100f;
+
     private Physic _physic;
 
-    private float height = 1f;
+    public float height = 1f;
 
     private bool canFall = false;
 
@@ -28,16 +30,18 @@ public class Falling : MonoBehaviour
 
     private void FixedUpdate()
     {
+        
         if (canFall)
         {
             if (_physic.velocity.magnitude < 0.2f)
             {
-                height -= 0.01f;
+                height -= 1f/TimeToFall;
                 if (height < 0f)
                 {
                     var created = Instantiate(Fell, transform);
-                    created.transform.localScale = new(1.5f, 1.5f, 1.5f);
+                    created.transform.localPosition = new(0f, 0f, -.02f);
                     created.transform.parent = null;
+                    created.transform.localScale = new(3f, 3f, 3f);
                     Destroy(gameObject);
                     return;
                 }

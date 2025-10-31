@@ -27,9 +27,12 @@ public class Box : MonoBehaviour
 
         content.GetComponent<Grabbable>().onTake = () =>
         {
+            content.GetComponent<Physic>().hasPhysic = true;
             content.GetComponent<Grabbable>().onTake = null;
             refillTime = 1;
         };
+
+        content.GetComponent<Physic>().hasPhysic = false;
         refillTime = 0;
     }
 
