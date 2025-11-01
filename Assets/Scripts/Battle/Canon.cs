@@ -46,8 +46,10 @@ public class Canon : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        var ammunition = collision.body.gameObject.GetComponent<Ammunition>();
-        if (ammunition!=null && ammunition.Tag.Contains(this.ammunition) && !isLoaded)
+        if (collision.body == null) return;
+        
+        var other = collision.body.gameObject;
+        if (other.TryGetComponent<Tagged>(out var ammunition) && ammunition.Tag.Contains(this.ammunition) && !isLoaded)
         {
             isLoaded = true;
             background.localScale = Vector3.Scale(background.localScale, new Vector3(1f, 1f, 1.2f));

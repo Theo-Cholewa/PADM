@@ -69,7 +69,7 @@ public class Physic : MonoBehaviour
     void OnCollisionStay(Collision collision)
     {
         var solid = collision.gameObject.GetComponent<Solid>();
-        if (solid != null)
+        if (solid != null && solid.DoPush)
         {
             var strength = -Math.Min(0f, collision.GetContact(0).separation);
             var normal = collision.GetContact(0).normal / 10f * strength;

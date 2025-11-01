@@ -16,7 +16,7 @@ public class Pullable : MonoBehaviour
 
     private Physic physic;
 
-    private Vector2 originalOffset;
+    private Vector3 originalOffset;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +36,7 @@ public class Pullable : MonoBehaviour
         {
             var fingers = pullable.GetOrderedGrabHands().ToList();
             originalOffset = fingers[0].position - fingers[1].position;
+            originalOffset.z = 0;
         }
     }
     
@@ -55,6 +56,7 @@ public class Pullable : MonoBehaviour
         if (grabbings.Count >= 2)
         {
             var newOffset = grabbings[0].position - grabbings[1].position;
+            newOffset.z = 0;
             transform.localRotation *= Quaternion.FromToRotation(originalOffset, newOffset);
             originalOffset = newOffset;
         }

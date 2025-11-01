@@ -10,6 +10,8 @@ using UnityEngine;
 public class Solid : MonoBehaviour
 {
 
+    public bool DoPush = true;
+
     // Start is called before the first frame update
     void Start()
     {

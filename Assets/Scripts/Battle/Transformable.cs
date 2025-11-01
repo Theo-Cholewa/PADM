@@ -32,7 +32,7 @@ public class Repairable : MonoBehaviour
     // Update is called once per frame
     void OnCollisionEnter(Collision collision)
     {
-        if(!repaired && (collision.gameObject.GetComponent<Ammunition>()?.Tag.Contains(Reparator)??false))
+        if(!repaired && (collision.gameObject.GetComponent<Tagged>()?.Tag.Contains(Reparator)??false))
         {
             repaired = true;
             Destroy(collision.gameObject);

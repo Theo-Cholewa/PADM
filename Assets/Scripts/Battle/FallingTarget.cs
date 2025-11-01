@@ -39,7 +39,10 @@ public class FallingTarget : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        var physic = collision.gameObject.GetComponent<Physic>();
+        var gameObject = collision.gameObject;
+        if (gameObject == null) return;
+
+        var physic = gameObject.GetComponent<Physic>();
         if (physic == null) return;
 
         if (physic.velocity.magnitude < 0.2f && collider.bounds.Contains(physic.transform.position))
