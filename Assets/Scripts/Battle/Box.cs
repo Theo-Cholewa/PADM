@@ -20,15 +20,15 @@ public class Box : MonoBehaviour
     {
         content = Instantiate(Created);
         content.transform.parent = gameObject.transform;
-        content.transform.localPosition = new(0, 0, 0);
+        content.transform.localPosition = new(0, 0, -0.01f);
         content.transform.localScale = new(.8f, .8f, .8f);
         content.transform.localRotation = new();
         content.transform.parent = null;
 
-        content.GetComponent<Grabbable>().onTake = () =>
+        content.GetComponent<Grabbable2>().onTake = () =>
         {
             content.GetComponent<Physic>().hasPhysic = true;
-            content.GetComponent<Grabbable>().onTake = null;
+            content.GetComponent<Grabbable2>().onTake = null;
             refillTime = 1;
         };
 

@@ -26,11 +26,8 @@ public class MultiTouchHandler : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(position);
         RaycastHit hit;
 
-        Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
-
         if (Physics.Raycast(ray, out hit))
         {
-            Debug.Log(hit.transform.name);
             if (hit.collider != null)
             {
                 return hit.transform.gameObject;
@@ -83,31 +80,40 @@ public class MultiTouchHandler : MonoBehaviour
     }
 
     private bool isPressed = true;
-    private Vector2 lastTouchPosition = new(0f,0f);
+    private Vector2 lastTouchPosition = new(0f, 0f);
+
+    void Start()
+    {
+        Input.simulateMouseWithTouches = false;
+    }
 
     void Update()
     {
         // On mouse click
-        if (!Input.mousePosition.Equals(lastTouchPosition))
+        if (Input.touchCount == 0)
         {
-            lastTouchPosition = Input.mousePosition;
-            TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-        }
-
-        if (isPressed)
-        {
-            if (Input.GetMouseButtonUp(0))
+            if (!Input.mousePosition.Equals(lastTouchPosition))
             {
-                TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-                isPressed = false;
+                lastTouchPosition = Input.mousePosition;
+                TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
             }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0))
+
+            if (isPressed)
             {
-                TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-                isPressed = true;
+                if (Input.GetMouseButtonUp(0))
+                {
+                    TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
+                    isPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Debug.Log("Mouse button pressed");
+                    TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
+                    isPressed = true;
+                }
             }
         }
 

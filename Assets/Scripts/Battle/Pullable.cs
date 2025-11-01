@@ -8,97 +8,55 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Représente un objet physique attrapable et draggable
 /// </summary>
-[RequireComponent(typeof(Solid))]
-public class Pullable : MonoBehaviour
+[RequireComponent(typeof(Physic), typeof(Grabbable))]
+public class Grabbable2 : MonoBehaviour
 {
 
-    public class Pulling
+    public Action onTake = null;
+
+    private Physic physic;
+
+    private Vector2 originalOffset;
+
+    // Start is called before the first frame update
+    void Start()
     {
-        public int fingerId;
-        public Vector3 position;
-        public GameObject draggerObject;
+        physic = GetComponent<Physic>();
     }
 
-    public Dictionary<int, Pulling> pullings = new Dictionary<int, Pulling>();
-
-    public List<int> fingers = new List<int>();
-
-    public GameObject DraggerPrefab = null;
-
-    public IEnumerable<Pulling> GetPullings()
+    void OnPullingStart(Grabbable pullable)
     {
-        return fingers.Select(fingerId => pullings[fingerId]);
-    }
-
-    void FixedUpdate()
-    {
-        if(fingers.Count > 0)
+        // On take callback
+        if (pullable.fingers.Count == 1)
         {
-            SendMessage("OnPullingUpdate", this, SendMessageOptions.DontRequireReceiver);
+            onTake?.Invoke();
+        }
+        // Handle rotation
+        if (pullable.fingers.Count >= 2)
+        {
+            var fingers = pullable.GetPullings().ToList();
+            originalOffset = fingers[0].position - fingers[1].position;
         }
     }
-
-    void UpdateShape(Pulling pulling)
+    
+    void OnPullingUpdate(Grabbable pullable)
     {
-        var from = pulling.position;
-        var to = transform.position;
-        var center = (from + to) / 2;
-        pulling.draggerObject.transform.parent = null;
-        pulling.draggerObject.transform.localPosition = center;
-        pulling.draggerObject.transform.localScale = new Vector3((from - to).magnitude, 5f, 1f);
-        pulling.draggerObject.transform.localRotation = Quaternion.FromToRotation(Vector3.left, (to - from).normalized);
-        pulling.draggerObject.transform.parent = transform;
-    }
+        var grabbings = pullable.GetPullings().ToList();
 
-    void UpdateTarget(Pulling pulling, TouchInfo info)
-    {
-        var ray = Camera.main.ScreenPointToRay(info.position);
-        var plane = new Plane(Vector3.forward, transform.position);
-        if (plane.Raycast(ray, out float distance))
+        // Handle translation
+        foreach (var target in grabbings)
         {
-            pulling.position = ray.GetPoint(distance);
+            var direction = (target.position - transform.position).normalized/physic.weight;
+            direction.z = 0;
+            physic.velocity += direction * .1f;
         }
-    }
-
-    void OnTouchDown(TouchInfo info)
-    {
-        var pulling = new Pulling
+        
+        // Handle rotation
+        if (grabbings.Count >= 2)
         {
-            fingerId = info.fingerId,
-            position = info.position,
-            draggerObject = DraggerPrefab ? Instantiate(DraggerPrefab) : null
-        };
-        UpdateTarget(pulling, info);
-        if (pulling.draggerObject != null) UpdateShape(pulling);
-
-        pullings[info.fingerId] = pulling;
-        fingers.Add(info.fingerId);
-
-        SendMessage("OnPullingStart", this, SendMessageOptions.DontRequireReceiver);
-    }
-
-    void OnTouchDrag(TouchInfo info)
-    {
-        var pulling = pullings[info.fingerId];
-        if (pulling != null)
-        {
-            // Visual
-            if (pulling.draggerObject != null) UpdateShape(pulling);
-
-            // Update pulling position
-            UpdateTarget(pulling, info);
-        }
-    }
-
-    void OnTouchDragEnd(TouchInfo info)
-    {
-        var pulling = pullings[info.fingerId];
-        if (pulling != null)
-        {
-            pullings.Remove(info.fingerId);
-            fingers.Remove(info.fingerId);
-            if (pulling.draggerObject != null) Destroy(pulling.draggerObject);
-            SendMessage("OnPullingEnd", this, SendMessageOptions.DontRequireReceiver);
+            var newOffset = grabbings[0].position - grabbings[1].position;
+            transform.localRotation *= Quaternion.FromToRotation(originalOffset, newOffset);
+            originalOffset = newOffset;
         }
     }
 }
