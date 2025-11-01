@@ -46,12 +46,7 @@ public class Canon : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("collide");
         var ammunition = collision.body.gameObject.GetComponent<Ammunition>();
-        Debug.Log("List");
-        Debug.Log(ammunition.Tag);
-        Debug.Log(this.ammunition);
-        Debug.Log(ammunition.Tag.Contains(this.ammunition));
         if (ammunition.Tag.Contains(this.ammunition) && !isLoaded)
         {
             isLoaded = true;

@@ -121,6 +121,7 @@ GameObject:
   - component: {fileID: 8232251884477642549}
   - component: {fileID: 6045800992825394171}
   - component: {fileID: 1449685840319734270}
+  - component: {fileID: 7746280943440111276}
   m_Layer: 0
   m_Name: planks
   m_TagString: Untagged
@@ -230,9 +231,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8d1efb9c8653314abacd76ea7e3329c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpeedEffect: {fileID: 0}
+  SpeedEffect: {fileID: 5819451732284088864, guid: e1108207147c53d449e1af069d8f68fe, type: 3}
   friction: 0.95
+  weight: 1
   velocity: {x: 0, y: 0, z: 0}
+  hasPhysic: 1
 --- !u!114 &1449685840319734270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,3 +248,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fefd6c855217bf345a78cd3c0b7c95f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7746280943440111276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9009766999372571680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf1eab26b5b91b45a73169f68e236e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fingers: 
+  DraggerPrefab: {fileID: 3350700823569118852, guid: 71c93668dc7779d4c9ca850a3bafe2e5, type: 3}

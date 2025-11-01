@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1132236688618694407}
   - component: {fileID: 9063234568432129884}
   - component: {fileID: -8186900164907888093}
+  - component: {fileID: 4145037344280199617}
   m_Layer: 0
   m_Name: barrel
   m_TagString: Untagged
@@ -223,6 +224,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4145037344280199617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3350700823569118852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf1eab26b5b91b45a73169f68e236e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fingers: 
+  DraggerPrefab: {fileID: 3350700823569118852, guid: 71c93668dc7779d4c9ca850a3bafe2e5, type: 3}
 --- !u!1 &5408502997496911930
 GameObject:
   m_ObjectHideFlags: 0

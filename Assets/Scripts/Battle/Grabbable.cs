@@ -7,11 +7,9 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Représente un objet physique attrapable et draggable
 /// </summary>
-[RequireComponent(typeof(Physic))]
+[RequireComponent(typeof(Physic), typeof(Pullable))]
 public class Grabbable : MonoBehaviour
 {
-    private Vector3 target = Vector2.zero;
-    private bool dragging = false;
 
     public Action onTake = null;
 
@@ -23,33 +21,21 @@ public class Grabbable : MonoBehaviour
         physic = GetComponent<Physic>();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    void OnPullingStart(Pullable pullable)
     {
-        if (dragging)
+        if (pullable.fingers.Count == 1)
         {
-            var direction = (target - transform.position).normalized;
+            onTake?.Invoke();
+        }
+    }
+    
+    void OnPullingUpdate(Pullable pullable)
+    {
+        foreach(var target in pullable.GetPullings())
+        {
+            var direction = (target.position - transform.position).normalized;
             direction.z = 0;
             physic.velocity += direction * .1f;
         }
-    }
-
-    void OnTouchDrag(TouchInfo info)
-    {
-        Debug.Log("Dragging "+info.fingerId+" "+info.position.ToString());
-        // Raycast mouse to z=0 plane
-        var ray = Camera.main.ScreenPointToRay(info.position);
-        var plane = new Plane(Vector3.forward, transform.position);
-        if (plane.Raycast(ray, out float distance))
-        {
-            target = ray.GetPoint(distance);
-            if (!dragging && onTake != null) onTake();
-            dragging = true;
-        }
-    }
-
-    void OnTouchDragEnd(TouchInfo info)
-    {
-        dragging = false;
     }
 }

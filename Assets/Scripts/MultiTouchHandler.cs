@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -132,7 +133,11 @@ public class MultiTouchHandler : MonoBehaviour
         // On drag
         foreach (var kvp in dict)
         {
-            kvp.Value.obj.SendMessage("OnTouchDrag", kvp.Value.info, SendMessageOptions.DontRequireReceiver);
+            if (kvp.Value.obj.IsDestroyed())
+            {
+                dict.Remove(kvp.Key);
+            }
+            else kvp.Value.obj.SendMessage("OnTouchDrag", kvp.Value.info, SendMessageOptions.DontRequireReceiver);
         }
     }
 }

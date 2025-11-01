@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5756435698747975337}
   - component: {fileID: 6447204548804422505}
   - component: {fileID: 204797249407539437}
+  - component: {fileID: 1424568235210490539}
   m_Layer: 0
   m_Name: ammunition
   m_TagString: Untagged
@@ -127,7 +128,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedEffect: {fileID: 5819451732284088864, guid: e1108207147c53d449e1af069d8f68fe, type: 3}
   friction: 0.98
+  weight: 1
   velocity: {x: 0, y: 0, z: 0}
+  hasPhysic: 1
 --- !u!114 &6447204548804422505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +156,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Fell: {fileID: 6488506888766268491, guid: e6e666a658de7f446ac394008d3b6752, type: 3}
+  TimeToFall: 100
+  height: 1
+--- !u!114 &1424568235210490539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2925315911217716507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf1eab26b5b91b45a73169f68e236e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fingers: 
+  DraggerPrefab: {fileID: 3350700823569118852, guid: 71c93668dc7779d4c9ca850a3bafe2e5, type: 3}
 --- !u!1 &7946250827071179216
 GameObject:
   m_ObjectHideFlags: 0
