@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 /// Représente un objet physique attrapable et draggable
 /// </summary>
 [RequireComponent(typeof(Physic), typeof(Grabbable))]
-public class Grabbable2 : MonoBehaviour
+public class Pullable : MonoBehaviour
 {
 
     public Action onTake = null;
@@ -24,24 +24,24 @@ public class Grabbable2 : MonoBehaviour
         physic = GetComponent<Physic>();
     }
 
-    void OnPullingStart(Grabbable pullable)
+    void OnGrabStart(Grabbable pullable)
     {
         // On take callback
-        if (pullable.fingers.Count == 1)
+        if (pullable.grabHandList.Count == 1)
         {
             onTake?.Invoke();
         }
         // Handle rotation
-        if (pullable.fingers.Count >= 2)
+        if (pullable.grabHandList.Count == 2)
         {
-            var fingers = pullable.GetPullings().ToList();
+            var fingers = pullable.GetOrderedGrabHands().ToList();
             originalOffset = fingers[0].position - fingers[1].position;
         }
     }
     
-    void OnPullingUpdate(Grabbable pullable)
+    void OnGrabUpdate(Grabbable pullable)
     {
-        var grabbings = pullable.GetPullings().ToList();
+        var grabbings = pullable.GetOrderedGrabHands().ToList();
 
         // Handle translation
         foreach (var target in grabbings)

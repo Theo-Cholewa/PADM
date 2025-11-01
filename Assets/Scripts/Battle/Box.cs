@@ -25,10 +25,10 @@ public class Box : MonoBehaviour
         content.transform.localRotation = new();
         content.transform.parent = null;
 
-        content.GetComponent<Grabbable2>().onTake = () =>
+        content.GetComponent<Pullable>().onTake = () =>
         {
             content.GetComponent<Physic>().hasPhysic = true;
-            content.GetComponent<Grabbable2>().onTake = null;
+            content.GetComponent<Pullable>().onTake = null;
             refillTime = 1;
         };
 
