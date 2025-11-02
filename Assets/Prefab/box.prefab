@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8963599187143692350}
   - component: {fileID: 5428483522322505708}
   - component: {fileID: 5000823997027039644}
-  - component: {fileID: 7094292721871190393}
   m_Layer: 0
   m_Name: background
   m_TagString: Untagged
@@ -62,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3ef11393413786545ad30cf5a2653bea, type: 2}
+  - {fileID: 2100000, guid: 574c877206c8d8b40996d1e53a045474, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,28 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7094292721871190393
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2480213623433177310}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &3796933296463578684
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,4 +128,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffea8c2d287cd7341a97bf3dc217cbb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  to_create: {fileID: 0}
+  Created: {fileID: 0}

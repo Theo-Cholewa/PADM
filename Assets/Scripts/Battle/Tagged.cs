@@ -1,18 +1,13 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Tagged : MonoBehaviour
 {
-    public List<Tag> Tags;
+    public List<string> Tag;
 
-    public static bool Is(GameObject obj, Tag tag)
+    public static bool Is(GameObject obj, string tag)
     {
-        var tagged = obj.GetComponent<Tagged>();
-        return tagged != null && tagged.Tags.Contains(tag);
-    }
-
-    public enum Tag
-    {
-        
+        return obj.TryGetComponent<Tagged>(out var tagged) && tagged.Tag.Contains(tag);
     }
 }

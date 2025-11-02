@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5756435698747975337}
   - component: {fileID: 6447204548804422505}
   - component: {fileID: 204797249407539437}
+  - component: {fileID: 1424568235210490539}
   m_Layer: 0
   m_Name: ammunition
   m_TagString: Untagged
@@ -113,6 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57a260bd289868b41b0d9abd7cd20886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DoPush: 1
 --- !u!114 &5756435698747975337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +129,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedEffect: {fileID: 5819451732284088864, guid: e1108207147c53d449e1af069d8f68fe, type: 3}
   friction: 0.98
+  weight: 1
   velocity: {x: 0, y: 0, z: 0}
+  hasPhysic: 1
 --- !u!114 &6447204548804422505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +157,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Fell: {fileID: 6488506888766268491, guid: e6e666a658de7f446ac394008d3b6752, type: 3}
+  TimeToFall: 100
+  height: 1
+--- !u!114 &1424568235210490539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2925315911217716507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf1eab26b5b91b45a73169f68e236e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grabHandList: 
+  DraggerPrefab: {fileID: 3350700823569118852, guid: 71c93668dc7779d4c9ca850a3bafe2e5, type: 3}
 --- !u!1 &7946250827071179216
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +184,6 @@ GameObject:
   - component: {fileID: 5939189677811188010}
   - component: {fileID: 3390348703193684438}
   - component: {fileID: 8476659514581821541}
-  - component: {fileID: 1788139992284826492}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -237,25 +256,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1788139992284826492
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7946250827071179216}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}

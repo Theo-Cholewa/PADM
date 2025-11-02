@@ -25,7 +25,7 @@ public class FallingTarget : MonoBehaviour
         }
     }
 
-    struct State
+    public class State: Component
     {
         public int time;
     }
@@ -39,13 +39,23 @@ public class FallingTarget : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        var physic = collision.gameObject.GetComponent<Physic>();
+        var gameObject = collision.gameObject;
+        if (gameObject == null) return;
+
+        var physic = gameObject.GetComponent<Physic>();
         if (physic == null) return;
 
         if (physic.velocity.magnitude < 0.2f && collider.bounds.Contains(physic.transform.position))
         {
             var sub = physic.GetOrAddComponent<Effect>();
-            sub.time+=2;
+            sub.time += 2;
+
+            var falling = physic.GetComponent<Falling>();
+            if (falling != null)
+            {
+                falling.height = 1f;
+            }
+
             if (sub.time > 60)
             {
                 var result = Instantiate(FallingResult, physic.transform);
@@ -57,4 +67,5 @@ public class FallingTarget : MonoBehaviour
         }
 
     }
+
 }

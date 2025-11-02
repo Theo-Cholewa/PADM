@@ -1,15 +1,20 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 
-public struct TouchInfo
+public class TouchInfo
 {
     public Vector2 position;
     public int fingerId;
+}
+
+public class GlobalTouchInfo
+{
+    public TouchInfo info;
+    public bool doCancel = false;
 }
 
 /// <summary>
@@ -20,16 +25,14 @@ public struct TouchInfo
 /// </summary>
 public class MultiTouchHandler : MonoBehaviour
 {
+
     GameObject GetTarget(Vector2 position)
     {
         Ray ray = Camera.main.ScreenPointToRay(position);
         RaycastHit hit;
 
-        Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
-
         if (Physics.Raycast(ray, out hit))
         {
-            Debug.Log(hit.transform.name);
             if (hit.collider != null)
             {
                 return hit.transform.gameObject;
@@ -46,34 +49,60 @@ public class MultiTouchHandler : MonoBehaviour
 
     private Dictionary<int, TouchState> dict = new();
 
+    private Dictionary<int, TouchInfo> touched = new();
+
+
+    bool SendGlobal(string message, TouchInfo info)
+    {
+        var state = new GlobalTouchInfo { info = info };
+        foreach(var o in gameObject.scene.GetRootGameObjects())
+        {
+            o.BroadcastMessage(message, state, SendMessageOptions.DontRequireReceiver);
+        }
+        return !state.doCancel;
+    }
+
 
     void TouchBegan(TouchInfo info)
     {
-        var target = GetTarget(info.position);
-        if (target != null)
+        touched[info.fingerId] = info;
+        if (SendGlobal("OnGlobalTouchDown", info))
         {
-            target.SendMessage("OnTouchDown", info, SendMessageOptions.DontRequireReceiver);
-            dict[info.fingerId] = new TouchState { obj = target, info = info };
+            var target = GetTarget(info.position);
+            if (target != null)
+            {
+                target.SendMessage("OnTouchDown", info, SendMessageOptions.DontRequireReceiver);
+                dict[info.fingerId] = new TouchState { obj = target, info = info };
+            }
         }
     }
 
     void TouchEnded(TouchInfo info)
     {
-        var target = GetTarget(info.position);
-        if (target != null)
+        touched.Remove(info.fingerId);
+        if (SendGlobal("OnGlobalTouchUp", info))
         {
-            target.SendMessage("OnTouchUp", info, SendMessageOptions.DontRequireReceiver);
+            var target = GetTarget(info.position);
+            if (target != null)
+            {
+                target.SendMessage("OnTouchUp", info, SendMessageOptions.DontRequireReceiver);
+            }
+            var previous = dict.GetValueOrDefault(info.fingerId);
+            if (previous != null && previous.obj != null)
+            {
+                previous.obj.SendMessage("OnTouchDragEnd", previous.info, SendMessageOptions.DontRequireReceiver);
+            }
+            dict.Remove(info.fingerId);
         }
-        var previous = dict.GetValueOrDefault(info.fingerId);
-        if (previous != null && previous.obj != null)
-        {
-            previous.obj.SendMessage("OnTouchDragEnd", previous.info, SendMessageOptions.DontRequireReceiver);
-        }
-        dict.Remove(info.fingerId);
     }
 
     void TouchMoved(TouchInfo info)
     {
+        if (touched.TryGetValue(info.fingerId, out var touchedpt))
+        {
+            touchedpt.position = info.position;
+        }
+        
         TouchState state = new();
         if (dict.TryGetValue(info.fingerId, out state))
         {
@@ -82,31 +111,39 @@ public class MultiTouchHandler : MonoBehaviour
     }
 
     private bool isPressed = true;
-    private Vector2 lastTouchPosition = new(0f,0f);
+    private Vector2 lastTouchPosition = new(0f, 0f);
+
+    void Start()
+    {
+        Input.simulateMouseWithTouches = false;
+    }
 
     void Update()
     {
         // On mouse click
-        if (!Input.mousePosition.Equals(lastTouchPosition))
+        if (Input.touchCount == 0)
         {
-            lastTouchPosition = Input.mousePosition;
-            TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-        }
-
-        if (isPressed)
-        {
-            if (Input.GetMouseButtonUp(0))
+            if (!Input.mousePosition.Equals(lastTouchPosition))
             {
-                TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-                isPressed = false;
+                lastTouchPosition = Input.mousePosition;
+                TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
             }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0))
+
+            if (isPressed)
             {
-                TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
-                isPressed = true;
+                if (Input.GetMouseButtonUp(0))
+                {
+                    TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
+                    isPressed = false;
+                }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
+                    isPressed = true;
+                }
             }
         }
 
@@ -132,7 +169,11 @@ public class MultiTouchHandler : MonoBehaviour
         // On drag
         foreach (var kvp in dict)
         {
-            kvp.Value.obj.SendMessage("OnTouchDrag", kvp.Value.info, SendMessageOptions.DontRequireReceiver);
+            if (kvp.Value.obj.IsDestroyed())
+            {
+                dict.Remove(kvp.Key);
+            }
+            else kvp.Value.obj.SendMessage("OnTouchDrag", kvp.Value.info, SendMessageOptions.DontRequireReceiver);
         }
     }
 }

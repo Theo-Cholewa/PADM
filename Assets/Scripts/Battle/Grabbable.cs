@@ -1,55 +1,119 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Timeline;
 
 /// <summary>
 /// Représente un objet physique attrapable et draggable
 /// </summary>
-[RequireComponent(typeof(Physic))]
+[RequireComponent(typeof(Solid))]
 public class Grabbable : MonoBehaviour
 {
-    private Vector3 target = Vector2.zero;
-    private bool dragging = false;
 
-    public Action onTake = null;
-
-    private Physic physic;
-
-    // Start is called before the first frame update
-    void Start()
+    public class GrabHand
     {
-        physic = GetComponent<Physic>();
+        public int fingerId;
+        public Vector3 position;
+        public GameObject draggerObject;
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Dictionnaire des mains qui attrapent l'objet.
+    /// Associe l'ID de chaque doigt à sa main correspondante.
+    /// </summary>
+    [HideInInspector]
+    public Dictionary<int, GrabHand> grabHands = new Dictionary<int, GrabHand>();
+
+    /// <summary>
+    /// Liste des ID des doigts qui attrapent l'objet, dans l'ordre dans lequel ils ont été ajoutés.
+    /// </summary>
+    [HideInInspector]
+    public List<int> grabHandList = new List<int>();
+
+    public GameObject DraggerPrefab = null;
+
+    /// <summary>
+    /// Retourne les mains qui attrapent l'objet, dans l'ordre dans lequel elles ont été ajoutées.
+    /// </summary>
+    /// <returns>Les mains qui attrapent l'objet.</returns>
+    public IEnumerable<GrabHand> GetOrderedGrabHands()
+    {
+        return grabHandList.Select(fingerId => grabHands[fingerId]);
+    }
+
     void FixedUpdate()
     {
-        if (dragging)
+        if(grabHandList.Count > 0)
         {
-            var direction = (target - transform.position).normalized;
-            direction.z = 0;
-            physic.velocity += direction * .1f;
+            SendMessage("OnGrabUpdate", this, SendMessageOptions.DontRequireReceiver);
         }
     }
 
-    void OnTouchDrag(TouchInfo info)
+    void UpdateShape(GrabHand pulling)
     {
-        Debug.Log("Dragging "+info.fingerId+" "+info.position.ToString());
-        // Raycast mouse to z=0 plane
+        var from = pulling.position;
+        var to = transform.position;
+        var center = (from + to) / 2;
+        pulling.draggerObject.transform.parent = null;
+        pulling.draggerObject.transform.localPosition = center;
+        pulling.draggerObject.transform.localScale = new Vector3((from - to).magnitude, 5f, 1f);
+        pulling.draggerObject.transform.localRotation = Quaternion.FromToRotation(Vector3.left, (to - from).normalized);
+        pulling.draggerObject.transform.parent = transform;
+    }
+
+    void UpdateTarget(GrabHand pulling, TouchInfo info)
+    {
         var ray = Camera.main.ScreenPointToRay(info.position);
         var plane = new Plane(Vector3.forward, transform.position);
         if (plane.Raycast(ray, out float distance))
         {
-            target = ray.GetPoint(distance);
-            if (!dragging && onTake != null) onTake();
-            dragging = true;
+            pulling.position = ray.GetPoint(distance);
+        }
+    }
+
+    void OnTouchDown(TouchInfo info)
+    {
+        var pulling = new GrabHand
+        {
+            fingerId = info.fingerId,
+            position = info.position,
+            draggerObject = DraggerPrefab ? Instantiate(DraggerPrefab) : null
+        };
+        UpdateTarget(pulling, info);
+        if (pulling.draggerObject != null) UpdateShape(pulling);
+
+        grabHands[info.fingerId] = pulling;
+        grabHandList.Add(info.fingerId);
+
+        SendMessage("OnGrabStart", this, SendMessageOptions.DontRequireReceiver);
+    }
+
+    void OnTouchDrag(TouchInfo info)
+    {
+        var pulling = grabHands[info.fingerId];
+        if (pulling != null)
+        {
+            // Visual
+            if (pulling.draggerObject != null) UpdateShape(pulling);
+
+            // Update pulling position
+            UpdateTarget(pulling, info);
         }
     }
 
     void OnTouchDragEnd(TouchInfo info)
     {
-        dragging = false;
+        var pulling = grabHands[info.fingerId];
+        if (pulling != null)
+        {
+            grabHands.Remove(info.fingerId);
+            grabHandList.Remove(info.fingerId);
+            if (pulling.draggerObject != null) Destroy(pulling.draggerObject);
+            SendMessage("OnGrabEnd", this, SendMessageOptions.DontRequireReceiver);
+        }
     }
 }

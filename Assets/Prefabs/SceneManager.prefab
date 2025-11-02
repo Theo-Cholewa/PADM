@@ -44,3 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7121bac7598eb204ebc66188f43cab0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scenes:
+  - RessourceTime
+  - Guerre
+  - 1v1

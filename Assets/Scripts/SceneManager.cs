@@ -1,12 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 public class SceneManager : MonoBehaviour
 {
+
+    private static List<KeyCode> keyCodes = new List<KeyCode>{
+        KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3,
+        KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7,
+        KeyCode.Alpha8, KeyCode.Alpha9,
+    };
+
+    public List<string> scenes = new List<string>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,22 +41,15 @@ public class SceneManager : MonoBehaviour
         // Raccourcis pour changer de scène : 0 -> Welcome, 1 -> RessourceTime, 2 -> Guerre
         var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.anyKeyDown)
         {
-            if (activeScene != "Welcome")
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Welcome");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if (activeScene != "RessourceTime")
-                UnityEngine.SceneManagement.SceneManager.LoadScene("RessourceTime");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            if (activeScene != "Guerre")
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Guerre");
+            for (int i = 0; i < scenes.Count; i++)
+            {
+                if (Input.GetKeyDown(keyCodes[i]))
+                {
+                    if(activeScene != scenes[i]) UnityEngine.SceneManagement.SceneManager.LoadScene(scenes[i]);
+                }
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
