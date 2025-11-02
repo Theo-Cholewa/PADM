@@ -1,8 +1,11 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Canon : MonoBehaviour
 {
     public GameObject projectile;
+
+    public AudioClip ShotSound;
 
     private Transform background;
     private float baseWidth;
@@ -20,26 +23,28 @@ public class Canon : MonoBehaviour
         baseWidth = background.localScale.x;
     }
 
-    void OnTouchDown(TouchInfo info)
+    public void TryToShoot()
     {
         if (isLoaded)
         {
-            var ptransform = transform;
-
-            var spawn = ptransform.position + ptransform.up * 5 * ptransform.lossyScale.y;
-
             var instance = Instantiate(projectile);
             instance.transform.parent = transform;
-            instance.transform.localScale = new(.3f,.3f,.3f);
+            instance.transform.localScale = new(.3f, .3f, .3f);
             instance.transform.localPosition = new(0f, 7f, 0f);
             instance.transform.parent = null;
 
             instance.GetComponent<Physic>().velocity = transform.TransformVector(new(0f, 7f, 0f)).normalized * power;
 
             isLoaded = false;
-            background.localScale = Vector3.Scale(background.localScale, new Vector3(1f, 1f, 1f/1.2f));
-        }
+            background.localScale = Vector3.Scale(background.localScale, new Vector3(1f, 1f, 1f / 1.2f));
 
+            GetComponent<AudioSource>().PlayOneShot(ShotSound);
+        }
+    }
+
+    void OnActivate(float strength)
+    {
+        TryToShoot();
     }
 
     void OnCollisionEnter(Collision collision)
