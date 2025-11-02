@@ -11,7 +11,7 @@ public class BucketPlane : MonoBehaviour
     private bool waterVisible = false;
     private bool rotating = false;
     private Quaternion targetRotation;
-    private bool rotated = false;
+    public bool rotated { get; private set; } // CHANGEMENT : Rendu public pour l'accès externe
 
     private Quaternion initialRotation;
     private Renderer puddleRenderer;
@@ -33,6 +33,7 @@ public class BucketPlane : MonoBehaviour
 
         bool puddleVisible = puddleRenderer != null && puddleRenderer.isVisible;
 
+        // --- Logique d'activation de l'eau (collecte) lorsque le seau est proche du puddle/hole ---
         if (!waterVisible && puddleVisible)
         {
             float distance = Vector3.Distance(transform.position, hole.position);
@@ -40,6 +41,9 @@ public class BucketPlane : MonoBehaviour
             {
                 water.SetActive(true);
                 waterVisible = true;
+                
+                Debug.Log("💧 Water collected");
+
                 if (puddle != null)
                 {
                     puddle.SetActive(false);
@@ -52,21 +56,23 @@ public class BucketPlane : MonoBehaviour
             }
         }
 
+        // --- Contrôle manuel de la rotation (via 'Q' pour les tests) ---
         if (Input.GetKeyDown(KeyCode.Q) && !rotating)
         {
             if (!rotated)
             {
-                targetRotation = Quaternion.Euler(179.286f, -89.99799f, -270.064f);
+                InitiateRotation();
             }
             else
             {
+                // Retour à la position initiale
                 targetRotation = initialRotation;
+                rotating = true;
+                rotated = false;
             }
-
-            rotating = true;
-            rotated = !rotated;
         }
 
+        // --- Rotation progressive ---
         if (rotating)
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -78,12 +84,16 @@ public class BucketPlane : MonoBehaviour
             }
         }
 
+        // --- Vidage du seau après rotation ---
         if (rotated && waterVisible && water != null)
         {
             water.SetActive(false);
             waterVisible = false;
+            Debug.Log("💦 Water emptied (manual or touch rotation)");
         }
-
+        
+        // La logique de collecte est répétée ici, je l'ai commentée car elle est déjà au début de l'Update
+        
         if (!waterVisible && puddleVisible)
         {
             float distance = Vector3.Distance(transform.position, hole.position);
@@ -92,6 +102,7 @@ public class BucketPlane : MonoBehaviour
                 water.SetActive(true);
                 waterVisible = true;
                 Debug.Log("💧 Water collected");
+                Debug.Log($"[DÉBOGAGE HIERARCHIE] Parent (BucketPlane) est actif: {gameObject.activeInHierarchy}. L'objet Water est actif: {water.activeSelf}");
 
                 // faire disparaître la flaque
                 if (puddle != null) puddle.SetActive(false);
@@ -99,6 +110,20 @@ public class BucketPlane : MonoBehaviour
                 // faire réapparaître le hole
                 if (hole != null) hole.gameObject.SetActive(true);
             }
+        }
+        
+    }
+
+    // NOUVEAU : Méthode appelée par SmoothDrag pour initier la rotation de vidage
+    public void InitiateRotation()
+    {
+        if (!rotating && !rotated)
+        {
+            // La rotation que vous avez définie
+            targetRotation = Quaternion.Euler(179.286f, -89.99799f, -270.064f);
+            rotating = true;
+            rotated = true;
+            Debug.Log("Rotation de vidage initiée par le drag tactile ou la touche 'Q'.");
         }
     }
 }

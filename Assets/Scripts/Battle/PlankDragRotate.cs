@@ -7,13 +7,18 @@ public class PlankDragRotate : MonoBehaviour
     private bool isDragging = false;
     private float zCoord;
 
-    private int[] activeTouchIds = new int[4] { -1, -1, -1, -1 };
-    private const int REQUIRED_TOUCHES = 1;
+    // CHANGEMENT MAJEUR 1: 2 touches requises
+    private int[] activeTouchIds = new int[2] { -1, -1 };
+    private const int REQUIRED_TOUCHES = 2; // CHANGEMENT MAJEUR 2: 2 touches
 
-    private Vector2[] lastPositions = new Vector2[4];
+    // NOUVEAU: Stocke les positions écran initiales des deux doigts
+    private Vector2[] initialPositions = new Vector2[2];
+
+    // NOUVEAU: Position du centre des doigts de la frame précédente pour le mouvement
+    private Vector2 lastCenterPosition;
 
     // --- VARIABLES D'EFFET VISUEL ---
-    public Material highlightMaterial; // À assigner dans l'Inspecteur
+    public Material highlightMaterial;
     private Renderer objectRenderer;
     private Material defaultMaterial;
 
@@ -29,7 +34,7 @@ public class PlankDragRotate : MonoBehaviour
             defaultMaterial = objectRenderer.material;
         }
 
-        Debug.Log("PlankDragRotate script démarré. Attente de 4 touches sur la planche.");
+        Debug.Log($"PlankDragRotate script démarré. Attente de {REQUIRED_TOUCHES} touche(s) pour le Drag.");
     }
 
     private void SetHighlight(bool highlight)
@@ -58,11 +63,6 @@ public class PlankDragRotate : MonoBehaviour
     {
         int touchCount = Input.touchCount;
 
-        if (touchCount > 0 && !isDragging)
-        {
-            //Debug.Log($"[UPDATE] Total de touches à l'écran : {touchCount}");
-        }
-
         if (!isDragging && touchCount >= REQUIRED_TOUCHES)
         {
             TryStartDrag(touchCount);
@@ -70,16 +70,14 @@ public class PlankDragRotate : MonoBehaviour
 
         if (isDragging)
         {
-            ApplyMovementAndRotation(touchCount);
+            ApplyMovement(touchCount);
         }
     }
 
     private void TryStartDrag(int touchCount)
     {
-        int foundTouches = 0;
-
-        // Log Initial
-        //Debug.Log($"[TRY START] Tentative de Démarrage. {REQUIRED_TOUCHES} touches requises.");
+        // On cherche seulement à enregistrer les touches valides
+        int foundTouches = activeTouchIds.Count(id => id != -1);
 
         for (int i = 0; i < touchCount; i++)
         {
@@ -92,49 +90,43 @@ public class PlankDragRotate : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hit) && hit.transform == transform)
                 {
-                    // NOUVEAU LOG : Affiche une touche valide sur l'objet.
-                    Debug.Log($"[TRY START] Touche trouvée sur la planche (ID: {touch.fingerId}).");
-
-                    if (foundTouches < REQUIRED_TOUCHES)
+                    // Chercher un slot libre et enregistrer la touche et sa position
+                    for (int j = 0; j < REQUIRED_TOUCHES; j++)
                     {
-                        activeTouchIds[foundTouches] = touch.fingerId;
-                        lastPositions[foundTouches] = touch.position;
-                        foundTouches++;
-
-                        // NOUVEAU LOG : Affiche l'état du compteur.
-                        Debug.Log($"[TRY START] Compteur : {foundTouches} / {REQUIRED_TOUCHES} touches valides sur la planche");
+                        if (activeTouchIds[j] == -1)
+                        {
+                            activeTouchIds[j] = touch.fingerId;
+                            initialPositions[j] = touch.position; // ENREGISTRE LA POSITION
+                            foundTouches++;
+                            break;
+                        }
                     }
-
-                    if (foundTouches == REQUIRED_TOUCHES)
-                    {
-                        isDragging = true;
-                        zCoord = mainCamera.WorldToScreenPoint(transform.position).z;
-                        SetHighlight(true); // <<<<<<<<<< ACTIVATION DE LA SURBRILLANCE
-                        Debug.Log(">>>> DRAG PLANCHE DÉMARRÉ avec 4 touches.");
-                        return;
-                    }
-                }
-                else
-                {
-                    //Debug.Log($"[TRY START] Touche (ID: {touch.fingerId}) touchant un autre objet ou l'espace vide.");
                 }
             }
         }
 
-        if (!isDragging)
+        // Si toutes les touches requises sont là
+        if (foundTouches == REQUIRED_TOUCHES)
         {
-            Debug.Log($"[TRY START] Fin de l'examen. Seulement {foundTouches} / {REQUIRED_TOUCHES} touches valides trouvées pour l'instant pour planche");
+            isDragging = true;
+            zCoord = mainCamera.WorldToScreenPoint(transform.position).z;
+
+            // Calculer le centre initial des deux touches
+            Vector2 center = (initialPositions[0] + initialPositions[1]) / REQUIRED_TOUCHES;
+            lastCenterPosition = center;
+
+            SetHighlight(true);
+            Debug.Log($">>>> DRAG PLANCHE DÉMARRÉ avec {REQUIRED_TOUCHES} touche(s).");
+            return;
         }
     }
 
-    private void ApplyMovementAndRotation(int touchCount)
+    private void ApplyMovement(int touchCount)
     {
-        Vector2[] currentPositions = new Vector2[REQUIRED_TOUCHES];
-        int activeCount = 0;
+        Vector2 currentCenter = Vector2.zero;
+        int activeDragTouchCount = 0;
 
-        // Log pour le suivi du drag
-        Debug.Log("[APPLY] Drag en cours...");
-
+        // 1. Collecter les positions des touches actives
         for (int i = 0; i < touchCount; i++)
         {
             Touch touch = Input.GetTouch(i);
@@ -143,68 +135,43 @@ public class PlankDragRotate : MonoBehaviour
             {
                 if (touch.fingerId == activeTouchIds[j])
                 {
-                    if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+
+                    if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
                     {
-                        currentPositions[j] = touch.position;
-                        activeCount++;
-                    }
-                    else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
-                    {
+                        // Une touche de drag s'est terminée
                         Debug.Log($"Plank Touch ID {touch.fingerId} levée/annulée.");
                         activeTouchIds[j] = -1;
-                        currentPositions[j] = Vector2.zero;
-
-                        // Le décompte est géré par la vérification finale activeCount < REQUIRED_TOUCHES
                     }
+                    else
+                    {
+                        // Les touches Moved ou Stationary contribuent au centre
+                        activeDragTouchCount++;
+                        currentCenter += touch.position;
+                    }
+                    break;
                 }
             }
         }
 
-        if (activeCount < REQUIRED_TOUCHES)
+        // 2. Vérification d'arrêt et application du mouvement
+        if (activeDragTouchCount < REQUIRED_TOUCHES)
         {
+            // Arrêt du Drag
+            for (int j = 0; j < activeTouchIds.Length; j++) activeTouchIds[j] = -1;
             isDragging = false;
-            SetHighlight(false); // <<<<<<<<<< DÉSACTIVATION DE LA SURBRILLANCE
-            Debug.Log($"<<<< DRAG PLANCHE ARRÊTÉ : Moins de 4 touches sont actives ({activeCount} / {REQUIRED_TOUCHES}).");
-            for (int i = 0; i < REQUIRED_TOUCHES; i++) activeTouchIds[i] = -1;
+            SetHighlight(false);
+            Debug.Log("<<<< DRAG PLANCHE ARRÊTÉ : Le nombre de touches actives est insuffisant.");
             return;
         }
 
-        Vector2 centerOld = Vector2.zero;
-        Vector2 centerNew = Vector2.zero;
+        // 3. Application du Mouvement (Translation)
+        currentCenter /= REQUIRED_TOUCHES; // Calculer la moyenne du centre actuel
 
-        for (int i = 0; i < REQUIRED_TOUCHES; i++)
-        {
-            centerOld += lastPositions[i];
-            centerNew += currentPositions[i];
-        }
-
-        centerOld /= REQUIRED_TOUCHES;
-        centerNew /= REQUIRED_TOUCHES;
-
-        Vector3 moveVector = GetWorldPosition(centerNew) - GetWorldPosition(centerOld);
+        Vector3 moveVector = GetWorldPosition(currentCenter) - GetWorldPosition(lastCenterPosition);
         transform.position += moveVector;
 
-        Vector2 leftCenterOld = (lastPositions[0] + lastPositions[1]) / 2f;
-        Vector2 leftCenterNew = (currentPositions[0] + currentPositions[1]) / 2f;
-
-        Vector2 rightCenterOld = (lastPositions[2] + lastPositions[3]) / 2f;
-        Vector2 rightCenterNew = (currentPositions[2] + currentPositions[3]) / 2f;
-
-        Vector2 plankVectorOld = rightCenterOld - leftCenterOld;
-        Vector2 plankVectorNew = rightCenterNew - leftCenterNew;
-
-        float angle = Vector2.SignedAngle(plankVectorOld, plankVectorNew);
-
-        if (Mathf.Abs(angle) > 0.01f)
-        {
-            transform.Rotate(Vector3.up, angle, Space.World);
-            Debug.Log($"Rotation de la planche appliquée : {angle:F2} degrés.");
-        }
-
-        for (int i = 0; i < REQUIRED_TOUCHES; i++)
-        {
-            lastPositions[i] = currentPositions[i];
-        }
+        // Mettre à jour la dernière position du centre pour la prochaine frame
+        lastCenterPosition = currentCenter;
     }
 
     private Vector3 GetWorldPosition(Vector2 screenPosition)
