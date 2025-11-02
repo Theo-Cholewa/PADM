@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 
 [RequireComponent(typeof(Physic))]
-public class Bucket : MonoBehaviour
+public class Bucket2 : MonoBehaviour
 {
     public GameObject Water;
 
