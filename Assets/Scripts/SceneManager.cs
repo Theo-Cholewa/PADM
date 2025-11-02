@@ -47,5 +47,11 @@ public class SceneManager : MonoBehaviour
             if (activeScene != "Guerre")
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Guerre");
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            if (activeScene != "Réparation")
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Réparation");
+        }
     }
 }
