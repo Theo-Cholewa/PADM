@@ -91,8 +91,7 @@ public class Gestable : MonoBehaviour
     {
         var info = global.info;
         var touchPos = GetCoord(info.position);
-        Debug.Log((transform.position - touchPos).magnitude);
-        if (gestMode && (transform.position - touchPos).magnitude < GestPointMaxDistance)
+        if (gestMode && (transform.position-touchPos).magnitude < GestPointMaxDistance)
         {
             var point = new GestPoint
             {

@@ -196,7 +196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedEffect: {fileID: 0}
   friction: 0.95
-  weight: 0.5
+  weight: 2
   velocity: {x: 0, y: 0, z: 0}
   hasPhysic: 1
 --- !u!114 &8093466867921421835

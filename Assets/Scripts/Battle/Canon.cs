@@ -12,7 +12,8 @@ public class Canon : MonoBehaviour
 
     public string ammunition;
 
-    public float power=1f;
+    public float MinimumPower = 2f;
+    public float MaximumPower = 4f;
 
     private bool isLoaded = false;
 
@@ -23,8 +24,9 @@ public class Canon : MonoBehaviour
         baseWidth = background.localScale.x;
     }
 
-    public void TryToShoot()
+    public void TryToShoot(float LocalPower)
     {
+        var RealPower = MinimumPower + (LocalPower * (MaximumPower - MinimumPower));
         if (isLoaded)
         {
             var instance = Instantiate(projectile);
@@ -33,7 +35,7 @@ public class Canon : MonoBehaviour
             instance.transform.localPosition = new(0f, 7f, 0f);
             instance.transform.parent = null;
 
-            instance.GetComponent<Physic>().velocity = transform.TransformVector(new(0f, 7f, 0f)).normalized * power;
+            instance.GetComponent<Physic>().velocity = transform.TransformVector(new(0f, 7f, 0f)).normalized * RealPower;
 
             isLoaded = false;
             background.localScale = Vector3.Scale(background.localScale, new Vector3(1f, 1f, 1f / 1.2f));
@@ -44,7 +46,7 @@ public class Canon : MonoBehaviour
 
     void OnActivate(float strength)
     {
-        TryToShoot();
+        TryToShoot(strength);
     }
 
     void OnCollisionEnter(Collision collision)

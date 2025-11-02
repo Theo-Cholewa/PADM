@@ -162,7 +162,6 @@ public class MultiTouchHandler : MonoBehaviour
             }
             else if (touch.phase == TouchPhase.Moved)
             {
-                Debug.Log("Mouse move");
                 TouchMoved(info);
             }
         }

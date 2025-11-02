@@ -159,7 +159,8 @@ MonoBehaviour:
   projectile: {fileID: 5251689240139023083, guid: aee5d2f113b5d3142bce3cd2ae7f444a, type: 3}
   ShotSound: {fileID: 8300000, guid: b8d4539dba8a8824e94d0cfa006c2a12, type: 3}
   ammunition: canon_ball
-  power: 2
+  MinimumPower: 1
+  MaximumPower: 3
 --- !u!54 &6403147544887127849
 Rigidbody:
   m_ObjectHideFlags: 0

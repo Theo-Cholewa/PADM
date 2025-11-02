@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Gestable))]
@@ -38,7 +39,10 @@ public class Flag : MonoBehaviour
         // Gest with one finger move the nearest pirate
         if (gestSize == 1)
         {
-            movingPirate = pirates.OrderBy(p => (p.transform.position - transform.position).sqrMagnitude).FirstOrDefault();
+            movingPirate = pirates
+                .Where(p => !p.IsDestroyed())
+                .OrderBy(p => (p.transform.position - transform.position).sqrMagnitude)
+                .FirstOrDefault();
         }
     }
 
