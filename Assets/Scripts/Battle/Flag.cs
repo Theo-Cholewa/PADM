@@ -72,6 +72,7 @@ public class Flag : MonoBehaviour
             var direction = ((points[0].position + points[1].position) / 2 - transform.position);
             foreach (var pirate in pirates)
             {
+                if (pirate.IsDestroyed()) continue;
                 pirate.Move(direction);
             }
         }
@@ -80,6 +81,7 @@ public class Flag : MonoBehaviour
         {
             foreach (var pirate in pirates)
             {
+                if (pirate.IsDestroyed()) continue;
                 if((transform.position - pirate.transform.position).magnitude > HomeSize)
                 {
                     pirate.MoveTo(transform.position);

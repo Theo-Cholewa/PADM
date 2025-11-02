@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Pirate : MonoBehaviour
 {
+    public MeshRenderer Highlight;
     public MeshRenderer Colored;
     public Flag flag;
     public float MoveSpeed = 0.03f;
@@ -12,6 +13,7 @@ public class Pirate : MonoBehaviour
     {
         flag.pirates.Add(this);
         Colored.material.color = flag.color;
+        Highlight.enabled = false;
     }
 
     public void Move(Vector3 direction)
@@ -29,5 +31,10 @@ public class Pirate : MonoBehaviour
         var direction = (position - transform.position);
         Move(direction);
     }
-    
+
+
+    public void SetHighlight(bool highlight)
+    {
+        Highlight.enabled = highlight;
+    }
 }
