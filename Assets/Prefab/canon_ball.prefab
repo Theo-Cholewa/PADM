@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5132858694424152751}
   - component: {fileID: 1977842084086777536}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57a260bd289868b41b0d9abd7cd20886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DoPush: 1
 --- !u!114 &3966768886749327568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,6 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedEffect: {fileID: 5819451732284088864, guid: e1108207147c53d449e1af069d8f68fe, type: 3}
   friction: 0.95
+  weight: 1
   velocity: {x: 2, y: 0, z: 0}
   hasPhysic: 1
 --- !u!114 &5147729124147879509
@@ -210,3 +212,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fell: {fileID: 6488506888766268491, guid: e6e666a658de7f446ac394008d3b6752, type: 3}
   TimeToFall: 20
+  height: 1

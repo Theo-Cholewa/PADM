@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2799050708340513673}
   m_Layer: 0
-  m_Name: corde
+  m_Name: link
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 8769855122809067561}
   - component: {fileID: 4861956178102846143}
   - component: {fileID: 214786545315262111}
-  - component: {fileID: 5107562303260369668}
   m_Layer: 0
   m_Name: image
   m_TagString: Untagged
@@ -94,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c660f40d8aa53fb4c848cb7084e4b5dd, type: 2}
+  - {fileID: 2100000, guid: 487363b51140d6a43b1c55d23d3305fc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,16 +115,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5107562303260369668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5408502997496911930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60f9a488a0da8b54c815f2ef6a02daa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  renderer: {fileID: 214786545315262111}

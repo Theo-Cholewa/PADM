@@ -13,7 +13,6 @@ public class Ship : MonoBehaviour
 
     void FixedUpdate()
     {;
-        Debug.Log("speed " + speed);
         if (speed > 0f) waterLevel += speed / 10000f;
         else waterLevel -= 4f / 10000f;
         if (waterLevel < 0f) waterLevel = 0f;

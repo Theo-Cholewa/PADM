@@ -21,12 +21,10 @@ public class ShipFiller : MonoBehaviour
             .OrderBy(ship => (ship.transform.position - pos).magnitude)
             .First();
         ship.speed += 4f;
-        Debug.Log("Ship speed increased");
     }
 
     void OnDestroy()
     {
         ship.speed -= 4f;
-        Debug.Log("Ship speed decreased");
     }
 }

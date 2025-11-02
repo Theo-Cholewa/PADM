@@ -16,7 +16,6 @@ public class Canon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Canon ready");
         background = transform.GetChild(0);
         baseWidth = background.localScale.x;
     }
@@ -27,7 +26,6 @@ public class Canon : MonoBehaviour
         {
             var ptransform = transform;
 
-            Debug.Log("Clicked on the canon");
             var spawn = ptransform.position + ptransform.up * 5 * ptransform.lossyScale.y;
 
             var instance = Instantiate(projectile);

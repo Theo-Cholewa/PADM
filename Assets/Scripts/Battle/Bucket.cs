@@ -18,7 +18,7 @@ public class Bucket : MonoBehaviour
 
     void Start()
     {
-        SetFilled(true);
+        SetFilled(false);
         physic = GetComponent<Physic>();
     }
 
