@@ -8,7 +8,7 @@ public class PlankDragRotate : MonoBehaviour
     private float zCoord;
 
     private int[] activeTouchIds = new int[4] { -1, -1, -1, -1 };
-    private const int REQUIRED_TOUCHES = 4;
+    private const int REQUIRED_TOUCHES = 1;
 
     private Vector2[] lastPositions = new Vector2[4];
 
@@ -58,6 +58,11 @@ public class PlankDragRotate : MonoBehaviour
     {
         int touchCount = Input.touchCount;
 
+        if (touchCount > 0 && !isDragging)
+        {
+            //Debug.Log($"[UPDATE] Total de touches à l'écran : {touchCount}");
+        }
+
         if (!isDragging && touchCount >= REQUIRED_TOUCHES)
         {
             TryStartDrag(touchCount);
@@ -73,6 +78,9 @@ public class PlankDragRotate : MonoBehaviour
     {
         int foundTouches = 0;
 
+        // Log Initial
+        //Debug.Log($"[TRY START] Tentative de Démarrage. {REQUIRED_TOUCHES} touches requises.");
+
         for (int i = 0; i < touchCount; i++)
         {
             Touch touch = Input.GetTouch(i);
@@ -84,11 +92,17 @@ public class PlankDragRotate : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hit) && hit.transform == transform)
                 {
+                    // NOUVEAU LOG : Affiche une touche valide sur l'objet.
+                    Debug.Log($"[TRY START] Touche trouvée sur la planche (ID: {touch.fingerId}).");
+
                     if (foundTouches < REQUIRED_TOUCHES)
                     {
                         activeTouchIds[foundTouches] = touch.fingerId;
                         lastPositions[foundTouches] = touch.position;
                         foundTouches++;
+
+                        // NOUVEAU LOG : Affiche l'état du compteur.
+                        Debug.Log($"[TRY START] Compteur : {foundTouches} / {REQUIRED_TOUCHES} touches valides sur la planche");
                     }
 
                     if (foundTouches == REQUIRED_TOUCHES)
@@ -100,7 +114,16 @@ public class PlankDragRotate : MonoBehaviour
                         return;
                     }
                 }
+                else
+                {
+                    //Debug.Log($"[TRY START] Touche (ID: {touch.fingerId}) touchant un autre objet ou l'espace vide.");
+                }
             }
+        }
+
+        if (!isDragging)
+        {
+            Debug.Log($"[TRY START] Fin de l'examen. Seulement {foundTouches} / {REQUIRED_TOUCHES} touches valides trouvées pour l'instant pour planche");
         }
     }
 
@@ -108,6 +131,9 @@ public class PlankDragRotate : MonoBehaviour
     {
         Vector2[] currentPositions = new Vector2[REQUIRED_TOUCHES];
         int activeCount = 0;
+
+        // Log pour le suivi du drag
+        Debug.Log("[APPLY] Drag en cours...");
 
         for (int i = 0; i < touchCount; i++)
         {
@@ -127,6 +153,8 @@ public class PlankDragRotate : MonoBehaviour
                         Debug.Log($"Plank Touch ID {touch.fingerId} levée/annulée.");
                         activeTouchIds[j] = -1;
                         currentPositions[j] = Vector2.zero;
+
+                        // Le décompte est géré par la vérification finale activeCount < REQUIRED_TOUCHES
                     }
                 }
             }
@@ -136,7 +164,7 @@ public class PlankDragRotate : MonoBehaviour
         {
             isDragging = false;
             SetHighlight(false); // <<<<<<<<<< DÉSACTIVATION DE LA SURBRILLANCE
-            Debug.Log("<<<< DRAG PLANCHE ARRÊTÉ : Moins de 4 touches sont actives.");
+            Debug.Log($"<<<< DRAG PLANCHE ARRÊTÉ : Moins de 4 touches sont actives ({activeCount} / {REQUIRED_TOUCHES}).");
             for (int i = 0; i < REQUIRED_TOUCHES; i++) activeTouchIds[i] = -1;
             return;
         }
