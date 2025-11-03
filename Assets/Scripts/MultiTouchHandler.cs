@@ -185,6 +185,7 @@ public class MultiTouchHandler : MonoBehaviour
                     lastPressedMouseFingerId = 275823;
                 }
             }
+            
         }
 
         // On touch
