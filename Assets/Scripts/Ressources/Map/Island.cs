@@ -15,14 +15,55 @@ public class Island : MonoBehaviour
     public Renderer woodRenderer;
     public Renderer stoneRenderer;
 
+    [Header("Visibilité / Éléments")]
+    [Tooltip("True = île visitée (active tout sauf le canvas ressource)")]
+    public bool isVisited = false;
+
+    [Tooltip("Contenu principal de l'île (poulailler, décor, etc.)")]
+    public GameObject islandContent;
+
+    [Tooltip("Canvas affiché avant visite (icône de ressource ou panneau indicatif)")]
+    public Canvas resourceCanvas;
+
     void Start()
     {
         UpdateMaterials();
+        UpdateVisibility();
     }
 
-    /// <summary>
-    /// Vérifie si la ressource est encore disponible.
-    /// </summary>
+    public void SetVisited(bool state)
+    {
+        if (isVisited == state) return;
+
+        isVisited = state;
+        UpdateVisibility();
+
+        if (isVisited)
+            Debug.Log($"🌴 L'île {islandID} a été visitée !");
+    }
+
+    private void UpdateVisibility()
+    {
+        // Si non visitée → on affiche uniquement le canvas ressource
+        if (!isVisited)
+        {
+            if (islandContent != null)
+                islandContent.SetActive(false);
+
+            if (resourceCanvas != null)
+                resourceCanvas.gameObject.SetActive(true);
+        }
+        // Si visitée → on affiche tout sauf le canvas ressource
+        else
+        {
+            if (islandContent != null)
+                islandContent.SetActive(true);
+
+            if (resourceCanvas != null)
+                resourceCanvas.gameObject.SetActive(false);
+        }
+    }
+
     public bool HasResource(string resourceType)
     {
         return resourceType switch
@@ -34,39 +75,22 @@ public class Island : MonoBehaviour
         };
     }
 
-    /// <summary>
-    /// Retire une ressource et met à jour la visibilité des plans.
-    /// </summary>
     public void CollectResource(string resourceType)
     {
         switch (resourceType)
         {
-            case "food":
-                hasFood = false;
-                break;
-            case "wood":
-                hasWood = false;
-                break;
-            case "stone":
-                hasStone = false;
-                break;
+            case "food": hasFood = false; break;
+            case "wood": hasWood = false; break;
+            case "stone": hasStone = false; break;
         }
 
         UpdateMaterials();
     }
 
-    /// <summary>
-    /// Active ou désactive les plans (MeshRenderer) selon les ressources restantes.
-    /// </summary>
     private void UpdateMaterials()
     {
-        if (foodRenderer != null)
-            foodRenderer.enabled = hasFood;
-
-        if (woodRenderer != null)
-            woodRenderer.enabled = hasWood;
-
-        if (stoneRenderer != null)
-            stoneRenderer.enabled = hasStone;
+        if (foodRenderer != null) foodRenderer.enabled = hasFood;
+        if (woodRenderer != null) woodRenderer.enabled = hasWood;
+        if (stoneRenderer != null) stoneRenderer.enabled = hasStone;
     }
 }

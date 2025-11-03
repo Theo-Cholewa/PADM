@@ -23,6 +23,7 @@ public class TouchIndicatorWave : MonoBehaviour, IPointerDownHandler, IPointerUp
     public bool isTouched = false;
     private Coroutine waveCoroutine;
     private readonly List<Image> activeWaves = new List<Image>();
+    private bool inputDisabed = false;
 
     void Start()
     {
@@ -41,7 +42,6 @@ public class TouchIndicatorWave : MonoBehaviour, IPointerDownHandler, IPointerUp
             wave.raycastTarget = false;
 
             activeWaves.Add(wave);
-
             StartCoroutine(AnimateWave(wave));
 
             yield return new WaitForSeconds(waveInterval);
@@ -71,6 +71,12 @@ public class TouchIndicatorWave : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            inputDisabed = true;
+            isTouched = !isTouched;
+        }
+
         // Détermine la couleur cible
         Color targetColor = isTouched ? touchedColor : idleColor;
 
