@@ -329,6 +329,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &86475136
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -624,6 +625,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &245926007
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1768,6 +1770,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &485573727
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2165,6 +2168,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &578954968
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3342,6 +3346,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &908111333
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3770,6 +3775,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1113289362
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4175,6 +4181,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1212353449
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5644,6 +5651,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1718523061
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7254,5 +7262,5 @@ SceneRoots:
   - {fileID: 183109881}
   - {fileID: 1294804890}
   - {fileID: 1867558776}
-  - {fileID: 1780346583}
   - {fileID: 286307114}
+  - {fileID: 1780346583}
