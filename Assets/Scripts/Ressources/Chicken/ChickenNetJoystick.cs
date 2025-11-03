@@ -15,26 +15,20 @@ public class ChickenNetJoystick : MonoBehaviour
     [Header("Zone de capture")]
     public float captureRadius = 1.5f;
 
-    // vitesse minimale quand les joysticks divergent complètement
-    [Range(0f, 1f)]
-    public float minSpeedFactor = 0.5f;
+    // 🔹 Bateau actuellement lié dynamiquement
+    [HideInInspector] public ShipController linkedShip;
 
     void Update()
     {
         if (!CanMove())
             return;
 
-        // Moyenne des directions
-        Vector2 avgDir = GetAverageDirection(out List<Vector2> directions);
+        // Moyenne des directions des 4 joysticks
+        Vector2 avgDir = GetAverageDirection();
 
         if (avgDir.sqrMagnitude > 0.01f)
         {
-            // Calcul de la cohérence des angles
-            float speedFactor = ComputeDirectionSimilarity(directions, avgDir);
-
-            // Conversion vers un déplacement sur le plan XZ
-            Vector3 move = new Vector3(avgDir.x, 0, avgDir.y) * moveSpeed * speedFactor * Time.deltaTime;
-
+            Vector3 move = new Vector3(avgDir.x, 0, avgDir.y) * moveSpeed * Time.deltaTime;
             transform.position += move;
             CheckCapture();
         }
@@ -45,46 +39,18 @@ public class ChickenNetJoystick : MonoBehaviour
         return topLeft.IsActive && topRight.IsActive && bottomLeft.IsActive && bottomRight.IsActive;
     }
 
-    Vector2 GetAverageDirection(out List<Vector2> dirs)
+    Vector2 GetAverageDirection()
     {
-        dirs = new List<Vector2>();
+        Vector2 sum = Vector2.zero;
+        int count = 0;
 
-        if (topLeft.IsActive) dirs.Add(topLeft.Direction.normalized);
-        if (topRight.IsActive) dirs.Add(topRight.Direction.normalized);
-        if (bottomLeft.IsActive) dirs.Add(bottomLeft.Direction.normalized);
-        if (bottomRight.IsActive) dirs.Add(bottomRight.Direction.normalized);
+        if (topLeft.IsActive) { sum += topLeft.Direction; count++; }
+        if (topRight.IsActive) { sum += topRight.Direction; count++; }
+        if (bottomLeft.IsActive) { sum += bottomLeft.Direction; count++; }
+        if (bottomRight.IsActive) { sum += bottomRight.Direction; count++; }
 
-        if (dirs.Count == 0) return Vector2.zero;
-
-        Vector2 avg = Vector2.zero;
-        foreach (var d in dirs) avg += d;
-        avg /= dirs.Count;
-
-        return avg.normalized;
-    }
-
-    float ComputeDirectionSimilarity(List<Vector2> directions, Vector2 avgDir)
-    {
-        if (directions.Count == 0) return 1f;
-
-        float avgAngle = Mathf.Atan2(avgDir.y, avgDir.x);
-        float totalDiff = 0f;
-
-        foreach (var dir in directions)
-        {
-            float angle = Mathf.Atan2(dir.y, dir.x);
-            float diff = Mathf.Abs(Mathf.DeltaAngle(Mathf.Rad2Deg * avgAngle, Mathf.Rad2Deg * angle));
-            totalDiff += diff;
-        }
-
-        float meanDiff = totalDiff / directions.Count;
-
-        // 0° → vitesse = 100 %
-        // 90° → vitesse = minSpeedFactor (50 % par défaut)
-        float t = Mathf.Clamp01(meanDiff / 90f); // interpolation de 0 à 1
-        float speedFactor = Mathf.Lerp(1f, minSpeedFactor, t);
-
-        return speedFactor;
+        if (count == 0) return Vector2.zero;
+        return (sum / count).normalized;
     }
 
     void CheckCapture()
@@ -95,9 +61,28 @@ public class ChickenNetJoystick : MonoBehaviour
             if (hit.CompareTag("Chicken"))
             {
                 Destroy(hit.gameObject);
-                Debug.Log("🐔 Poulet capturé !");
+
+                if (linkedShip != null)
+                {
+                    ShipData shipData = linkedShip.GetComponent<ShipData>();
+                    if (shipData != null)
+                    {
+                        shipData.AddResource("food", 1);
+                        Debug.Log($"🐔 {linkedShip.playerName} a capturé un poulet — nourriture totale : {shipData.food}");
+                    }
+                }
+                else
+                {
+                    Debug.Log("🐔 Poulet capturé (aucun bateau actuellement accosté).");
+                }
             }
         }
+    }
+
+    // 🔹 Méthode appelée par le bateau ou l'île
+    public void SetLinkedShip(ShipController ship)
+    {
+        linkedShip = ship;
     }
 
 #if UNITY_EDITOR
