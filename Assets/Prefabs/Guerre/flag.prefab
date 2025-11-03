@@ -163,6 +163,9 @@ MonoBehaviour:
   color: {r: 0, g: 1, b: 0.053812027, a: 1}
   Colored: {fileID: 7649317108878377853}
   HomeSize: 50
+  ViseurPrefab: {fileID: 3350700823569118852, guid: 7ca62d773ef04dc41900afdaf912f292, type: 3}
+  MovePrefab: {fileID: 3350700823569118852, guid: cb0955e41c2ff1b46b857b02eca7f597, type: 3}
+  GoBackPrefab: {fileID: 3350700823569118852, guid: 0ceba6365e201734ebf97fee7be81a9e, type: 3}
   pirates: []
 --- !u!135 &2348625400625260405
 SphereCollider:
@@ -212,6 +215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GestPointMaxDistance: 30
   DraggerPrefab: {fileID: 3350700823569118852, guid: 091a142eadb45f046bf8a628de6ec94f, type: 3}
+  ZonePrefab: {fileID: 3350700823569118852, guid: a3073465e93eeb94ca74d87867080c40, type: 3}
   gestPointList: 
 --- !u!1 &5250638872484770115
 GameObject:
