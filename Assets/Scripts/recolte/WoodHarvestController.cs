@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class WoodHarvestController : MonoBehaviour
 {
+    [Header("Premiers indicateurs")]
+    public GameObject[] firstIndicators;
+
     [Header("Références enfants")]
     public TouchIndicatorWaveMulti[] indicators;   // Références vers les deux composants enfants
 
@@ -20,11 +23,43 @@ public class WoodHarvestController : MonoBehaviour
 
     private bool allActivated = false;
 
+    void Awake()
+    {
+        if (firstIndicators != null)
+        {
+            foreach (var indicator in firstIndicators)
+            {
+                if (indicator == null) continue;
+
+                // On tente de désactiver le GameObject
+                indicator.SetActive(false);
+
+                // On ajoute aussi une sécurité avec CanvasGroup pour les UI
+                var cg = indicator.GetComponent<CanvasGroup>();
+                if (cg == null)
+                    cg = indicator.AddComponent<CanvasGroup>();
+
+                cg.alpha = 0; // invisible
+                cg.interactable = false;
+                cg.blocksRaycasts = false;
+            }
+        }
+    }
+
     void Start()
     {
         // Si rien n’est assigné manuellement, on récupère automatiquement les enfants
         if (indicators == null || indicators.Length == 0)
             indicators = GetComponentsInChildren<TouchIndicatorWaveMulti>();
+
+        if (firstIndicators != null)
+        {
+            // Désactive tous les premiers indicateurs au départ
+            foreach (var indicator in firstIndicators)
+            {
+                indicator?.SetActive(false);
+            }
+        }
 
         if (harvestObjects != null)
         {
@@ -47,6 +82,27 @@ public class WoodHarvestController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            foreach (var indicator in firstIndicators)
+            {
+                if (indicator == null) continue;
+
+                indicator.SetActive(true);
+
+                var cg = indicator.GetComponent<CanvasGroup>();
+                if (cg != null)
+                {
+                    cg.alpha = 1;
+                    cg.interactable = true;
+                    cg.blocksRaycasts = true;
+                }
+            }
+
+            Debug.Log("🔄 Réinitialisation des indicateurs de récolte.");
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ActivateHarvestObjects(false);
