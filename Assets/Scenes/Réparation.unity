@@ -414,11 +414,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3551623499620413751, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -95.1
+      value: -99.6
       objectReference: {fileID: 0}
     - target: {fileID: 3551623499620413751, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.2
+      value: -15.7
       objectReference: {fileID: 0}
     - target: {fileID: 3551623499620413751, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -458,6 +458,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5568235252745713953, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.g
+      value: 0.2243948
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.r
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -871,6 +883,18 @@ PrefabInstance:
     - target: {fileID: 5568235252745713953, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.b
+      value: 0.10815287
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: color.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

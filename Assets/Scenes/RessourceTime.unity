@@ -3841,7 +3841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   directionAxis: 0
-  teleportDistance: -90
+  teleportDistance: -85
   targetTag: Blue
   targetTag2: Red
 --- !u!1 &1833996158
@@ -4065,7 +4065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   directionAxis: 0
-  teleportDistance: 90
+  teleportDistance: 85
   targetTag: Blue
   targetTag2: Red
 --- !u!1 &1855697651
@@ -4267,7 +4267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnRadius: 10
   spawnInterval: 1
-  maxChickens: 10
+  maxChickens: 5
   chickenPrefab: {fileID: 5452458411339275128, guid: 4b5ca8fdeeedb074d89303b4113e4064, type: 3}
   groundY: 2
 --- !u!4 &1998055606
