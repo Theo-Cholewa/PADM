@@ -110,7 +110,10 @@ public class MultiTouchHandler : MonoBehaviour
         }
     }
 
-    private bool isPressed = true;
+    private bool isPressed = false;
+    private bool isPressed2 = false;
+    private bool isPressed3 = false;
+    private int lastPressedMouseFingerId = 275821;
     private Vector2 lastTouchPosition = new(0f, 0f);
 
     void Start()
@@ -126,7 +129,7 @@ public class MultiTouchHandler : MonoBehaviour
             if (!Input.mousePosition.Equals(lastTouchPosition))
             {
                 lastTouchPosition = Input.mousePosition;
-                TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
+                TouchMoved(new TouchInfo { position = Input.mousePosition, fingerId = lastPressedMouseFingerId });
             }
 
             if (isPressed)
@@ -143,6 +146,43 @@ public class MultiTouchHandler : MonoBehaviour
                 {
                     TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275821 });
                     isPressed = true;
+                    lastPressedMouseFingerId = 275821;
+                }
+            }
+
+            if (isPressed2)
+            {
+                if (Input.GetMouseButtonUp(1))
+                {
+                    TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275822 });
+                    isPressed2 = false;
+                }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(1))
+                {
+                    TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275822 });
+                    isPressed2 = true;
+                    lastPressedMouseFingerId = 275822;
+                }
+            }
+
+            if (isPressed3)
+            {
+                if (Input.GetMouseButtonUp(2))
+                {
+                    TouchEnded(new TouchInfo { position = Input.mousePosition, fingerId = 275823 });
+                    isPressed3 = false;
+                }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(2))
+                {
+                    TouchBegan(new TouchInfo { position = Input.mousePosition, fingerId = 275823 });
+                    isPressed3 = true;
+                    lastPressedMouseFingerId = 275823;
                 }
             }
         }

@@ -10,6 +10,10 @@ public class Flag : MonoBehaviour
     public Color color;
     public MeshRenderer Colored;
     public float HomeSize = 50f;
+
+    public GameObject ViseurPrefab;
+    public GameObject MovePrefab;
+    public GameObject GoBackPrefab;
     
 
     [HideInInspector]
@@ -33,6 +37,49 @@ public class Flag : MonoBehaviour
     private HashSet<Pirate> selectedPirates = new();
     private int gestSize = 0;
 
+    private GameObject ViseurInstance = null;
+    private GameObject MoveInstance = null;
+    private GameObject GoBackInstance = null;
+
+    void UpdateVisual(Gestable gestable)
+    {
+        var gests = gestable.GetOrderedGestPoints().ToList();
+        if (gests.Count > 0)
+        {
+            var position = gests[0].position + new Vector3(0, 0, -.1f);
+            var rotation = Quaternion.FromToRotation(Vector3.up, (position - transform.position).normalized);
+            if (gests.Count == 1)
+            {
+                if (ViseurInstance == null) ViseurInstance = Instantiate(ViseurPrefab);
+                if (MoveInstance != null) { Destroy(MoveInstance); MoveInstance = null; }
+                if (GoBackInstance != null) { Destroy(GoBackInstance); GoBackInstance = null; }
+                ViseurInstance.transform.position = position;
+                ViseurInstance.transform.rotation = rotation;
+            }
+            else if (gests.Count == 2)
+            {
+                if (MoveInstance == null) MoveInstance = Instantiate(MovePrefab);
+                if (ViseurInstance != null) { Destroy(ViseurInstance); ViseurInstance = null; }
+                if (GoBackInstance != null) { Destroy(GoBackInstance); GoBackInstance = null; }
+                MoveInstance.transform.position = position;
+                MoveInstance.transform.rotation = rotation;
+            }
+            else if (gests.Count == 3)
+            {
+                if (GoBackInstance == null) GoBackInstance = Instantiate(GoBackPrefab);
+                if (ViseurInstance != null) { Destroy(ViseurInstance); ViseurInstance = null; }
+                if (MoveInstance != null) { Destroy(MoveInstance); MoveInstance = null; }
+                GoBackInstance.transform.position = position;
+                GoBackInstance.transform.rotation = rotation;
+            }
+        }
+        else
+        {
+            if (ViseurInstance != null) { Destroy(ViseurInstance); ViseurInstance = null; }
+            if (MoveInstance != null) { Destroy(MoveInstance); MoveInstance = null; }
+            if (GoBackInstance != null) { Destroy(GoBackInstance); GoBackInstance = null; }
+        }
+    }
 
     void OnGestStart(Gestable gestable)
     {
@@ -51,7 +98,7 @@ public class Flag : MonoBehaviour
             }
             selectedPirates.Clear();
         }
-
+        UpdateVisual(gestable);
     }
 
     void OnGestUpdate(Gestable gestable)
@@ -70,7 +117,7 @@ public class Flag : MonoBehaviour
                 var distance_to_pirate = (nearest_point - pirate.transform.position).magnitude;
                 if (distance_to_pirate < 10f)
                 {
-                    if(selectedPirates.Add(pirate))
+                    if (selectedPirates.Add(pirate))
                     {
                         pirate.SetHighlight(true);
                     }
@@ -93,12 +140,13 @@ public class Flag : MonoBehaviour
             foreach (var pirate in selectedPirates)
             {
                 if (pirate.IsDestroyed()) continue;
-                if((transform.position - pirate.transform.position).magnitude > HomeSize)
+                if ((transform.position - pirate.transform.position).magnitude > HomeSize)
                 {
                     pirate.MoveTo(transform.position);
                 }
             }
         }
+        UpdateVisual(gestable);
     }
 
 

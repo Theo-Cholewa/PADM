@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Timeline;
 
 /// <summary>
 /// Représente un objet physique attrapable et draggable
@@ -18,6 +14,8 @@ public class Gestable : MonoBehaviour
     public float GestPointMaxDistance = 10f;
 
     public GameObject DraggerPrefab = null;
+
+    public GameObject ZonePrefab = null;
 
     public class GestPoint
     {
@@ -75,15 +73,24 @@ public class Gestable : MonoBehaviour
     // Pressing a finger down on the object start the "Gest Mode"
     private bool gestMode = false;
 
+    private GameObject zoneObject = null;
+
     void OnTouchDown(TouchInfo info)
     {
         if (!gestMode) transform.localScale *= 1.1f;
+        if (zoneObject == null && ZonePrefab!=null)
+        {
+            zoneObject = Instantiate(ZonePrefab, transform);
+            zoneObject.transform.parent = null;
+            zoneObject.transform.localScale = new Vector3(GestPointMaxDistance*2, GestPointMaxDistance*2, GestPointMaxDistance*2);
+        }
         gestMode = true;
     }
 
     void OnTouchDragEnd(TouchInfo info)
     {
         if (gestMode) transform.localScale /= 1.1f;
+        if (zoneObject != null) Destroy(zoneObject);
         gestMode = false;
     }
 
