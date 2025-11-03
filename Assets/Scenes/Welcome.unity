@@ -301,7 +301,7 @@ Transform:
   m_GameObject: {fileID: 86475133}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.62850976, z: -0, w: 0.77780175}
-  m_LocalPosition: {x: 7.69, y: -0.020926435, z: -1.71}
+  m_LocalPosition: {x: 7.27, y: -0.020926435, z: -1.71}
   m_LocalScale: {x: 1.6225, y: 1, z: 1.9630793}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -326,6 +326,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &86475136
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -367,7 +370,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: b5ced793883eff9439dfb6d7848aead2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -618,6 +621,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &245926007
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -659,7 +665,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: 9fbbd38626fd1904daa084e924084008, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1759,6 +1765,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &485573727
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1800,7 +1809,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: 07a9a9609108e4b4caf4730f4f6e0761, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2153,6 +2162,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &578954968
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2194,7 +2206,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: fa542ab47cc7bb3418c35926f8cab963, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3327,6 +3339,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &908111333
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3368,7 +3383,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: fc3b1278c2f433e4c95790c289231b42, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3752,6 +3767,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &1113289362
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3793,7 +3811,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: 07a9a9609108e4b4caf4730f4f6e0761, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4154,6 +4172,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &1212353449
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4195,7 +4216,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: d7e3cf47d90a5e644bec3ccaf0112d15, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5620,6 +5641,9 @@ MonoBehaviour:
   foodRenderer: {fileID: 0}
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
+  isVisited: 0
+  islandContent: {fileID: 0}
+  resourceCanvas: {fileID: 0}
 --- !u!135 &1718523061
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5661,7 +5685,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 77d3f6b491ade4f49a3a08b2bbfdd426, type: 2}
+  - {fileID: 2100000, guid: b5ced793883eff9439dfb6d7848aead2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
