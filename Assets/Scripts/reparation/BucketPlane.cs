@@ -72,6 +72,16 @@ public class BucketPlane : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            if (water != null && !waterVisible)
+            {
+                water.SetActive(true);
+                waterVisible = true;
+                Debug.Log("💧 Water manually activated (W)");
+            }
+        }
+
         // --- Rotation progressive ---
         if (rotating)
         {
