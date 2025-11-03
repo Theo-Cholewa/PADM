@@ -54,7 +54,7 @@ public class Bucket2 : MonoBehaviour
         return Vector3.Dot(GetMovementDirection(), GetRotationDirection());
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionStay(Collision collision)
     {
         // Check everything
         if (isFilled) return;
