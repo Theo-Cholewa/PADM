@@ -21,8 +21,11 @@ public class WoodHarvestController : MonoBehaviour
     public GameObject targetObject;
     public string scriptNameToRemove;
 
-    private bool allActivated = false;
+    [Header("🔹 Référence au bateau accosté")]
+    private ShipController linkedShip;
 
+    private bool allActivated = false;
+    /*
     void Awake()
     {
         if (firstIndicators != null)
@@ -44,14 +47,14 @@ public class WoodHarvestController : MonoBehaviour
                 cg.blocksRaycasts = false;
             }
         }
-    }
+    }*/
 
     void Start()
     {
         // Si rien n’est assigné manuellement, on récupère automatiquement les enfants
         if (indicators == null || indicators.Length == 0)
             indicators = GetComponentsInChildren<TouchIndicatorWaveMulti>();
-
+        /*
         if (firstIndicators != null)
         {
             // Désactive tous les premiers indicateurs au départ
@@ -59,7 +62,7 @@ public class WoodHarvestController : MonoBehaviour
             {
                 indicator?.SetActive(false);
             }
-        }
+        }*/
 
         if (harvestObjects != null)
         {
@@ -108,6 +111,20 @@ public class WoodHarvestController : MonoBehaviour
             ActivateHarvestObjects(false);
             ActivateTriggerObjects(false);
             prefabToHide?.SetActive(false);
+
+            if (linkedShip != null)
+            {
+                ShipData shipData = linkedShip.GetComponent<ShipData>();
+                if (shipData != null)
+                {
+                    shipData.AddResource("wood", 10);
+                    Debug.Log($"🌲 {linkedShip.playerName} a récolté du bois — total bois : {shipData.wood}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("⚠ Aucun bateau lié pour recevoir le bois !");
+            }
 
             if (targetObject != null && !string.IsNullOrEmpty(scriptNameToRemove))
             {
@@ -191,4 +208,11 @@ public class WoodHarvestController : MonoBehaviour
         else
             Debug.Log("🔕 Triggers désactivés.");
     }
+
+    // 🔹 Lien avec le bateau accosté (appelé depuis ShipController)
+    public void SetLinkedShip(ShipController ship)
+    {
+        linkedShip = ship;
+    }
+
 }

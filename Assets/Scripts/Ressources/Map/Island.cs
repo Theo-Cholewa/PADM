@@ -25,6 +25,17 @@ public class Island : MonoBehaviour
     [Tooltip("Canvas affiché avant visite (icône de ressource ou panneau indicatif)")]
     public Canvas resourceCanvas;
 
+    public enum ResourceType
+    {
+        None,
+        Food,
+        Wood,
+        Stone
+    }
+    [Header("Type de ressource principale")]
+    [Tooltip("Choisissez la ressource principale de cette île")]
+    public ResourceType mainResource = ResourceType.None;
+
     void Start()
     {
         UpdateMaterials();

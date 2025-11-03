@@ -943,6 +943,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &331865140
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1366,6 +1367,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5039743370840173162, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 963194227}
     - target: {fileID: 5317789226813306952, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -1400,6 +1405,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7826289214691439111, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7841023041993908667, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
+      propertyPath: m_PresetInfoIsWorld
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7945217782445869831, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
@@ -1540,8 +1549,9 @@ MonoBehaviour:
   woodRenderer: {fileID: 0}
   stoneRenderer: {fileID: 0}
   isVisited: 0
-  islandContent: {fileID: 0}
+  islandContent: {fileID: 407506500}
   resourceCanvas: {fileID: 1833996162}
+  mainResource: 2
 --- !u!114 &492422854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2765,6 +2775,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1026911448
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3039,6 +3050,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 1969062316}
   resourceCanvas: {fileID: 375071668}
+  mainResource: 1
 --- !u!135 &1219909877
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4113,6 +4125,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1855697654
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4345,6 +4358,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!136 &2133484220
 CapsuleCollider:
   m_ObjectHideFlags: 0
