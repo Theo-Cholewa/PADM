@@ -36,6 +36,14 @@ public class Flood : MonoBehaviour
             TransformHoleToPuddle();
             visibleTimer = 0f;
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            if (hole != null && puddle != null)
+            {
+                hole.SetActive(true);
+            }
+        }
     }
 
     void TransformHoleToPuddle()

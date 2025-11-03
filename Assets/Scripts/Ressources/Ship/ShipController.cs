@@ -46,7 +46,8 @@ public class ShipController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         data = GetComponent<ShipData>();
 
-        if (data != null){
+        if (data != null)
+        {
             data.OnResourcesChanged += UpdateResourceBars;
             UpdateResourceBars();
         }
@@ -77,8 +78,8 @@ public class ShipController : MonoBehaviour
                 if (foodImage != null) foodImage.enabled = true;
                 if (stoneImage != null) stoneImage.enabled = true;
 
-                // 🔹 Recherche d’île proche (hiérarchie actuelle)
-                float detectionRadius = 30f;
+                // 🔹 Recherche d’île proche
+                float detectionRadius = 20f;
                 Island[] allIslands = FindObjectsOfType<Island>();
                 currentIslandDocked = null;
 
@@ -92,18 +93,56 @@ public class ShipController : MonoBehaviour
 
                         Debug.Log($"⚓ {playerName} est ancré près de l’île {island.islandID} (dist={distance:F1})");
 
-                        // 🔹 Cherche le Net dans l'IslandContent
                         if (island.islandContent != null)
                         {
-                            ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
-                            if (net != null)
+                            // --- Actions selon la ressource principale ---
+                            switch (island.mainResource)
                             {
-                                net.SetLinkedShip(this);
-                                Debug.Log($"🪢 Le filet de l’île {island.islandID} est maintenant lié à {playerName}");
-                            }
-                            else
-                            {
-                                Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
+                                case Island.ResourceType.Food:
+                                    // 🐔 Gestion des poulets
+                                    ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                                    if (net != null)
+                                    {
+                                        net.SetLinkedShip(this);
+                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {playerName}");
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
+                                    }
+                                    break;
+
+                                case Island.ResourceType.Wood:
+                                    // 🌲 Gestion du bois
+                                    Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
+                                    WoodHarvestController wood = null;
+
+                                    if (canvas != null)
+                                        wood = canvas.GetComponentInChildren<WoodHarvestController>(true);
+
+                                    if (wood == null)
+                                        wood = island.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+
+                                    if (wood != null)
+                                    {
+                                        wood.gameObject.SetActive(true);
+                                        wood.SetLinkedShip(this); // ✅ lie le bateau ici
+                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {playerName} !");
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
+                                    }
+                                    break;
+
+                                case Island.ResourceType.Stone:
+                                    Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
+                                    break;
+
+                                case Island.ResourceType.None:
+                                default:
+                                    Debug.Log($"ℹ️ L'île {island.islandID} ne contient aucune ressource exploitable.");
+                                    break;
                             }
                         }
 
@@ -123,21 +162,40 @@ public class ShipController : MonoBehaviour
 
                 if (currentIslandDocked != null)
                 {
-                    // 🔹 Délie le filet de l’île actuelle
                     if (currentIslandDocked.islandContent != null)
                     {
-                        ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
-                        if (net != null)
+                        switch (currentIslandDocked.mainResource)
                         {
-                            net.SetLinkedShip(null);
-                            Debug.Log($"🪢 Le filet de l’île {currentIslandDocked.islandID} est maintenant libéré.");
+                            case Island.ResourceType.Food:
+                                // 🐔 Déconnecte le filet
+                                ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                                if (net != null)
+                                {
+                                    net.SetLinkedShip(null);
+                                    Debug.Log($"🪢 Filet de l’île {currentIslandDocked.islandID} libéré.");
+                                }
+                                break;
+
+                            case Island.ResourceType.Wood:
+                                // 🌲 Désactive proprement la récolte du bois
+                                WoodHarvestController wood = currentIslandDocked.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+                                if (wood != null)
+                                {
+                                    wood.SetLinkedShip(null);
+                                    wood.gameObject.SetActive(false);
+                                    Debug.Log($"🌲 Récolte de bois désactivée sur l’île {currentIslandDocked.islandID}");
+                                }
+                                break;
+
+                            case Island.ResourceType.Stone:
+                                Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
+                                break;
                         }
                     }
 
                     // 🔹 Remet l’île dans son état initial
                     currentIslandDocked.SetVisited(false);
                     Debug.Log($"🏝️ {playerName} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
-
                     currentIslandDocked = null;
                 }
             }
@@ -202,9 +260,7 @@ public class ShipController : MonoBehaviour
         RectTransform rt = image.rectTransform;
         Vector2 size = rt.sizeDelta;
 
-        // on mappe 10 → 100px, 0 → 0px
         size.y = Mathf.Clamp((amount / 10f) * 100f, 0f, 100f);
         rt.sizeDelta = size;
     }
-
 }
