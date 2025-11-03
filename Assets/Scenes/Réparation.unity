@@ -387,7 +387,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hole: {fileID: 2018367879}
   puddle: {fileID: 1797834894}
-  visibleDuration: 200
+  visibleDuration: 15
 --- !u!1001 &623771230
 PrefabInstance:
   m_ObjectHideFlags: 0
