@@ -38,7 +38,7 @@ public class SceneManager : MonoBehaviour
 #endif
         }
 
-        // Raccourcis pour changer de scène : 0 -> Welcome, 1 -> RessourceTime, 2 -> Guerre
+        // Raccourcis pour changer de scène : 1 -> Welcome, 2 -> RessourceTime, 3 -> RessourceBois, 4 -> Guerre, 5 -> Réparation
         var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         if (Input.anyKeyDown)
@@ -50,12 +50,6 @@ public class SceneManager : MonoBehaviour
                     if(activeScene != scenes[i]) UnityEngine.SceneManagement.SceneManager.LoadScene(scenes[i]);
                 }
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            if (activeScene != "Réparation")
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Réparation");
         }
     }
 }
