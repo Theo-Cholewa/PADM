@@ -102,7 +102,7 @@ GameObject:
   m_Layer: 0
   m_Name: planks
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: b1b8ca14c8fa8af48a57e8150f987a96, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

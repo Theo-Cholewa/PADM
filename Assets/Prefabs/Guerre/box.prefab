@@ -96,7 +96,7 @@ GameObject:
   m_Layer: 0
   m_Name: box
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: c3d5d03008fe03b49b1eee0bfcd752a0, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
