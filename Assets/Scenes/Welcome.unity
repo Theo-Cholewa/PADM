@@ -329,6 +329,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &86475136
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -624,6 +625,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &245926007
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -778,6 +780,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1367969253087044968, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      propertyPath: cloudController
+      value: 
+      objectReference: {fileID: 368801970}
     - target: {fileID: 6598886712082313278, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
       propertyPath: m_Name
       value: SceneManager
@@ -1232,6 +1238,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358188647}
   m_CullTransparentMesh: 1
+--- !u!114 &368801970 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 320498937726336654, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+  m_PrefabInstance: {fileID: 845761781470560138}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75dbde155623f094c8402506480cf7c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &376068235
 GameObject:
   m_ObjectHideFlags: 0
@@ -1768,6 +1785,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &485573727
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2165,6 +2183,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &578954968
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3342,6 +3361,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &908111333
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3770,6 +3790,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1113289362
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4175,6 +4196,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1212353449
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5644,6 +5666,7 @@ MonoBehaviour:
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
+  mainResource: 0
 --- !u!135 &1718523061
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7246,12 +7269,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2095426465}
   m_CullTransparentMesh: 1
+--- !u!1001 &845761781470560138
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4127067131735685982, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_Name
+      value: CloudRevealController
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.0837834
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.2080784
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.7944351
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712888414686570370, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 647715062}
   - {fileID: 183109881}
+  - {fileID: 845761781470560138}
   - {fileID: 1294804890}
   - {fileID: 1867558776}
   - {fileID: 1780346583}

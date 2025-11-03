@@ -18,6 +18,11 @@ public class SceneManager : MonoBehaviour
 
     public List<string> scenes = new List<string>();
 
+    [Header("Contrôleur de nuages (pour Welcome uniquement)")]
+    public CloudRevealController cloudController;
+
+    private bool isSwitching = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,11 +50,32 @@ public class SceneManager : MonoBehaviour
         {
             for (int i = 0; i < scenes.Count; i++)
             {
-                if (Input.GetKeyDown(keyCodes[i]))
+                if (i < keyCodes.Count && Input.GetKeyDown(keyCodes[i]))
                 {
-                    if(activeScene != scenes[i]) UnityEngine.SceneManagement.SceneManager.LoadScene(scenes[i]);
+                    string targetScene = scenes[i];
+                    if (activeScene != targetScene)
+                    {
+                        if (isSwitching) return;
+                        StartCoroutine(SwitchSceneWithClouds(activeScene, targetScene));
+                        break;
+                    }
                 }
             }
         }
+    }
+
+    private IEnumerator SwitchSceneWithClouds(string currentScene, string nextScene)
+    {
+        isSwitching = true;
+
+        // Jouer l'animation de nuages pour masquer la transition
+        if (cloudController != null)
+        {
+            yield return StartCoroutine(cloudController.PlayCloudHide());
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(nextScene);
+        isSwitching = false;
     }
 }
