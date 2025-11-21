@@ -260,7 +260,10 @@ public class ShipController : MonoBehaviour
         RectTransform rt = image.rectTransform;
         Vector2 size = rt.sizeDelta;
 
-        size.y = Mathf.Clamp((amount / 10f) * 100f, 0f, 100f);
+        // 0 ressource → 0 px ; 10 ressources → resourceMaxSize px
+        float t = Mathf.Clamp01(amount / 10f);
+        size.y = Mathf.Lerp(0f, resourceMaxSize, t);
+
         rt.sizeDelta = size;
     }
 }

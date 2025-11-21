@@ -117,7 +117,7 @@ public class WoodHarvestController : MonoBehaviour
                 ShipData shipData = linkedShip.GetComponent<ShipData>();
                 if (shipData != null)
                 {
-                    shipData.AddResource("wood", 10);
+                    shipData.AddResource("wood", 3);
                     Debug.Log($"🌲 {linkedShip.playerName} a récolté du bois — total bois : {shipData.wood}");
                 }
             }
