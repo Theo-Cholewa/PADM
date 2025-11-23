@@ -182,11 +182,6 @@ MonoBehaviour:
   - {fileID: 331865139}
   - {fileID: 1219909876}
   - {fileID: 1855697653}
-  blueShipSelector: b
-  redShipSelector: n
-  foodKey: x
-  woodKey: c
-  stoneKey: v
 --- !u!1 &73836390
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,12 +928,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 4
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -1432,7 +1421,6 @@ GameObject:
   - component: {fileID: 492422851}
   - component: {fileID: 492422850}
   - component: {fileID: 492422853}
-  - component: {fileID: 492422854}
   m_Layer: 0
   m_Name: Island2
   m_TagString: Untagged
@@ -1541,32 +1529,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 2
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 407506500}
   resourceCanvas: {fileID: 1833996162}
   mainResource: 2
---- !u!114 &492422854
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 492422848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69ec933ea4ee29c44b5ba53ca426dc4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  islandRenderer: {fileID: 492422851}
-  baseColor: {r: 0.8, g: 0.7, b: 0.5, a: 1}
-  pulseColor: {r: 1, g: 0.68896925, b: 0.6, a: 1}
-  speed: 1.5
 --- !u!1 &500203770
 GameObject:
   m_ObjectHideFlags: 0
@@ -2673,12 +2639,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 7
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -2894,12 +2854,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 3
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -3169,12 +3123,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 5
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 1969062316}
   resourceCanvas: {fileID: 375071668}
@@ -4408,12 +4356,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 6
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -4641,12 +4583,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 1
-  hasFood: 1
-  hasWood: 1
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
