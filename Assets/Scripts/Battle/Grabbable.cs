@@ -67,11 +67,10 @@ public class Grabbable : MonoBehaviour
 
     void UpdateTarget(GrabHand pulling, TouchInfo info)
     {
-        var ray = Camera.main.ScreenPointToRay(info.position);
         var plane = new Plane(Vector3.forward, transform.position);
-        if (plane.Raycast(ray, out float distance))
+        if (plane.Raycast(info.ray, out float distance))
         {
-            pulling.position = ray.GetPoint(distance);
+            pulling.position = info.ray.GetPoint(distance);
         }
     }
 
@@ -87,6 +86,7 @@ public class Grabbable : MonoBehaviour
         if (pulling.draggerObject != null) UpdateShape(pulling);
 
         grabHands[info.fingerId] = pulling;
+        grabHandList.Remove(info.fingerId);
         grabHandList.Add(info.fingerId);
 
         SendMessage("OnGrabStart", this, SendMessageOptions.DontRequireReceiver);

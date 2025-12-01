@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class TouchInfo
 {
+    public Ray ray;
     public Vector2 position;
     public int fingerId;
 }
@@ -26,11 +27,15 @@ public class GlobalTouchInfo
 public class MultiTouchHandler : MonoBehaviour
 {
 
-    GameObject GetTarget(Vector2 position)
+    Ray GetRay(Vector2 position)
     {
         Ray ray = Camera.main.ScreenPointToRay(position);
-        RaycastHit hit;
+        return ray;
+    }
 
+    GameObject GetTarget(Ray ray)
+    {
+        RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
             if (hit.collider != null)
@@ -65,10 +70,13 @@ public class MultiTouchHandler : MonoBehaviour
 
     void TouchBegan(TouchInfo info)
     {
+        var ray = GetRay(info.position);
+        info.position = new(ray.origin.x,ray.origin.y);
+        info.ray = ray;
         touched[info.fingerId] = info;
         if (SendGlobal("OnGlobalTouchDown", info))
         {
-            var target = GetTarget(info.position);
+            var target = GetTarget(ray);
             if (target != null)
             {
                 target.SendMessage("OnTouchDown", info, SendMessageOptions.DontRequireReceiver);
@@ -79,10 +87,13 @@ public class MultiTouchHandler : MonoBehaviour
 
     void TouchEnded(TouchInfo info)
     {
+        var ray = GetRay(info.position);
+        info.position = new(ray.origin.x,ray.origin.y);
+        info.ray = ray;
         touched.Remove(info.fingerId);
         if (SendGlobal("OnGlobalTouchUp", info))
         {
-            var target = GetTarget(info.position);
+            var target = GetTarget(ray);
             if (target != null)
             {
                 target.SendMessage("OnTouchUp", info, SendMessageOptions.DontRequireReceiver);
@@ -98,6 +109,9 @@ public class MultiTouchHandler : MonoBehaviour
 
     void TouchMoved(TouchInfo info)
     {
+        var ray = GetRay(info.position);
+        info.position = new(ray.origin.x,ray.origin.y);
+        info.ray = ray;
         if (touched.TryGetValue(info.fingerId, out var touchedpt))
         {
             touchedpt.position = info.position;
@@ -113,12 +127,13 @@ public class MultiTouchHandler : MonoBehaviour
     private bool isPressed = false;
     private bool isPressed2 = false;
     private bool isPressed3 = false;
-    private int lastPressedMouseFingerId = 275821;
+    private int lastPressedMouseFingerId = -1;
     private Vector2 lastTouchPosition = new(0f, 0f);
 
     void Start()
     {
         Input.simulateMouseWithTouches = false;
+                Debug.LogError("This message will make the console appear in Development Builds");
     }
 
     void Update()
@@ -195,6 +210,7 @@ public class MultiTouchHandler : MonoBehaviour
             var info = new TouchInfo { position = touch.position, fingerId = touch.fingerId };
             if (touch.phase == TouchPhase.Began)
             {
+                Debug.LogError("one : "+info.position);
                 TouchBegan(info);
             }
             else if (touch.phase == TouchPhase.Ended)

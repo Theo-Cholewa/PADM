@@ -59,9 +59,8 @@ public class Gestable : MonoBehaviour
         pulling.draggerObject.transform.parent = transform;
     }
 
-    Vector3 GetCoord(Vector2 coord)
+    Vector3 GetCoord(Ray ray)
     {
-        var ray = Camera.main.ScreenPointToRay(coord);
         var plane = new Plane(Vector3.forward, transform.position);
         if (plane.Raycast(ray, out float distance))
         {
@@ -97,14 +96,14 @@ public class Gestable : MonoBehaviour
     void OnGlobalTouchDown(GlobalTouchInfo global)
     {
         var info = global.info;
-        var touchPos = GetCoord(info.position);
+        var touchPos = GetCoord(info.ray);
         if (gestMode && (transform.position-touchPos).magnitude < GestPointMaxDistance)
         {
             var point = new GestPoint
             {
                 draggerObject = DraggerPrefab ? Instantiate(DraggerPrefab) : null,
                 info = info,
-                position = GetCoord(info.position)
+                position = GetCoord(info.ray)
             };
             gestPoints[info.fingerId] = point;
             gestPointList.Add(info.fingerId);
@@ -133,7 +132,7 @@ public class Gestable : MonoBehaviour
             var fingerId = gestPointList[i];
             if (gestPoints.TryGetValue(fingerId, out var point))
             {
-                point.position = GetCoord(point.info.position);
+                point.position = GetCoord(point.info.ray);
                 UpdateShape(point);
             }
         }
