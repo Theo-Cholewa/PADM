@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RessourceTime.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Recolte.unity
     guid: 70a856a958e33634b94dd5b37093c570
   - enabled: 1
@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: "Assets/Scenes/R\xE9paration.unity"
     guid: 5653a34b08c94764b910bafc44efb374
+  - enabled: 1
+    path: Assets/Scenes/VR.unity
+    guid: 0ed9f457a959f944d87e5ec7ef9f9c43
   m_configObjects: {}
