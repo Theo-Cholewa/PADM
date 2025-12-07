@@ -53,8 +53,43 @@ public class NetworkDebugger : MonoBehaviour
         }
     }
 
+    [Serializable]
+    public class ValueZone
+    {
+        public string Name;
+        public TextMeshProUGUI Label;
+        public TMP_InputField Input;
+        public TextMeshProUGUI Value;
+        PartyTools.ValueServer<string> Server;
+        PartyTools.ValueClient<string> Client;
+        
+
+        public void Init()
+        {
+            var party = PartyTools.GetParty(Label.gameObject.scene);
+
+            Label.text = Name;
+            Server = new PartyTools.ValueServer<string>(party, Name, "default", s => s);
+            Client = new PartyTools.ValueClient<string>(party, Name, s => s, OnChange);
+            Input.onSubmit.AddListener(OnInputSubmit);
+        }
+
+        void OnInputSubmit(string input)
+        {
+            Server.SetValue(input);
+        }
+
+        void OnChange()
+        {
+            Value.text = string.Join("\n", Client.GetValues().Values);
+        }
+    }
+
     public ToggleZone Screen;
     public ToggleZone Ship;
+    public ValueZone A;
+    public ValueZone B;
+
 
     // Start is called before the first frame update
     void Start()
@@ -70,6 +105,8 @@ public class NetworkDebugger : MonoBehaviour
 
         Screen.Init();
         Ship.Init();
+        A.Init();
+        B.Init();
     }
 
     void OnPeerListChange(PartyPeer _)
