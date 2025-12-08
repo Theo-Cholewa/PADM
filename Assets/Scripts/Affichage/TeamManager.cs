@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI; 
 
@@ -33,6 +34,28 @@ public class TeamManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
+        sharedDataServer = new PartyTools.ValueServer<SharedData>(
+            Party.current,
+            $"team_{teamName.ToLower()}",
+            new SharedData
+            {
+                gold = gold,
+                wood = wood,
+                rock = rock,
+                chicken = chicken,
+                cannonLevel = cannonLevel,
+                pirateLevel = pirateLevel,
+                barrelLevel = barrelLevel,
+                shipLevel = shipLevel
+            },
+            (sharedData) => JsonUtility.ToJson(sharedData)
+        );
+        Party.current.OnMessage.AddListener(OnMessage);
+    }
+
+    void OnDestroy()
+    {
+        Party.current.OnMessage.RemoveListener(OnMessage);
     }
 
     public void ModifyResource(ResourceType type, int amount)
@@ -67,9 +90,57 @@ public class TeamManager : MonoBehaviour
         if(chickenText) chickenText.text = "x" + chicken.ToString();
 
         // Mise à jour des niveaux (si tu les as assignés)
-        if(cannonLevelText) cannonLevelText.text = "lvl " + cannonLevel.ToString();
-        if(pirateLevelText) pirateLevelText.text = "lvl " + pirateLevel.ToString();
-        if(barrelLevelText) barrelLevelText.text = "lvl " + barrelLevel.ToString();
-        if(shipLevelText) shipLevelText.text = "lvl " + shipLevel.ToString();
+        if(cannonLevelText) cannonLevelText.text = "lvl" + cannonLevel.ToString();
+        if(pirateLevelText) pirateLevelText.text = "lvl" + pirateLevel.ToString();
+        if(barrelLevelText) barrelLevelText.text = "lvl" + barrelLevel.ToString();
+        if(shipLevelText) shipLevelText.text = "lvl" + shipLevel.ToString();
+    }
+
+    // NETWORK //
+    [Serializable]
+    public struct SharedData
+    {
+        public int gold;
+        public int wood;
+        public int rock;
+        public int chicken;
+        public int cannonLevel;
+        public int pirateLevel;
+        public int barrelLevel;
+        public int shipLevel;
+    }
+
+    PartyTools.ValueServer<SharedData> sharedDataServer;
+
+    void UpdateNetwork()
+    {
+        sharedDataServer.SetValue(new SharedData
+        {
+            gold = gold,
+            wood = wood,
+            rock = rock,
+            chicken = chicken,
+            cannonLevel = cannonLevel,
+            pirateLevel = pirateLevel,
+            barrelLevel = barrelLevel,
+            shipLevel = shipLevel
+        });
+    }
+
+    void OnMessage(PartyMessage message)
+    {
+        if (message.message.StartsWith("store;add;"))
+        {
+            var param = message.message.Split(';');
+            if(param[2]!=teamName.ToLower())return;
+            var value = int.Parse(param[3]);
+            var type = param[4];
+            if(type=="gold") gold += value;
+            else if(type=="wood") wood += value;
+            else if(type=="rock") rock += value;
+            else if(type=="chicken") chicken += value;
+            UpdateUI();
+            UpdateNetwork();
+        }
     }
 }
