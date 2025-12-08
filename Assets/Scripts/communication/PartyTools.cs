@@ -189,7 +189,11 @@ public static class PartyTools
         {
             return values.Values.Count==0 ? defaultValue : values.Values.Aggregate((a,b)=>aggregator(a,b,values.Values.Count));
         }
-        
+
+        public T FirstOrDefault()
+        {
+            return values.Values.Count == 0 ? default : values.Values.First();
+        }
     }
 
     /// <summary>

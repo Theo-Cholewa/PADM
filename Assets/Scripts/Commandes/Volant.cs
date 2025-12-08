@@ -1,25 +1,30 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Volant : MonoBehaviour
 {
 
-    PartyTools.ValueServer<float> server;
+    PartyTools.ValueServer<(float,float)> server;
     float rotation = 0f;
+
+    [DoNotSerialize]
+    public float speed = 0f;
 
     void Start()
     {
+        speed = 0f;
         var party = Party.current;
         var teamName = Team.currentTeam.name;
-        server = new(party,$"direction_{teamName}", 0f, v=>v.ToString());
+        server = new(party,$"direction_{teamName}", (0f, 0f), v=>JsonUtility.ToJson(v));
+        StartCoroutine(SendData());
     }
 
     void SetRotation(float new_rotation)
     {
         rotation = new_rotation;
-        if(server!=null)server.SetValue(rotation);
-        Debug.Log(rotation);
         transform.rotation = Quaternion.Euler(0, 0, rotation);
     }
     
@@ -39,11 +44,13 @@ public class Volant : MonoBehaviour
     void OnTouchDown(TouchInfo info)
     {
         last[info.fingerId] = ToPosition(info.position);
+        isMoving = true;
     }
 
     void OnTouchDragEnd(TouchInfo info)
     {
         last.Remove(info.fingerId);
+        isMoving = false;
     }
 
     bool isMoving = false;
@@ -71,7 +78,6 @@ public class Volant : MonoBehaviour
             if (Math.Abs(power) > 0.1)
             {
                 SetRotation(rotation - power);
-                isMoving = true;
             }
         }
 
@@ -83,11 +89,20 @@ public class Volant : MonoBehaviour
         {
             SetRotation(Mathf.Lerp(rotation, 0, 0.02f));
         }
-        else isMoving = false;
     }
 
     void OnDestroy()
     {
         server.Destroy();
+    }
+
+    IEnumerator SendData()
+    {
+        while (true)
+        {
+            if(server!=null)server.SetValue((rotation, speed));
+            Debug.Log($"Sending data: rotation={rotation}, speed={speed}");
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

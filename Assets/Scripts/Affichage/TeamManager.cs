@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
 
-public class TeamManager : MonoBehaviour
+public partial class TeamManager : MonoBehaviour
 {
     [Header("Identité")]
     public string teamName = "Red"; 
@@ -34,10 +33,10 @@ public class TeamManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
-        sharedDataServer = new PartyTools.ValueServer<SharedData>(
+        sharedDataServer = new PartyTools.ValueServer<StoreData>(
             Party.current,
             $"team_{teamName.ToLower()}",
-            new SharedData
+            new StoreData
             {
                 gold = gold,
                 wood = wood,
@@ -71,6 +70,7 @@ public class TeamManager : MonoBehaviour
             case ResourceType.Barrel: barrelLevel += amount; break;
             case ResourceType.Ship: shipLevel += amount; break;
         }
+        UpdateNetwork();
         UpdateUI();
     }
 
@@ -96,25 +96,11 @@ public class TeamManager : MonoBehaviour
         if(shipLevelText) shipLevelText.text = "lvl" + shipLevel.ToString();
     }
 
-    // NETWORK //
-    [Serializable]
-    public struct SharedData
-    {
-        public int gold;
-        public int wood;
-        public int rock;
-        public int chicken;
-        public int cannonLevel;
-        public int pirateLevel;
-        public int barrelLevel;
-        public int shipLevel;
-    }
-
-    PartyTools.ValueServer<SharedData> sharedDataServer;
+    PartyTools.ValueServer<StoreData> sharedDataServer;
 
     void UpdateNetwork()
     {
-        sharedDataServer.SetValue(new SharedData
+        sharedDataServer.SetValue(new StoreData
         {
             gold = gold,
             wood = wood,

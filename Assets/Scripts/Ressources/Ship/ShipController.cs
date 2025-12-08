@@ -41,14 +41,22 @@ public class ShipController : MonoBehaviour
     // 🔹 île actuellement accostée
     private Island currentIslandDocked = null;
 
-    private PartyTools.ValueClient<float> directionClient;
+    private PartyTools.ValueClient<(float,float)> directionClient;
+    private PartyTools.ValueClient<StoreData> storeDataClient;
 
     void Start()
     {
         directionClient = new(
             Party.current,
             $"direction_{playerName.ToLower()}",
-            v => float.Parse(v),
+            v => JsonUtility.FromJson<(float,float)>(v),
+            ()=>{}
+        );
+
+        storeDataClient = new(
+            Party.current,
+            $"team_{playerName.ToLower()}",
+            v => JsonUtility.FromJson<StoreData>(v),
             ()=>{}
         );
 
@@ -212,16 +220,27 @@ public class ShipController : MonoBehaviour
 
         if (anchorDropped) return;
 
+        var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
+        var volantCount = directionClient?.GetValues()?.Count ?? 1;
+        if(volantCount==0) volantCount = 1;
+
+
         // --- Mouvement avant/arrière ---
+        var data = storeDataClient?.FirstOrDefault();
+        var speed = (data?.shipLevel ?? 1);
+        if(speed==0)speed = 1;
+        
         if (Input.GetKey(moveForward))
-            currentSpeed += acceleration * Time.deltaTime;
+            currentSpeed += acceleration * Time.deltaTime * speed;
         else
-            currentSpeed -= deceleration * Time.deltaTime;
+            currentSpeed -= deceleration * Time.deltaTime * speed;
 
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
+        currentSpeed += volantData.Item2/volantCount * acceleration * Time.deltaTime * speed;
 
+        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed*speed);
+        
+        currentRotationSpeed -= volantData.Item1/volantCount /18f * rotationAcceleration * Time.deltaTime;
 
-        currentRotationSpeed += (directionClient==null ? 0f : directionClient.GetAggregate((a,b,c)=>(a+b)/c, 0f)/180f)*rotationAcceleration*Time.deltaTime;
 
         // --- Rotation inertielle ---
         if (Input.GetKey(turnLeft))
