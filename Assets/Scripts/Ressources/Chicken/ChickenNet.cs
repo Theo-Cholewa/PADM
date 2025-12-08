@@ -23,6 +23,7 @@ public class ChickenNet : MonoBehaviour
             {
                 Destroy(hit.gameObject); // capture !
                 Debug.Log("🐔 Poulet capturé !");
+                Party.current.BroadcastMessage("store;add;blue;1;chicken");
             }
         }
     }

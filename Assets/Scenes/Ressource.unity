@@ -4453,7 +4453,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnRadius: 10
   spawnInterval: 1
-  maxChickens: 5
+  maxChickens: 100
   chickenPrefab: {fileID: 5452458411339275128, guid: 4b5ca8fdeeedb074d89303b4113e4064, type: 3}
   groundY: 2
 --- !u!4 &1998055606
