@@ -30,6 +30,13 @@ public partial class TeamManager : MonoBehaviour
     public Text barrelLevelText;
     public Text shipLevelText;
 
+    [Header("Références UI (Jauges / Barres)")]
+    public Image cannonBarImage;
+    public Image pirateBarImage;
+    public Image barrelBarImage;
+    public Image shipBarImage;
+    private const float MAX_LEVEL = 5f;
+
     void Start()
     {
         UpdateUI();
@@ -83,7 +90,6 @@ public partial class TeamManager : MonoBehaviour
     // Met à jour l'affichage
     public void UpdateUI()
     {
-        // On vérifie si le texte est assigné avant de le modifier pour éviter les erreurs
         if(goldText) goldText.text = gold.ToString() + "g";
         if(woodText) woodText.text = "x" + wood.ToString();
         if(rockText) rockText.text = "x" + rock.ToString();
@@ -94,6 +100,13 @@ public partial class TeamManager : MonoBehaviour
         if(pirateLevelText) pirateLevelText.text = "lvl" + pirateLevel.ToString();
         if(barrelLevelText) barrelLevelText.text = "lvl" + barrelLevel.ToString();
         if(shipLevelText) shipLevelText.text = "lvl" + shipLevel.ToString();
+
+        float steps = MAX_LEVEL - 1;
+
+        if (cannonBarImage) cannonBarImage.fillAmount = (cannonLevel - 1) / steps;
+        if (pirateBarImage) pirateBarImage.fillAmount = (pirateLevel - 1) / steps;
+        if (barrelBarImage) barrelBarImage.fillAmount = (barrelLevel - 1) / steps;
+        if (shipBarImage)   shipBarImage.fillAmount = (shipLevel - 1)   / steps;
     }
 
     PartyTools.ValueServer<StoreData> sharedDataServer;

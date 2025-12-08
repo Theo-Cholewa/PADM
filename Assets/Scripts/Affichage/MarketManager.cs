@@ -26,14 +26,10 @@ public class MarketManager : MonoBehaviour
     public int blueShipPrice = 50;
     
     [Header("UI Text References (Prices)")]
-    // Wood Prices Texts
     public Text woodPrice1; public Text woodPrice2; public Text woodPrice3; public Text woodPrice4;
-    // Chicken Prices Texts
     public Text chickenPrice1; public Text chickenPrice2; public Text chickenPrice3; public Text chickenPrice4;
-    // Rock Prices Texts
     public Text rockPrice1; public Text rockPrice2; public Text rockPrice3; public Text rockPrice4;
     
-    // Upgrade Price Texts
     public Text redCannonPriceText1; public Text redCannonPriceText2;
     public Text redPiratePriceText1; public Text redPiratePriceText2;
     public Text redBarrelPriceText1; public Text redBarrelPriceText2;
@@ -59,31 +55,42 @@ public class MarketManager : MonoBehaviour
     public Button UpgradeBarrelRedTeam; public Button UpgradeBarrelBlueTeam;
     public Button UpgradeShipRedTeam; public Button UpgradeShipBlueTeam;
 
+    [Header("Economic System")]
+    public float boomDuration = 45f;
+    public float minTimeBetweenBooms = 20f;
+    public float maxTimeBetweenBooms = 60f;
+    private int baseWoodPrice;
+    private int baseRockPrice;
+    private int baseChickenPrice;
+
+
     void Start()
     {
+        baseWoodPrice = woodPrice;
+        baseRockPrice = rockPrice;
+        baseChickenPrice = chickenPrice;
+
         UpdatePriceUI();
         SetupButtons();
+
+        StartCoroutine(EconomicCycleRoutine());
     }
 
     // --- SETUP ---
 
     void UpdatePriceUI()
     {
-        // Helper string
         string g = "g";
 
-        // Resources
         SetText(woodPrice + g, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
         SetText(chickenPrice + g, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
         SetText(rockPrice + g, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
 
-        // Red Upgrades
         SetText(redCannonPrice + g, redCannonPriceText1, redCannonPriceText2);
         SetText(redPiratePrice + g, redPiratePriceText1, redPiratePriceText2);
         SetText(redBarrelPrice + g, redBarrelPriceText1, redBarrelPriceText2);
         SetText(redShipPrice + g, redShipPriceText1, redShipPriceText2);
 
-        // Blue Upgrades
         SetText(blueCannonPrice + g, blueCannonPriceText1, blueCannonPriceText2);
         SetText(bluePiratePrice + g, bluePiratePriceText1, bluePiratePriceText2);
         SetText(blueBarrelPrice + g, blueBarrelPriceText1, blueBarrelPriceText2);
@@ -92,7 +99,6 @@ public class MarketManager : MonoBehaviour
 
     void SetupButtons()
     {
-        // --- RED TEAM ---
         buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, ResourceType.Wood, woodPrice));
         sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, ResourceType.Wood, woodPrice));
 
@@ -107,7 +113,6 @@ public class MarketManager : MonoBehaviour
         UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Barrel, redBarrelPrice));
         UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Ship, redShipPrice));
 
-        // --- BLUE TEAM ---
         buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, ResourceType.Wood, woodPrice));
         sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, ResourceType.Wood, woodPrice));
 
@@ -123,7 +128,6 @@ public class MarketManager : MonoBehaviour
         UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Ship, blueShipPrice));
     }
 
-    // --- LOGIC ---
 
     public void BuyResource(TeamManager team, ResourceType type, int price)
     {
@@ -141,7 +145,6 @@ public class MarketManager : MonoBehaviour
 
     public void SellResource(TeamManager team, ResourceType type, int price)
     {
-        // Check if team has the resource
         bool hasResource = false;
         switch (type)
         {
@@ -152,8 +155,9 @@ public class MarketManager : MonoBehaviour
 
         if (hasResource)
         {
+            int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
-            team.ModifyGold(price); // Selling gives gold back
+            team.ModifyGold(sellPrice);
             Debug.Log(team.teamName + " sold " + type);
         }
         else
@@ -199,5 +203,124 @@ public class MarketManager : MonoBehaviour
         {
             if(t != null) t.text = text;
         }
+    }
+
+    IEnumerator EconomicCycleRoutine()
+    {
+        while (true)
+        {
+            float waitTime = Random.Range(minTimeBetweenBooms, maxTimeBetweenBooms);
+            yield return new WaitForSeconds(waitTime);
+
+            TriggerRandomBoom();
+
+            yield return new WaitForSeconds(boomDuration);
+
+            ResetPrices();
+        }
+    }
+
+// --- NOUVELLE LOGIQUE DU BOOM ---
+
+    void TriggerRandomBoom()
+    {
+        Debug.Log("--- ECONOMIC BOOM STARTED ---");
+
+        // Pile ou face : modifie-t-on 1 ou 2 ressources ?
+        bool modifyTwoResources = (Random.value > 0.5f);
+
+        // Liste des types disponibles
+        List<ResourceType> availableTypes = new List<ResourceType> { ResourceType.Wood, ResourceType.Rock, ResourceType.Chicken };
+
+        if (modifyTwoResources)
+        {
+            // --- CAS : 2 RESSOURCES (1 UP, 1 DOWN) ---
+            
+            // 1. On tire 2 ressources au hasard
+            int index1 = Random.Range(0, availableTypes.Count);
+            ResourceType type1 = availableTypes[index1];
+            availableTypes.RemoveAt(index1); // On retire pour ne pas la repiocher
+
+            int index2 = Random.Range(0, availableTypes.Count);
+            ResourceType type2 = availableTypes[index2];
+
+            // 2. On décide qui monte et qui descend
+            bool firstIsUp = (Random.value > 0.5f);
+
+            // 3. Génération des multiplicateurs
+            // UP : Entre x1.2 et x2.5
+            // DOWN : Entre x0.4 et x0.8
+            float mult1 = firstIsUp ? Random.Range(1.2f, 2.5f) : Random.Range(0.4f, 0.8f);
+            float mult2 = firstIsUp ? Random.Range(0.4f, 0.8f) : Random.Range(1.2f, 2.5f);
+
+            ApplyPriceModification(type1, mult1);
+            ApplyPriceModification(type2, mult2);
+        }
+        else
+        {           
+            int index = Random.Range(0, availableTypes.Count);
+            ResourceType type = availableTypes[index];
+
+            float randomMult = Random.Range(0.5f, 2.5f);
+            
+            ApplyPriceModification(type, randomMult);
+        }
+
+        UpdatePriceUI();
+    }
+
+    void ApplyPriceModification(ResourceType type, float multiplier)
+    {
+        switch (type)
+        {
+            case ResourceType.Wood:
+                woodPrice = Mathf.CeilToInt(baseWoodPrice * multiplier);
+                Debug.Log($"BOIS : {baseWoodPrice} -> {woodPrice} (x{multiplier:F2})");
+                UpdateTextColor(woodPrice, baseWoodPrice, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
+                break;
+
+            case ResourceType.Rock:
+                rockPrice = Mathf.CeilToInt(baseRockPrice * multiplier);
+                Debug.Log($"PIERRE : {baseRockPrice} -> {rockPrice} (x{multiplier:F2})");
+                UpdateTextColor(rockPrice, baseRockPrice, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
+                break;
+
+            case ResourceType.Chicken:
+                chickenPrice = Mathf.CeilToInt(baseChickenPrice * multiplier);
+                Debug.Log($"POULET : {baseChickenPrice} -> {chickenPrice} (x{multiplier:F2})");
+                UpdateTextColor(chickenPrice, baseChickenPrice, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
+                break;
+        }
+    }
+
+    void UpdateTextColor(int currentPrice, int basePrice, params Text[] texts)
+    {
+        Color targetColor = Color.black;
+        Color darkGreen = new Color(0f, 0.6f, 0f);
+
+        if (currentPrice > basePrice) 
+            targetColor = darkGreen;
+        else if (currentPrice < basePrice) 
+            targetColor = Color.red;
+
+        foreach (Text t in texts)
+        {
+            if (t != null) t.color = targetColor;
+        }
+    }
+
+void ResetPrices()
+    {
+        Debug.Log("--- FIN DU BOOM ECONOMIQUE ---");
+        
+        woodPrice = baseWoodPrice;
+        rockPrice = baseRockPrice;
+        chickenPrice = baseChickenPrice;
+
+        UpdateTextColor(woodPrice, baseWoodPrice, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
+        UpdateTextColor(rockPrice, baseRockPrice, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
+        UpdateTextColor(chickenPrice, baseChickenPrice, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
+
+        UpdatePriceUI();
     }
 }
