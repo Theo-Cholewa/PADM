@@ -27,7 +27,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Volant.unity
     guid: 901defd891c554b42b7c2dfbdba98d3f
   - enabled: 1
-    path: Assets/Scenes/Team.unity
+    path: Assets/Scenes/TeamSelection.unity
     guid: f0ccb1f79776d384783107662af6bd7f
   - enabled: 1
     path: Assets/Scenes/Ressource.unity

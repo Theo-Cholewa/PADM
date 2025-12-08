@@ -119,8 +119,10 @@ public class Party : MonoBehaviour
     IPAddress myself;
 
     // LIFE CYCLE //
+    bool isRunning = false;
     void Start()
     {
+        if(current!=null)return;
 
         DontDestroyOnLoad(gameObject);
         current = this;
@@ -138,13 +140,19 @@ public class Party : MonoBehaviour
         BroadcastMyself();
 
         StartCoroutine(WaitForBroadcast());
+
+        isRunning = true;
     }
 
     void OnDestroy()
     {
+        if(!isRunning) return;
+
         DestroyListenTcp();
         DestroyBroadcast();
         DestroyTcpLoop();
+        current = null;
+        isRunning = false;
     }
 
 

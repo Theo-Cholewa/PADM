@@ -220,6 +220,9 @@ public class ShipController : MonoBehaviour
 
         currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
 
+
+        currentRotationSpeed += (directionClient==null ? 0f : directionClient.GetAggregate((a,b,c)=>(a+b)/c, 0f)/180f)*rotationAcceleration*Time.deltaTime;
+
         // --- Rotation inertielle ---
         if (Input.GetKey(turnLeft))
             currentRotationSpeed -= rotationAcceleration * Time.deltaTime;
@@ -236,9 +239,7 @@ public class ShipController : MonoBehaviour
                 currentRotationSpeed = 0;
         }
 
-        var networkRotation = directionClient==null ? 0f : directionClient.GetAggregate((a,b,c)=>(a+b)/c, 0f)/60f;
-
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed+networkRotation, -maxRotationSpeed, maxRotationSpeed);
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
     }
 
     void FixedUpdate()
