@@ -70,7 +70,8 @@ public class NetworkDebugger : MonoBehaviour
 
             Label.text = Name;
             Server = new PartyTools.ValueServer<string>(party, Name, "default", s => s);
-            Client = new PartyTools.ValueClient<string>(party, Name, s => s, OnChange);
+            Client = new PartyTools.ValueClient<string>(party, Name, s => s);
+            Client.onChange = OnChange;
             Input.onSubmit.AddListener(OnInputSubmit);
         }
 
@@ -79,7 +80,7 @@ public class NetworkDebugger : MonoBehaviour
             Server.SetValue(input);
         }
 
-        void OnChange()
+        void OnChange(PartyPeer peer, string value)
         {
             Value.text = string.Join("\n", Client.GetValues().Values);
         }

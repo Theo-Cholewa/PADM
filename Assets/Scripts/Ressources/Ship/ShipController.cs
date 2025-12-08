@@ -49,15 +49,13 @@ public class ShipController : MonoBehaviour
         directionClient = new(
             Party.current,
             $"direction_{playerName.ToLower()}",
-            v => JsonUtility.FromJson<(float,float)>(v),
-            ()=>{}
+            v => JsonUtility.FromJson<(float,float)>(v)
         );
 
         storeDataClient = new(
             Party.current,
             $"team_{playerName.ToLower()}",
-            v => JsonUtility.FromJson<StoreData>(v),
-            ()=>{}
+            v => JsonUtility.FromJson<StoreData>(v)
         );
 
         rb = GetComponent<Rigidbody>();

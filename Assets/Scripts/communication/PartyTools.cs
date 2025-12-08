@@ -126,13 +126,15 @@ public static class PartyTools
         private Party party;
         private string name;
         private Func<string,T> fromStr;
-        private Action onChange;
+        public Action<PartyPeer,T> onSet = null;
+        public Action<PartyPeer,T> onAdd = null;
+        public Action<PartyPeer,T> onRemove = null;
+        public Action<PartyPeer,T> onChange = null;
         
-        public ValueClient(Party party, string name, Func<string,T> fromStr, Action onChange)
+        public ValueClient(Party party, string name, Func<string,T> fromStr)
         {
             this.party = party;
             this.fromStr = fromStr;
-            this.onChange = onChange;
             this.name = name;
             party.OnMessage.AddListener(OnMessage);
             party.OnDisconnect.AddListener(OnDisconnect);
@@ -158,13 +160,26 @@ public static class PartyTools
                 if (opt == "set")
                 {
                     var value = fromStr(param[1]);
+                    var added = !values.ContainsKey(message.peer);
                     values[message.peer] = value;
-                    onChange();
+                    if(added){
+                        if(onAdd!=null) onAdd(message.peer, value);
+                    }
+                    else
+                    {
+                        if(onSet!=null) onSet(message.peer, value);
+                    }
+                    if(onChange!=null) onChange(message.peer, value);
                 }
                 else if (opt == "remove")
                 {
-                    values.Remove(message.peer);
-                    onChange();
+                    if(values.TryGetValue(message.peer, out var value))
+                    {
+                        values.Remove(message.peer);
+                        if(onRemove!=null) onRemove(message.peer, value);
+                        if(onChange!=null) onChange(message.peer, value);
+                    }
+                    
                 }
             }
         }
@@ -176,8 +191,12 @@ public static class PartyTools
 
         void OnDisconnect(PartyPeer peer)
         {
-            values.Remove(peer);
-            onChange();
+            if(values.TryGetValue(peer, out var value))
+            {
+                values.Remove(peer);
+                if(onRemove!=null) onRemove(peer, value);
+                if(onChange!=null) onChange(peer, value);
+            }
         }
 
         public Dictionary<PartyPeer,T> GetValues()

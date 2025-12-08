@@ -1,26 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Volant : MonoBehaviour
+public class Helm : MonoBehaviour
 {
-
-    PartyTools.ValueServer<(float,float)> server;
-    float rotation = 0f;
-
-    [DoNotSerialize]
-    public float speed = 0f;
-
-    void Start()
-    {
-        speed = 0f;
-        var party = Party.current;
-        var teamName = Team.currentTeam.name;
-        server = new(party,$"direction_{teamName}", (0f, 0f), v=>JsonUtility.ToJson(v));
-        StartCoroutine(SendData());
-    }
+    [HideInInspector]
+    public float rotation = 0f;
 
     void SetRotation(float new_rotation)
     {
@@ -29,6 +15,7 @@ public class Volant : MonoBehaviour
     }
     
     private Dictionary<int,Vector3> last = new();
+
 
     Vector3 ToPosition(Vector2 pos)
     {
@@ -88,21 +75,6 @@ public class Volant : MonoBehaviour
         if (!isMoving)
         {
             SetRotation(Mathf.Lerp(rotation, 0, 0.02f));
-        }
-    }
-
-    void OnDestroy()
-    {
-        server.Destroy();
-    }
-
-    IEnumerator SendData()
-    {
-        while (true)
-        {
-            if(server!=null)server.SetValue((rotation, speed));
-            Debug.Log($"Sending data: rotation={rotation}, speed={speed}");
-            yield return new WaitForSeconds(0.1f);
         }
     }
 }
