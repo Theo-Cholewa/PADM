@@ -9,19 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
-static class PartyTools
+public static class PartyTools
 {
-    
-    public static Party GetParty(Scene scene)
-    {
-        foreach(var obj in scene.GetRootGameObjects())
-        {
-            var component = obj.GetComponentInChildren<Party>();
-            if(component != null) return component;
-        }
-        return null;
-    }
-
 
     /// <summary>
     /// Indique un rôle donné aux autres membres de la Party.
@@ -196,9 +185,9 @@ static class PartyTools
             return values;
         }
 
-        public T GetAggregate(Func<T,T,T> aggregator, T defaultValue)
+        public T GetAggregate(Func<T,T,int,T> aggregator, T defaultValue)
         {
-            return values.Values.Count==0 ? defaultValue : values.Values.Aggregate((a,b)=>aggregator(a,b));
+            return values.Values.Count==0 ? defaultValue : values.Values.Aggregate((a,b)=>aggregator(a,b,values.Values.Count));
         }
         
     }

@@ -41,8 +41,17 @@ public class ShipController : MonoBehaviour
     // 🔹 île actuellement accostée
     private Island currentIslandDocked = null;
 
+    private PartyTools.ValueClient<float> directionClient;
+
     void Start()
     {
+        directionClient = new(
+            Party.current,
+            $"direction_{playerName.ToLower()}",
+            v => float.Parse(v),
+            ()=>{}
+        );
+
         rb = GetComponent<Rigidbody>();
         data = GetComponent<ShipData>();
 
@@ -227,7 +236,9 @@ public class ShipController : MonoBehaviour
                 currentRotationSpeed = 0;
         }
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
+        var networkRotation = directionClient==null ? 0f : directionClient.GetAggregate((a,b,c)=>(a+b)/c, 0f)/60f;
+
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed+networkRotation, -maxRotationSpeed, maxRotationSpeed);
     }
 
     void FixedUpdate()

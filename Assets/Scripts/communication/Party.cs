@@ -36,6 +36,8 @@ class Client
 
 public class Party : MonoBehaviour
 {
+    public static Party current;
+
     [Header("Identity")]
     public string PartyName = "Unknown";
 
@@ -119,6 +121,10 @@ public class Party : MonoBehaviour
     // LIFE CYCLE //
     void Start()
     {
+
+        DontDestroyOnLoad(gameObject);
+        current = this;
+
         var random = new System.Random();
         Identifier = PartyName+new int[]{0,0,0,0,0,0,0,0}.Select(_ => CHARACTERS[random.Next(CHARACTERS.Length)]).Aggregate("", (a,b) => a+b);
 
@@ -153,12 +159,13 @@ public class Party : MonoBehaviour
     {
         tcpListener = new TcpListener(myself, TcpPort);
         tcpListener.Start();
+        Log("TCP Listener started");
     }
 
     void DestroyListenTcp()
     {
         tcpListener.Stop();
-        Debug.Log("Stopped TCP Listener");
+        Log("TCP Listener stopped");
     }
 
     async Task<bool> ListenOnTcp()
@@ -397,8 +404,9 @@ public class Party : MonoBehaviour
 
             // Broadcast
             udpClient.Send(bytes, bytes.Length, "255.255.255.255", UdpPort);
+
             // Simulate broadcast to loopback
-            for(var n=1; n<10; n++) udpClient.Send(bytes, bytes.Length, $"127.0.0.{n}", UdpPort);
+            if(ip.ToString().StartsWith("127")) for(var n=1; n<10; n++) udpClient.Send(bytes, bytes.Length, $"127.0.0.{n}", UdpPort);
         }
     }
 
@@ -513,7 +521,7 @@ public class Party : MonoBehaviour
         // If editor
         if (Application.isEditor)
         {
-            return IPAddress.Parse("127.0.0.1");
+            //return IPAddress.Parse("127.0.0.1");
         }
 
         // Get from args
@@ -534,6 +542,11 @@ public class Party : MonoBehaviour
             }
         }
         throw new Exception("No network adapters with an IPv4 address in the system!");
+    }
+
+    private void Log(string msg)
+    {
+        Debug.Log($"[PARTY] {msg}");
     }
 
     private static string GetArg(string name)

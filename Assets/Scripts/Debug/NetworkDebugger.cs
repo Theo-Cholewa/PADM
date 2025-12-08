@@ -29,7 +29,7 @@ public class NetworkDebugger : MonoBehaviour
 
         public void Init()
         {
-            var party = PartyTools.GetParty(Toggle.gameObject.scene);
+            var party = Party.current;
 
             RoleClient = new(party, s=>s==Role, OnChange, OnChange);
 
@@ -66,7 +66,7 @@ public class NetworkDebugger : MonoBehaviour
 
         public void Init()
         {
-            var party = PartyTools.GetParty(Label.gameObject.scene);
+            var party = Party.current;
 
             Label.text = Name;
             Server = new PartyTools.ValueServer<string>(party, Name, "default", s => s);
@@ -94,7 +94,7 @@ public class NetworkDebugger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var party = PartyTools.GetParty(gameObject.scene);
+        var party = Party.current;
         Debug.Log($"Party initialized {party}");
         IPAddressUI.text = party.GetIPAddress().ToString();
         IdentifierUI.text = party.GetIdentifier();
