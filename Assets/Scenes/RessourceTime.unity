@@ -1760,6 +1760,10 @@ MonoBehaviour:
   turnLeft: k
   turnRight: ;
   anchorKey: l
+  useNetworkSteering: 1
+  useNetworkThrottle: 1
+  networkSteerInput: 0
+  networkThrottleInput: 0
   stopImage: {fileID: 236773116}
   woodImage: {fileID: 1133283431}
   foodImage: {fileID: 702533735}
@@ -2718,6 +2722,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 90, z: 0}
+--- !u!1 &1007348051 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6598886712082313278, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+  m_PrefabInstance: {fileID: 3573770631935037204}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1007348055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007348051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac983529a3b8ae4bb7f42687642856d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  listenPort: 8888
+  shipController: {fileID: 601322237}
 --- !u!1 &1026911445
 GameObject:
   m_ObjectHideFlags: 0
@@ -3243,6 +3266,10 @@ MonoBehaviour:
   turnLeft: a
   turnRight: d
   anchorKey: s
+  useNetworkSteering: 1
+  useNetworkThrottle: 1
+  networkSteerInput: 0
+  networkThrottleInput: 0
   stopImage: {fileID: 500510933}
   woodImage: {fileID: 1236845218}
   foodImage: {fileID: 1556320058}
@@ -4584,7 +4611,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6598886712082313278, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1007348055}
   m_SourcePrefab: {fileID: 100100000, guid: 3f29a77343cf2284eaa7bd81dc975f81, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

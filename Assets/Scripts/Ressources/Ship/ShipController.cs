@@ -15,6 +15,37 @@ public class ShipController : MonoBehaviour
 
     private bool anchorDropped = false;
 
+    [Header("Contrôle réseau")]
+    [Tooltip("Si activé, la rotation vient du mobile plutôt que du clavier.")]
+    public bool useNetworkSteering = false;
+
+    [Tooltip("Si activé, l'accélération vient du mobile plutôt que du clavier.")]
+    public bool useNetworkThrottle = false;
+
+    [Tooltip("Entrée réseau normalisée [-1,1] (mise à jour par TcpReceiver).")]
+    [Range(-1f, 1f)]
+    public float networkSteerInput = 0f;
+
+    [Tooltip("Entrée de throttle réseau [0,1] (0 = coupé, 1 = bouton appuyé).")]
+    [Range(0f, 1f)]
+    public float networkThrottleInput = 0f;
+
+    public void SetNetworkSteer(float value)
+    {
+        networkSteerInput = Mathf.Clamp(value, -1f, 1f);
+    }
+
+    public void SetNetworkThrottle(float value)
+    {
+        networkThrottleInput = Mathf.Clamp01(value);
+    }
+
+    // 🔹 Appelé par TcpReceiver quand il reçoit ANCHOR:TOGGLE
+    public void ToggleAnchorFromNetwork()
+    {
+        ToggleAnchor();
+    }
+
     [Header("UI")]
     public RawImage stopImage;
     public RawImage woodImage;
@@ -60,174 +91,203 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
-        // --- Gestion de l’ancre ---
+        // --- Gestion de l’ancre (clavier) ---
         if (Input.GetKeyDown(anchorKey))
         {
-            anchorDropped = !anchorDropped;
+            ToggleAnchor();
+        }
 
-            if (anchorDropped)
+        // Si l’ancre est posée, le bateau ne bouge plus
+        if (anchorDropped) return;
+
+        // --- Mouvement avant/arrière ---
+        if (useNetworkThrottle)
+        {
+            // Bouton appuyé => accélère, relâché => décélère jusqu'à 0
+            if (networkThrottleInput > 0.5f)
+                currentSpeed += acceleration * Time.deltaTime;
+            else
+                currentSpeed -= deceleration * Time.deltaTime;
+        }
+        else
+        {
+            // Contrôle clavier classique
+            if (Input.GetKey(moveForward))
+                currentSpeed += acceleration * Time.deltaTime;
+            else
+                currentSpeed -= deceleration * Time.deltaTime;
+        }
+
+        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
+
+        // --- Rotation ---
+        if (useNetworkSteering)
+        {
+            float steer = networkSteerInput;      // -1 à 1
+            currentRotationSpeed = steer * maxRotationSpeed;
+            // Debug.Log($"[{playerName}] networkSteerInput={networkSteerInput:F3}, currentRotationSpeed={currentRotationSpeed:F1}");
+        }
+        else
+        {
+            float steerInput = 0f;
+
+            if (Input.GetKey(turnLeft))
+                steerInput = -1f;
+            else if (Input.GetKey(turnRight))
+                steerInput = 1f;
+
+            if (Mathf.Abs(steerInput) > 0.01f)
             {
-                // Pose de l’ancre
-                currentSpeed = 0f;
-                currentRotationSpeed = 0f;
-                rb.velocity = Vector3.zero;
-                Debug.Log($"{playerName} pose l’ancre ⚓");
-
-                if (stopImage != null) stopImage.enabled = true;
-                if (woodImage != null) woodImage.enabled = true;
-                if (foodImage != null) foodImage.enabled = true;
-                if (stoneImage != null) stoneImage.enabled = true;
-
-                // 🔹 Recherche d’île proche
-                float detectionRadius = 20f;
-                Island[] allIslands = FindObjectsOfType<Island>();
-                currentIslandDocked = null;
-
-                foreach (Island island in allIslands)
-                {
-                    float distance = Vector3.Distance(transform.position, island.transform.position);
-                    if (distance <= detectionRadius)
-                    {
-                        island.SetVisited(true);
-                        currentIslandDocked = island;
-
-                        Debug.Log($"⚓ {playerName} est ancré près de l’île {island.islandID} (dist={distance:F1})");
-
-                        if (island.islandContent != null)
-                        {
-                            // --- Actions selon la ressource principale ---
-                            switch (island.mainResource)
-                            {
-                                case Island.ResourceType.Food:
-                                    // 🐔 Gestion des poulets
-                                    ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
-                                    if (net != null)
-                                    {
-                                        net.SetLinkedShip(this);
-                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {playerName}");
-                                    }
-                                    else
-                                    {
-                                        Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
-                                    }
-                                    break;
-
-                                case Island.ResourceType.Wood:
-                                    // 🌲 Gestion du bois
-                                    Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
-                                    WoodHarvestController wood = null;
-
-                                    if (canvas != null)
-                                        wood = canvas.GetComponentInChildren<WoodHarvestController>(true);
-
-                                    if (wood == null)
-                                        wood = island.islandContent.GetComponentInChildren<WoodHarvestController>(true);
-
-                                    if (wood != null)
-                                    {
-                                        wood.gameObject.SetActive(true);
-                                        wood.SetLinkedShip(this); // ✅ lie le bateau ici
-                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {playerName} !");
-                                    }
-                                    else
-                                    {
-                                        Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
-                                    }
-                                    break;
-
-                                case Island.ResourceType.Stone:
-                                    Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
-                                    break;
-
-                                case Island.ResourceType.None:
-                                default:
-                                    Debug.Log($"ℹ️ L'île {island.islandID} ne contient aucune ressource exploitable.");
-                                    break;
-                            }
-                        }
-
-                        break;
-                    }
-                }
+                currentRotationSpeed += steerInput * rotationAcceleration * Time.deltaTime;
             }
             else
             {
-                // Lève l’ancre
-                Debug.Log($"{playerName} relève l’ancre ⚓");
+                if (currentRotationSpeed > 0)
+                    currentRotationSpeed -= rotationDeceleration * Time.deltaTime;
+                else if (currentRotationSpeed < 0)
+                    currentRotationSpeed += rotationDeceleration * Time.deltaTime;
 
-                if (stopImage != null) stopImage.enabled = false;
-                if (woodImage != null) woodImage.enabled = false;
-                if (foodImage != null) foodImage.enabled = false;
-                if (stoneImage != null) stoneImage.enabled = false;
+                if (Mathf.Abs(currentRotationSpeed) < 0.5f)
+                    currentRotationSpeed = 0;
+            }
 
-                if (currentIslandDocked != null)
+            currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
+        }
+    }
+
+    // 🔹 Toute la logique ancre regroupée ici
+    private void ToggleAnchor()
+    {
+        anchorDropped = !anchorDropped;
+
+        if (anchorDropped)
+        {
+            // Pose de l’ancre
+            currentSpeed = 0f;
+            currentRotationSpeed = 0f;
+            rb.velocity = Vector3.zero;
+            Debug.Log($"{playerName} pose l’ancre ⚓");
+
+            if (stopImage != null) stopImage.enabled = true;
+            if (woodImage != null) woodImage.enabled = true;
+            if (foodImage != null) foodImage.enabled = true;
+            if (stoneImage != null) stoneImage.enabled = true;
+
+            // 🔹 Recherche d’île proche
+            float detectionRadius = 20f;
+            Island[] allIslands = FindObjectsOfType<Island>();
+            currentIslandDocked = null;
+
+            foreach (Island island in allIslands)
+            {
+                float distance = Vector3.Distance(transform.position, island.transform.position);
+                if (distance <= detectionRadius)
                 {
-                    if (currentIslandDocked.islandContent != null)
+                    island.SetVisited(true);
+                    currentIslandDocked = island;
+
+                    Debug.Log($"⚓ {playerName} est ancré près de l’île {island.islandID} (dist={distance:F1})");
+
+                    if (island.islandContent != null)
                     {
-                        switch (currentIslandDocked.mainResource)
+                        switch (island.mainResource)
                         {
                             case Island.ResourceType.Food:
-                                // 🐔 Déconnecte le filet
-                                ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                                ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
                                 if (net != null)
                                 {
-                                    net.SetLinkedShip(null);
-                                    Debug.Log($"🪢 Filet de l’île {currentIslandDocked.islandID} libéré.");
+                                    net.SetLinkedShip(this);
+                                    Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {playerName}");
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
                                 }
                                 break;
 
                             case Island.ResourceType.Wood:
-                                // 🌲 Désactive proprement la récolte du bois
-                                WoodHarvestController wood = currentIslandDocked.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+                                Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
+                                WoodHarvestController wood = null;
+
+                                if (canvas != null)
+                                    wood = canvas.GetComponentInChildren<WoodHarvestController>(true);
+
+                                if (wood == null)
+                                    wood = island.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+
                                 if (wood != null)
                                 {
-                                    wood.SetLinkedShip(null);
-                                    wood.gameObject.SetActive(false);
-                                    Debug.Log($"🌲 Récolte de bois désactivée sur l’île {currentIslandDocked.islandID}");
+                                    wood.gameObject.SetActive(true);
+                                    wood.SetLinkedShip(this);
+                                    Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {playerName} !");
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
                                 }
                                 break;
 
                             case Island.ResourceType.Stone:
-                                Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
+                                Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
+                                break;
+
+                            case Island.ResourceType.None:
+                            default:
+                                Debug.Log($"ℹ️ L'île {island.islandID} ne contient aucune ressource exploitable.");
                                 break;
                         }
                     }
 
-                    // 🔹 Remet l’île dans son état initial
-                    currentIslandDocked.SetVisited(false);
-                    Debug.Log($"🏝️ {playerName} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
-                    currentIslandDocked = null;
+                    break;
                 }
             }
         }
-
-        if (anchorDropped) return;
-
-        // --- Mouvement avant/arrière ---
-        if (Input.GetKey(moveForward))
-            currentSpeed += acceleration * Time.deltaTime;
-        else
-            currentSpeed -= deceleration * Time.deltaTime;
-
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
-
-        // --- Rotation inertielle ---
-        if (Input.GetKey(turnLeft))
-            currentRotationSpeed -= rotationAcceleration * Time.deltaTime;
-        else if (Input.GetKey(turnRight))
-            currentRotationSpeed += rotationAcceleration * Time.deltaTime;
         else
         {
-            if (currentRotationSpeed > 0)
-                currentRotationSpeed -= rotationDeceleration * Time.deltaTime;
-            else if (currentRotationSpeed < 0)
-                currentRotationSpeed += rotationDeceleration * Time.deltaTime;
+            // Lève l’ancre
+            Debug.Log($"{playerName} relève l’ancre ⚓");
 
-            if (Mathf.Abs(currentRotationSpeed) < 0.5f)
-                currentRotationSpeed = 0;
+            if (stopImage != null) stopImage.enabled = false;
+            if (woodImage != null) woodImage.enabled = false;
+            if (foodImage != null) foodImage.enabled = false;
+            if (stoneImage != null) stoneImage.enabled = false;
+
+            if (currentIslandDocked != null)
+            {
+                if (currentIslandDocked.islandContent != null)
+                {
+                    switch (currentIslandDocked.mainResource)
+                    {
+                        case Island.ResourceType.Food:
+                            ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                            if (net != null)
+                            {
+                                net.SetLinkedShip(null);
+                                Debug.Log($"🪢 Filet de l’île {currentIslandDocked.islandID} libéré.");
+                            }
+                            break;
+
+                        case Island.ResourceType.Wood:
+                            WoodHarvestController wood = currentIslandDocked.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+                            if (wood != null)
+                            {
+                                wood.SetLinkedShip(null);
+                                wood.gameObject.SetActive(false);
+                                Debug.Log($"🌲 Récolte de bois désactivée sur l’île {currentIslandDocked.islandID}");
+                            }
+                            break;
+
+                        case Island.ResourceType.Stone:
+                            Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
+                            break;
+                    }
+                }
+
+                currentIslandDocked.SetVisited(false);
+                Debug.Log($"🏝️ {playerName} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
+                currentIslandDocked = null;
+            }
         }
-
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
     }
 
     void FixedUpdate()
