@@ -5,16 +5,16 @@ public class WoodHarvestController : MonoBehaviour
     [Header("Premiers indicateurs")]
     public GameObject[] firstIndicators;
 
-    [Header("Références enfants")]
-    public TouchIndicatorWaveMulti[] indicators;   // Références vers les deux composants enfants
+    [Header("Références enfants (PHASE 1)")]
+    public TouchIndicatorWaveMulti[] indicators; // phase 1 (hand-spike)
 
-    [Header("Objets à activer quand les deux joueurs sont prêts")]
-    public GameObject[] harvestObjects;
+    [Header("Objets à activer quand les deux joueurs sont prêts (PHASE 2)")]
+    public GameObject[] harvestObjects; // contient Saw + hold-touch-indicator + etc.
 
-    [Header("Objets à desactiver quand les deux joueurs sont prêts")]
+    [Header("Objets de trigger (optionnel) - UI phase 1")]
     public GameObject[] triggerObjects;
 
-    [Header("Prefab à masquer quand on appuie sur ESPACE")]
+    [Header("Prefab à masquer quand la récolte est finie")]
     public GameObject prefabToHide;
 
     [Header("Composant dont on veut supprimer un script")]
@@ -24,135 +24,39 @@ public class WoodHarvestController : MonoBehaviour
     [Header("🔹 Référence au bateau accosté")]
     private ShipController linkedShip;
 
-    private bool allActivated = false;
-    /*
-    void Awake()
-    {
-        if (firstIndicators != null)
-        {
-            foreach (var indicator in firstIndicators)
-            {
-                if (indicator == null) continue;
-
-                // On tente de désactiver le GameObject
-                indicator.SetActive(false);
-
-                // On ajoute aussi une sécurité avec CanvasGroup pour les UI
-                var cg = indicator.GetComponent<CanvasGroup>();
-                if (cg == null)
-                    cg = indicator.AddComponent<CanvasGroup>();
-
-                cg.alpha = 0; // invisible
-                cg.interactable = false;
-                cg.blocksRaycasts = false;
-            }
-        }
-    }*/
+    private bool phase2Active = false;
+    private bool finished = false;
 
     void Start()
     {
-        // Si rien n’est assigné manuellement, on récupère automatiquement les enfants
         if (indicators == null || indicators.Length == 0)
             indicators = GetComponentsInChildren<TouchIndicatorWaveMulti>();
-        /*
-        if (firstIndicators != null)
-        {
-            // Désactive tous les premiers indicateurs au départ
-            foreach (var indicator in firstIndicators)
-            {
-                indicator?.SetActive(false);
-            }
-        }*/
 
-        if (harvestObjects != null)
-        {
-            // Désactive tous les objets de récolte au départ
-            foreach (var obj in harvestObjects)
-            {
-                obj?.SetActive(false);
-            }
-        }
-        
-        if (triggerObjects != null)
-        {
-            // Active tous les objets de trigger au départ
-            foreach (var obj in triggerObjects)
-            {
-                obj?.SetActive(true);
-            }
-        }
+        // Phase 2 OFF au départ
+        ActivateHarvestObjects(false);
+
+        // Phase 1 ON
+        SetIndicatorsRaycast(true);
+        ActivateTriggerObjects(true);
     }
 
     void Update()
     {
+        // Reset
         if (Input.GetKeyDown(KeyCode.R))
         {
-            foreach (var indicator in firstIndicators)
-            {
-                if (indicator == null) continue;
-
-                indicator.SetActive(true);
-
-                var cg = indicator.GetComponent<CanvasGroup>();
-                if (cg != null)
-                {
-                    cg.alpha = 1;
-                    cg.interactable = true;
-                    cg.blocksRaycasts = true;
-                }
-            }
-
-            Debug.Log("🔄 Réinitialisation des indicateurs de récolte.");
+            ResetAll();
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ActivateHarvestObjects(false);
-            ActivateTriggerObjects(false);
-            prefabToHide?.SetActive(false);
+        // Si déjà fini, ne plus rien gérer
+        if (finished) return;
 
-            if (linkedShip != null)
-            {
-                ShipData shipData = linkedShip.GetComponent<ShipData>();
-                if (shipData != null)
-                {
-                    shipData.AddResource("wood", 10);
-                    Debug.Log($"🌲 {linkedShip.playerName} a récolté du bois — total bois : {shipData.wood}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("⚠ Aucun bateau lié pour recevoir le bois !");
-            }
-
-            if (targetObject != null && !string.IsNullOrEmpty(scriptNameToRemove))
-            {
-                var component = targetObject.GetComponent(scriptNameToRemove);
-                if (component != null)
-                {
-                    if (component is IslandPulse islandPulse && islandPulse.islandRenderer != null)
-                    {
-                        islandPulse.islandRenderer.material.color = islandPulse.baseColor;
-                        Debug.Log("🎨 Couleur de l'île réinitialisée avant suppression du script.");
-                    }
-                    Destroy(component);
-                    Debug.Log($"🗑️ Script '{scriptNameToRemove}' supprimé de {targetObject.name}");
-                }
-                else
-                {
-                    Debug.LogWarning($"⚠️ Aucun script nommé '{scriptNameToRemove}' trouvé sur {targetObject.name}");
-                }
-            }
-            return;
-        }
-        
         if (indicators == null || indicators.Length == 0)
             return;
 
+        // PHASE 1 : attendre que les 2 indicateurs soient OK
         bool everyoneActive = true;
-
-        // Vérifie si chaque TouchIndicatorWaveMulti est actif
         foreach (var indicator in indicators)
         {
             if (indicator == null || !indicator.isTouched)
@@ -162,36 +66,115 @@ public class WoodHarvestController : MonoBehaviour
             }
         }
 
-        // Si tous sont activés et que ce n’était pas encore le cas → message console
-        if (everyoneActive && !allActivated)
+        if (everyoneActive && !phase2Active)
         {
-            allActivated = true;
+            phase2Active = true;
+
+            // Active phase 2
             ActivateHarvestObjects(true);
+
+            // Cache phase 1
             ActivateTriggerObjects(false);
+
+            // On empêche de retoucher phase 1 (mais on ne reset pas l'état)
+            SetIndicatorsRaycast(false);
+
+            Debug.Log("🌲 Phase 2 activée !");
         }
 
-        // Si un se relâche, on peut repasser à false (facultatif)
-        if (!everyoneActive && allActivated)
+        // Si tu veux garder le retour phase 1 si quelqu'un relâche, garde ça.
+        // Sinon, commente ce bloc.
+        if (!everyoneActive && phase2Active)
         {
-            allActivated = false;
+            phase2Active = false;
+
             ActivateHarvestObjects(false);
             ActivateTriggerObjects(true);
+            SetIndicatorsRaycast(true);
+
+            // Reset aussi les touches phase 2 (sinon états collés)
+            ResetTouchesInHarvestObjects();
+
+            Debug.Log("❌ Retour phase 1.");
         }
+    }
+
+    // ✅ Appelée par SawHoldFinish quand la découpe est terminée
+    public void FinishHarvest()
+    {
+        if (finished) return;
+        finished = true;
+
+        ActivateHarvestObjects(false);
+        ActivateTriggerObjects(false);
+        SetIndicatorsRaycast(false);
+        prefabToHide?.SetActive(false);
+
+        // Récompense
+        if (linkedShip != null)
+        {
+            ShipData shipData = linkedShip.GetComponent<ShipData>();
+            if (shipData != null)
+            {
+                shipData.AddResource("wood", 10);
+                Debug.Log($"🌲 {linkedShip.playerName} a récolté du bois — total bois : {shipData.wood}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("⚠ Aucun bateau lié pour recevoir le bois !");
+        }
+
+        // Suppression script optionnelle
+        if (targetObject != null && !string.IsNullOrEmpty(scriptNameToRemove))
+        {
+            var component = targetObject.GetComponent(scriptNameToRemove);
+            if (component != null)
+            {
+                if (component is IslandPulse islandPulse && islandPulse.islandRenderer != null)
+                {
+                    islandPulse.islandRenderer.material.color = islandPulse.baseColor;
+                    Debug.Log("🎨 Couleur de l'île réinitialisée avant suppression du script.");
+                }
+
+                Destroy(component);
+                Debug.Log($"🗑️ Script '{scriptNameToRemove}' supprimé de {targetObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ Aucun script nommé '{scriptNameToRemove}' trouvé sur {targetObject.name}");
+            }
+        }
+
+        Debug.Log("✅ Wood-harvest terminé !");
+    }
+
+    private void ResetAll()
+    {
+        // Reset touches phase 1
+        if (indicators != null)
+        {
+            foreach (var ind in indicators)
+                ind?.ResetTouches();
+        }
+
+        finished = false;
+        phase2Active = false;
+
+        ActivateHarvestObjects(false);
+        ActivateTriggerObjects(true);
+        SetIndicatorsRaycast(true);
+
+        ResetTouchesInHarvestObjects();
+
+        Debug.Log("🔄 Reset complet (phase 1).");
     }
 
     void ActivateHarvestObjects(bool state)
     {
         if (harvestObjects == null) return;
-
         foreach (var obj in harvestObjects)
-        {
             obj?.SetActive(state);
-        }
-
-        if (state)
-            Debug.Log("🌲 Récolte possible — objets activés !");
-        else
-            Debug.Log("❌ Récolte interrompue — objets désactivés.");
     }
 
     void ActivateTriggerObjects(bool state)
@@ -200,19 +183,51 @@ public class WoodHarvestController : MonoBehaviour
 
         foreach (var obj in triggerObjects)
         {
-            obj?.SetActive(state);
-        }
+            if (obj == null) continue;
 
-        if (state)
-            Debug.Log("🔔 Triggers activés.");
-        else
-            Debug.Log("🔕 Triggers désactivés.");
+            var ind = obj.GetComponent<TouchIndicatorWaveMulti>();
+            if (ind != null)
+            {
+                ind.SetRaycast(state);
+
+                var cg = obj.GetComponent<CanvasGroup>();
+                if (cg == null) cg = obj.AddComponent<CanvasGroup>();
+
+                cg.alpha = state ? 1f : 0f;
+                cg.interactable = state;
+                cg.blocksRaycasts = state;
+
+                continue;
+            }
+
+            obj.SetActive(state);
+        }
     }
 
-    // 🔹 Lien avec le bateau accosté (appelé depuis ShipController)
+    void SetIndicatorsRaycast(bool enabled)
+    {
+        if (indicators == null) return;
+        foreach (var ind in indicators)
+            ind?.SetRaycast(enabled);
+    }
+
+    private void ResetTouchesInHarvestObjects()
+    {
+        if (harvestObjects == null) return;
+
+        foreach (var go in harvestObjects)
+        {
+            if (go == null) continue;
+
+            // reset tous les TouchIndicatorWaveMulti trouvés dans les enfants
+            var touches = go.GetComponentsInChildren<TouchIndicatorWaveMulti>(true);
+            foreach (var t in touches)
+                t?.ResetTouches();
+        }
+    }
+
     public void SetLinkedShip(ShipController ship)
     {
         linkedShip = ship;
     }
-
 }
