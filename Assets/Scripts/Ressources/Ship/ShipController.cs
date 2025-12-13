@@ -3,7 +3,9 @@ using UnityEngine.UI;
 
 public class ShipController : MonoBehaviour
 {
-    public string playerName = "Red";
+    public TeamEnum TeamId = TeamEnum.RED;
+    public Team team => Team.Of(TeamId);
+
     private ShipData data;
     private Rigidbody rb;
 
@@ -42,21 +44,18 @@ public class ShipController : MonoBehaviour
     private Island currentIslandDocked = null;
 
     private PartyTools.ValueClient<(float,float)> directionClient;
-    private PartyTools.ValueClient<StoreData> storeDataClient;
+
+    private RessourceClient.TeamClient ressources;
 
     void Start()
     {
         directionClient = new(
             Party.current,
-            $"direction_{playerName.ToLower()}",
+            $"direction_{team.id}",
             v => JsonUtility.FromJson<(float,float)>(v)
         );
 
-        storeDataClient = new(
-            Party.current,
-            $"team_{playerName.ToLower()}",
-            v => JsonUtility.FromJson<StoreData>(v)
-        );
+        ressources = RessourceClient.current.Get(team);
 
         rb = GetComponent<Rigidbody>();
         data = GetComponent<ShipData>();
@@ -86,7 +85,7 @@ public class ShipController : MonoBehaviour
                 currentSpeed = 0f;
                 currentRotationSpeed = 0f;
                 rb.velocity = Vector3.zero;
-                Debug.Log($"{playerName} pose l’ancre ⚓");
+                Debug.Log($"{team} pose l’ancre ⚓");
 
                 if (stopImage != null) stopImage.enabled = true;
                 if (woodImage != null) woodImage.enabled = true;
@@ -106,7 +105,7 @@ public class ShipController : MonoBehaviour
                         island.SetVisited(true);
                         currentIslandDocked = island;
 
-                        Debug.Log($"⚓ {playerName} est ancré près de l’île {island.islandID} (dist={distance:F1})");
+                        Debug.Log($"⚓ {team} est ancré près de l’île {island.islandID} (dist={distance:F1})");
 
                         if (island.islandContent != null)
                         {
@@ -119,7 +118,7 @@ public class ShipController : MonoBehaviour
                                     if (net != null)
                                     {
                                         net.SetLinkedShip(this);
-                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {playerName}");
+                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {team}");
                                     }
                                     else
                                     {
@@ -142,7 +141,7 @@ public class ShipController : MonoBehaviour
                                     {
                                         wood.gameObject.SetActive(true);
                                         wood.SetLinkedShip(this); // ✅ lie le bateau ici
-                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {playerName} !");
+                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {team} !");
                                     }
                                     else
                                     {
@@ -168,7 +167,7 @@ public class ShipController : MonoBehaviour
             else
             {
                 // Lève l’ancre
-                Debug.Log($"{playerName} relève l’ancre ⚓");
+                Debug.Log($"{team} relève l’ancre ⚓");
 
                 if (stopImage != null) stopImage.enabled = false;
                 if (woodImage != null) woodImage.enabled = false;
@@ -210,7 +209,7 @@ public class ShipController : MonoBehaviour
 
                     // 🔹 Remet l’île dans son état initial
                     currentIslandDocked.SetVisited(false);
-                    Debug.Log($"🏝️ {playerName} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
+                    Debug.Log($"🏝️ {team} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
                     currentIslandDocked = null;
                 }
             }
@@ -224,9 +223,9 @@ public class ShipController : MonoBehaviour
 
 
         // --- Mouvement avant/arrière ---
-        var data = storeDataClient?.FirstOrDefault();
-        var speed = (data?.shipLevel ?? 1);
-        if(speed==0)speed = 1;
+        var data = ressources.value;
+        var speed = data.shipLevel;
+        if(speed<=0)speed = 1;
         
         if (Input.GetKey(moveForward))
             currentSpeed += acceleration * Time.deltaTime * speed;

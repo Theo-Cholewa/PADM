@@ -133,13 +133,13 @@ public class MarketManager : MonoBehaviour
     {
         if (team.gold >= price)
         {
-            team.ModifyGold(-price);
+            team.ModifyResource(ResourceType.Gold, -price);
             team.ModifyResource(type, 1);
-            Debug.Log(team.teamName + " bought " + type);
+            Debug.Log(team.team + " bought " + type);
         }
         else
         {
-            Debug.Log(team.teamName + " : Not enough Gold!");
+            Debug.Log(team.team + " : Not enough Gold!");
         }
     }
 
@@ -157,12 +157,12 @@ public class MarketManager : MonoBehaviour
         {
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
-            team.ModifyGold(sellPrice);
-            Debug.Log(team.teamName + " sold " + type);
+            team.ModifyResource(ResourceType.Gold, sellPrice);
+            Debug.Log(team.team + " sold " + type);
         }
         else
         {
-            Debug.Log(team.teamName + " : Not enough resources to sell!");
+            Debug.Log(team.team + " : Not enough resources to sell!");
         }
     }
 
@@ -181,19 +181,19 @@ public class MarketManager : MonoBehaviour
 
         if (currentLevel >= 5)
         {
-            Debug.Log(team.teamName + " : " + type + " est déjà au niveau Max (5) !");
+            Debug.Log(team.team + " : " + type + " est déjà au niveau Max (5) !");
             return;
         }
 
         if (team.gold >= price)
         {
-            team.ModifyGold(-price);
+            team.ModifyResource(ResourceType.Gold, -price);
             team.ModifyResource(type, 1);
-            Debug.Log(team.teamName + " upgraded " + type + " to level " + (currentLevel + 1));
+            Debug.Log(team.team + " upgraded " + type + " to level " + (currentLevel + 1));
         }
         else
         {
-            Debug.Log(team.teamName + " : Not enough Gold for upgrade!");
+            Debug.Log(team.team + " : Not enough Gold for upgrade!");
         }
     }
 

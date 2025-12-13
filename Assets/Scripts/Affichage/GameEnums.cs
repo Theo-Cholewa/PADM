@@ -1,14 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum ResourceType
 {
     Wood,
     Rock,
     Chicken,
+
     Cannon,
     Pirate,
     Barrel,
-    Ship
+    Ship,
+
+    Gold,
 }

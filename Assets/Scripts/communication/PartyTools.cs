@@ -4,10 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine.SceneManagement;
 
 public static class PartyTools
 {
@@ -142,7 +140,7 @@ public static class PartyTools
             party.SendMessageToAll("value;ask");
         }
 
-        public void Remove()
+        public void Dispose()
         {
             party.OnMessage.RemoveListener(OnMessage);
             party.OnDisconnect.RemoveListener(OnDisconnect);

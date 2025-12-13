@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -7,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Gestable))]
 public class Flag : MonoBehaviour
 {
-    public Color color;
+    public TeamEnum TeamId;
     public MeshRenderer Colored;
     public float HomeSize = 50f;
 
@@ -21,7 +20,7 @@ public class Flag : MonoBehaviour
 
     void Update()
     {
-        Colored.material.color = color;
+        Colored.material.color = Team.Of(TeamId).color;
     }
 
     void OnTouchDown(TouchInfo info)

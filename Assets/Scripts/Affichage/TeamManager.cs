@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public partial class TeamManager : MonoBehaviour
 {
     [Header("Identité")]
-    public string teamName = "Red"; 
+    public Team team = Team.RED; 
 
     [Header("Ressources Actuelles")]
     public int gold = 150; 
@@ -40,10 +41,10 @@ public partial class TeamManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
-        sharedDataServer = new PartyTools.ValueServer<StoreData>(
+        sharedDataServer = new PartyTools.ValueServer<RessourceData>(
             Party.current,
-            $"team_{teamName.ToLower()}",
-            new StoreData
+            $"team_{team.id}",
+            new RessourceData
             {
                 gold = gold,
                 wood = wood,
@@ -76,14 +77,10 @@ public partial class TeamManager : MonoBehaviour
             case ResourceType.Pirate: pirateLevel += amount; break;
             case ResourceType.Barrel: barrelLevel += amount; break;
             case ResourceType.Ship: shipLevel += amount; break;
+
+            case ResourceType.Gold: gold += amount; break;
         }
         UpdateNetwork();
-        UpdateUI();
-    }
-
-    public void ModifyGold(int amount)
-    {
-        gold += amount;
         UpdateUI();
     }
 
@@ -109,11 +106,11 @@ public partial class TeamManager : MonoBehaviour
         if (shipBarImage)   shipBarImage.fillAmount = (shipLevel - 1)   / steps;
     }
 
-    PartyTools.ValueServer<StoreData> sharedDataServer;
+    PartyTools.ValueServer<RessourceData> sharedDataServer;
 
     void UpdateNetwork()
     {
-        sharedDataServer.SetValue(new StoreData
+        sharedDataServer.SetValue(new RessourceData
         {
             gold = gold,
             wood = wood,
@@ -131,13 +128,11 @@ public partial class TeamManager : MonoBehaviour
         if (message.message.StartsWith("store;add;"))
         {
             var param = message.message.Split(';');
-            if(param[2]!=teamName.ToLower())return;
+            if(param[2]!=team.id)return;
             var value = int.Parse(param[3]);
-            var type = param[4];
-            if(type=="gold") gold += value;
-            else if(type=="wood") wood += value;
-            else if(type=="rock") rock += value;
-            else if(type=="chicken") chicken += value;
+            var typeName = param[4];
+            var type = Enum.Parse<ResourceType>(typeName);
+            ModifyResource(type, value);
             UpdateUI();
             UpdateNetwork();
         }
