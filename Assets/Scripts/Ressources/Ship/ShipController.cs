@@ -242,21 +242,21 @@ public class ShipController : MonoBehaviour
 
         // --- Rotation inertielle ---
         if (Input.GetKey(turnLeft))
-            currentRotationSpeed -= rotationAcceleration * Time.deltaTime;
+            currentRotationSpeed -= rotationAcceleration * Time.deltaTime * speed;
         else if (Input.GetKey(turnRight))
-            currentRotationSpeed += rotationAcceleration * Time.deltaTime;
+            currentRotationSpeed += rotationAcceleration * Time.deltaTime * speed;
         else
         {
             if (currentRotationSpeed > 0)
-                currentRotationSpeed -= rotationDeceleration * Time.deltaTime;
+                currentRotationSpeed -= rotationDeceleration * Time.deltaTime * speed;
             else if (currentRotationSpeed < 0)
-                currentRotationSpeed += rotationDeceleration * Time.deltaTime;
+                currentRotationSpeed += rotationDeceleration * Time.deltaTime * speed;
 
             if (Mathf.Abs(currentRotationSpeed) < 0.5f)
                 currentRotationSpeed = 0;
         }
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed*speed, maxRotationSpeed*speed);
     }
 
     void FixedUpdate()
