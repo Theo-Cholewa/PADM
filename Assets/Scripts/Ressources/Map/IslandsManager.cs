@@ -9,10 +9,6 @@ public class IslandsManager : MonoBehaviour
     [Header("Références aux îles")]
     public Island[] islands; // assigner les îles dans l’inspecteur
 
-    private string currentShip = "";  // "blue" ou "red"
-    private int currentIsland = -1;   // numéro de l’île sélectionné
-
-
     Island GetIslandByID(int id)
     {
         foreach (var island in islands)

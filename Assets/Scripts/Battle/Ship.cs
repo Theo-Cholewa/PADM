@@ -1,9 +1,10 @@
 using UnityEngine;
 public class Ship : MonoBehaviour
 {
+    public TeamEnum TeamId;
     public float speed = 0f;
     private float waterLevel = 0f;
-    public Renderer renderer;
+    public new Renderer renderer;
 
     void FixedUpdate()
     {
