@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -76,6 +77,7 @@ public class ShipController : MonoBehaviour
 
     private PartyTools.ValueClient<(float,float)> directionClient;
 
+
     private RessourceClient.TeamClient ressources;
 
     void Start()
@@ -105,6 +107,12 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
+        var data = ressources.value;
+        var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
+        var volantCount = directionClient?.GetValues()?.Count ?? 1;
+        if(volantCount==0) volantCount = 1;
+        
+
         // --- Gestion de l’ancre (clavier) ---
         if (Input.GetKeyDown(anchorKey))
         {
@@ -114,59 +122,65 @@ public class ShipController : MonoBehaviour
         // Si l’ancre est posée, le bateau ne bouge plus
         if (anchorDropped) return;
 
+        var speed = data.shipLevel;
+        if(speed<=0)speed = 1;
+
         // --- Mouvement avant/arrière ---
+        var addedSpeed = 0f;
+
+            // Network 
         if (useNetworkThrottle)
         {
-            // Bouton appuyé => accélère, relâché => décélère jusqu'à 0
-            if (networkThrottleInput > 0.5f)
-                currentSpeed += acceleration * Time.deltaTime;
-            else
-                currentSpeed -= deceleration * Time.deltaTime;
-        }
-        else
-        {
-            // Contrôle clavier classique
-            if (Input.GetKey(moveForward))
-                currentSpeed += acceleration * Time.deltaTime;
-            else
-                currentSpeed -= deceleration * Time.deltaTime;
+            if (networkThrottleInput > 0.5f) addedSpeed += acceleration;
         }
 
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
+            // Contrôle clavier classique
+        if (Input.GetKey(moveForward)) addedSpeed += acceleration;
+
+            // Party
+        addedSpeed += volantData.Item2/volantCount * acceleration;
+
+        if (addedSpeed > 0f) currentSpeed += addedSpeed * speed * Time.deltaTime;
+        else currentSpeed -= deceleration * speed * Time.deltaTime;   
+
+        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * speed);
+
 
         // --- Rotation ---
+        var addedRotationSpeed = 0f;
+        
+            // Network
         if (useNetworkSteering)
         {
             float steer = networkSteerInput;      // -1 à 1
-            currentRotationSpeed = steer * maxRotationSpeed;
-            // Debug.Log($"[{playerName}] networkSteerInput={networkSteerInput:F3}, currentRotationSpeed={currentRotationSpeed:F1}");
+            addedRotationSpeed += steer;
+        }
+
+            // Keyboard
+        if (Input.GetKey(turnLeft))
+            addedRotationSpeed += -1f;
+        else if (Input.GetKey(turnRight))
+            addedRotationSpeed += 1f;
+
+            // Party
+        addedRotationSpeed -= volantData.Item1/volantCount;
+
+        if (Math.Abs(addedRotationSpeed) > 0.01f)
+        {
+            currentRotationSpeed += addedRotationSpeed * Time.deltaTime * speed * rotationAcceleration;
         }
         else
         {
-            float steerInput = 0f;
+            if (currentRotationSpeed > 0)
+                currentRotationSpeed -= rotationDeceleration * Time.deltaTime * speed;
+            else if (currentRotationSpeed < 0)
+                currentRotationSpeed += rotationDeceleration * Time.deltaTime * speed;
 
-            if (Input.GetKey(turnLeft))
-                steerInput = -1f;
-            else if (Input.GetKey(turnRight))
-                steerInput = 1f;
-
-            if (Mathf.Abs(steerInput) > 0.01f)
-            {
-                currentRotationSpeed += steerInput * rotationAcceleration * Time.deltaTime;
-            }
-            else
-            {
-                if (currentRotationSpeed > 0)
-                    currentRotationSpeed -= rotationDeceleration * Time.deltaTime;
-                else if (currentRotationSpeed < 0)
-                    currentRotationSpeed += rotationDeceleration * Time.deltaTime;
-
-                if (Mathf.Abs(currentRotationSpeed) < 0.5f)
-                    currentRotationSpeed = 0;
-            }
-
-            currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
+            if (Mathf.Abs(currentRotationSpeed) < 0.5f)
+                currentRotationSpeed = 0;
         }
+
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed * speed, maxRotationSpeed * speed);
     }
 
     // 🔹 Toute la logique ancre regroupée ici
@@ -297,7 +311,6 @@ public class ShipController : MonoBehaviour
                             Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
                             break;
                     }
-                }
 
                     // 🔹 Remet l’île dans son état initial
                     currentIslandDocked.SetVisited(false);
@@ -306,48 +319,6 @@ public class ShipController : MonoBehaviour
                 }
             }
         }
-
-        if (anchorDropped) return;
-
-        var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
-        var volantCount = directionClient?.GetValues()?.Count ?? 1;
-        if(volantCount==0) volantCount = 1;
-
-
-        // --- Mouvement avant/arrière ---
-        var data = ressources.value;
-        var speed = data.shipLevel;
-        if(speed<=0)speed = 1;
-        
-        if (Input.GetKey(moveForward))
-            currentSpeed += acceleration * Time.deltaTime * speed;
-        else
-            currentSpeed -= deceleration * Time.deltaTime * speed;
-
-        currentSpeed += volantData.Item2/volantCount * acceleration * Time.deltaTime * speed;
-
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed*speed);
-        
-        currentRotationSpeed -= volantData.Item1/volantCount /18f * rotationAcceleration * Time.deltaTime;
-
-
-        // --- Rotation inertielle ---
-        if (Input.GetKey(turnLeft))
-            currentRotationSpeed -= rotationAcceleration * Time.deltaTime * speed;
-        else if (Input.GetKey(turnRight))
-            currentRotationSpeed += rotationAcceleration * Time.deltaTime * speed;
-        else
-        {
-            if (currentRotationSpeed > 0)
-                currentRotationSpeed -= rotationDeceleration * Time.deltaTime * speed;
-            else if (currentRotationSpeed < 0)
-                currentRotationSpeed += rotationDeceleration * Time.deltaTime * speed;
-
-            if (Mathf.Abs(currentRotationSpeed) < 0.5f)
-                currentRotationSpeed = 0;
-        }
-
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed*speed, maxRotationSpeed*speed);
     }
 
     void FixedUpdate()
