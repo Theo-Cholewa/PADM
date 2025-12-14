@@ -13,17 +13,26 @@ public class TcpReceiver : MonoBehaviour
     public int listenPort = 8888;
 
     [Header("Bateau controlle")]
-    public ShipController shipController;
+    public ShipController redShip;
+    public ShipController blueShip;
+
+    [Header("Debug")]
+    public bool logMessages = true;
 
     private TcpListener listener;
     private Thread listenThread;
     private bool running;
 
-    private float latestSteer = 0f;
-    private float latestThrottle = 0f;
+    // Dernières valeurs reçues par équipe
+    private volatile float latestSteerRed = 0f;
+    private volatile float latestSteerBlue = 0f;
 
-    // ⚓ Demande de toggle d’ancre venue du réseau
-    private volatile bool anchorToggleRequested = false;
+    private volatile float latestThrottleRed = 0f;
+    private volatile float latestThrottleBlue = 0f;
+
+    // ⚓ Demande de toggle d’ancre par équipe
+    private volatile bool anchorToggleRedRequested = false;
+    private volatile bool anchorToggleBlueRequested = false;
 
     void Start()
     {
@@ -79,30 +88,57 @@ public class TcpReceiver : MonoBehaviour
                     var line = reader.ReadLine();
                     if (line == null) break;
 
-                    Debug.Log($"[TCP] Reçu: {line}");
+                    if (logMessages)
+                        Debug.Log($"[TCP] Reçu: {line}");
 
-                    if (line.StartsWith("STEER:", StringComparison.OrdinalIgnoreCase))
+                    var parts = line.Split(new[] { ':' }, 2);
+                    if (parts.Length != 2)
                     {
-                        var valStr = line.Substring("STEER:".Length);
+                        if (logMessages)
+                            Debug.LogWarning($"[TCP] Format invalide: {line}");
+                        continue;
+                    }
+
+                    var team = parts[0].Trim().ToUpperInvariant(); // "RED" / "BLUE"
+                    var payload = parts[1].Trim();
+
+                    bool isBlue = team == "BLUE";
+                    bool isRed = team == "RED";
+
+                    if (!isBlue && !isRed)
+                    {
+                        if (logMessages) Debug.LogWarning($"[TCP] Team inconnue: {team} ({line})");
+                        continue;
+                    }
+
+                    if (payload.StartsWith("STEER:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var valStr = payload.Substring("STEER:".Length);
                         if (float.TryParse(valStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float steer))
                         {
                             steer = Mathf.Clamp(steer, -1f, 1f);
-                            latestSteer = steer;
+                            if (isBlue) latestSteerBlue = steer;
+                            else latestSteerRed = steer;
                         }
                     }
-                    else if (line.StartsWith("THR:", StringComparison.OrdinalIgnoreCase))
+                    else if (payload.StartsWith("THR:", StringComparison.OrdinalIgnoreCase))
                     {
-                        var valStr = line.Substring("THR:".Length);
+                        var valStr = payload.Substring("THR:".Length);
                         if (float.TryParse(valStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float thr))
                         {
                             thr = Mathf.Clamp01(thr);
-                            latestThrottle = thr;
+                            if (isBlue) latestThrottleBlue = thr;
+                            else latestThrottleRed = thr;
                         }
                     }
-                    else if (line.StartsWith("ANCHOR:", StringComparison.OrdinalIgnoreCase))
+                    else if (payload.StartsWith("ANCHOR:", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Pour l’instant : chaque ANCHOR:TOGGLE déclenche un toggle
-                        anchorToggleRequested = true;
+                        // On ne toggle que si c'est vraiment "ANCHOR:TOGGLE"
+                        if (payload.Equals("ANCHOR:TOGGLE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (isBlue) anchorToggleBlueRequested = true;
+                            else anchorToggleRedRequested = true;
+                        }
                     }
                 }
             }
@@ -117,22 +153,34 @@ public class TcpReceiver : MonoBehaviour
 
     void Update()
     {
-        if (shipController == null) return;
-
-        if (shipController.useNetworkSteering)
+        if (redShip != null)
         {
-            shipController.SetNetworkSteer(latestSteer);
+            if (redShip.useNetworkSteering)
+                redShip.SetNetworkSteer(latestSteerRed);
+
+            if (redShip.useNetworkThrottle)
+                redShip.SetNetworkThrottle(latestThrottleRed);
+
+            if (anchorToggleRedRequested)
+            {
+                anchorToggleRedRequested = false;
+                redShip.ToggleAnchorFromNetwork();
+            }
         }
 
-        if (shipController.useNetworkThrottle)
+        if (blueShip != null)
         {
-            shipController.SetNetworkThrottle(latestThrottle);
-        }
+            if (blueShip.useNetworkSteering)
+                blueShip.SetNetworkSteer(latestSteerBlue);
 
-        if (anchorToggleRequested)
-        {
-            anchorToggleRequested = false;
-            shipController.ToggleAnchorFromNetwork();
+            if (blueShip.useNetworkThrottle)
+                blueShip.SetNetworkThrottle(latestThrottleBlue);
+
+            if (anchorToggleBlueRequested)
+            {
+                anchorToggleBlueRequested = false;
+                blueShip.ToggleAnchorFromNetwork();
+            }
         }
     }
 

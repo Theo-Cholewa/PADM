@@ -2740,7 +2740,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listenPort: 8888
-  shipController: {fileID: 601322237}
+  redShip: {fileID: 601322237}
+  blueShip: {fileID: 1239320259}
+  logMessages: 1
 --- !u!1 &1026911445
 GameObject:
   m_ObjectHideFlags: 0
