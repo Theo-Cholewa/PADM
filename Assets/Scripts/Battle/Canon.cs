@@ -1,14 +1,13 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Canon : MonoBehaviour
 {
+    public TeamEnum team;
     public GameObject projectile;
 
     public AudioClip ShotSound;
 
     private Transform background;
-    private float baseWidth;
 
     public string ammunition;
 
@@ -17,16 +16,20 @@ public class Canon : MonoBehaviour
 
     private bool isLoaded = false;
 
+    private RessourceClient.TeamClient client;
+
     // Start is called before the first frame update
     void Start()
     {
         background = transform.GetChild(0);
-        baseWidth = background.localScale.x;
+        client = RessourceClient.current.Get(Team.Of(team));
     }
 
     public void TryToShoot(float LocalPower)
     {
-        var RealPower = MinimumPower + (LocalPower * (MaximumPower - MinimumPower));
+        var powerLevel = client.value.cannonLevel;
+        if(powerLevel<=0) powerLevel = 1;
+        var RealPower = MinimumPower + LocalPower * (MaximumPower - MinimumPower) * (.5f+powerLevel/2f);
         if (isLoaded)
         {
             var instance = Instantiate(projectile);

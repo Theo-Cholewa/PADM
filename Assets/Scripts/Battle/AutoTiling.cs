@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AutoTiling : MonoBehaviour
 {
-    public Renderer renderer;
+    public new Renderer renderer;
 
     void Start()
     {

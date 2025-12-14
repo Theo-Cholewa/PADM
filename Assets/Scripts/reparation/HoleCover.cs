@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Linq; // Ajouté pour les requêtes LINQ si nécessaire, mais non utilisé ici.
 
 public class HoleCover : MonoBehaviour
 {

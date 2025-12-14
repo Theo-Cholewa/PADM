@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Pirate : MonoBehaviour
@@ -12,7 +10,7 @@ public class Pirate : MonoBehaviour
     void Start()
     {
         flag.pirates.Add(this);
-        Colored.material.color = flag.color;
+        Colored.material.color = Team.Of(flag.TeamId).color;
         Highlight.enabled = false;
     }
 

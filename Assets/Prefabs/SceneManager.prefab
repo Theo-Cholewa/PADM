@@ -46,7 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scenes:
   - Welcome
-  - RessourceTime
+  - Ressource
   - Recolte
   - Guerre
   - "R\xE9paration"
+  - Team
+  - Volant
+  cloudController: {fileID: 0}

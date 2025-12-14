@@ -17,10 +17,6 @@ public class WoodHarvestController : MonoBehaviour
     [Header("Prefab à masquer quand on appuie sur ESPACE")]
     public GameObject prefabToHide;
 
-    [Header("Composant dont on veut supprimer un script")]
-    public GameObject targetObject;
-    public string scriptNameToRemove;
-
     [Header("🔹 Référence au bateau accosté")]
     private ShipController linkedShip;
 
@@ -117,32 +113,14 @@ public class WoodHarvestController : MonoBehaviour
                 ShipData shipData = linkedShip.GetComponent<ShipData>();
                 if (shipData != null)
                 {
-                    shipData.AddResource("wood", 10);
-                    Debug.Log($"🌲 {linkedShip.playerName} a récolté du bois — total bois : {shipData.wood}");
+                    shipData.AddResource("wood", 3);
+                    Debug.Log($"🌲 {linkedShip.team} a récolté du bois — total bois : {shipData.wood}");
+                    RessourceClient.current.Get(linkedShip.team).Add(ResourceType.Wood, 3);
                 }
             }
             else
             {
                 Debug.LogWarning("⚠ Aucun bateau lié pour recevoir le bois !");
-            }
-
-            if (targetObject != null && !string.IsNullOrEmpty(scriptNameToRemove))
-            {
-                var component = targetObject.GetComponent(scriptNameToRemove);
-                if (component != null)
-                {
-                    if (component is IslandPulse islandPulse && islandPulse.islandRenderer != null)
-                    {
-                        islandPulse.islandRenderer.material.color = islandPulse.baseColor;
-                        Debug.Log("🎨 Couleur de l'île réinitialisée avant suppression du script.");
-                    }
-                    Destroy(component);
-                    Debug.Log($"🗑️ Script '{scriptNameToRemove}' supprimé de {targetObject.name}");
-                }
-                else
-                {
-                    Debug.LogWarning($"⚠️ Aucun script nommé '{scriptNameToRemove}' trouvé sur {targetObject.name}");
-                }
             }
             return;
         }

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +5,7 @@ using UnityEngine;
 public class Tappable : MonoBehaviour
 {
     public List<Material> materials;
-    public MeshRenderer renderer;
+    public new MeshRenderer renderer;
     public AudioClip tapSound;
 
     public int tapCount = 3;
