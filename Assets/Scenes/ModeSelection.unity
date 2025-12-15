@@ -138,6 +138,10 @@ PrefabInstance:
       propertyPath: targetScene
       value: Store
       objectReference: {fileID: 0}
+    - target: {fileID: 3505069603090154249, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 574c877206c8d8b40996d1e53a045474, type: 2}
     - target: {fileID: 8680137344087197970, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 55
@@ -696,6 +700,10 @@ PrefabInstance:
       propertyPath: targetScene
       value: Ressource
       objectReference: {fileID: 0}
+    - target: {fileID: 3505069603090154249, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 574c877206c8d8b40996d1e53a045474, type: 2}
     - target: {fileID: 8680137344087197970, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -17
@@ -818,6 +826,10 @@ PrefabInstance:
       propertyPath: targetScene
       value: Volant
       objectReference: {fileID: 0}
+    - target: {fileID: 3505069603090154249, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 574c877206c8d8b40996d1e53a045474, type: 2}
     - target: {fileID: 8680137344087197970, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -89
