@@ -237,5 +237,47 @@ public partial class TeamManager : MonoBehaviour
             ModifyResource(RessourceType.Rock,5);
             ModifyResource(RessourceType.Chicken,3);
         }
+                if (TeamId == TeamEnum.RED)
+        {
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                wood += 1;
+                UpdateUI();
+                AnimateResource(RessourceType.Wood);
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                rock += 1;
+                UpdateUI(); 
+                AnimateResource(RessourceType.Rock);               
+            }
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                chicken += 1;
+                UpdateUI();
+                AnimateResource(RessourceType.Chicken);
+            }
+        }
+        else if (TeamId == TeamEnum.BLUE)
+        {
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                wood += 1;
+                UpdateUI();
+                AnimateResource(RessourceType.Wood);
+            }
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                rock += 1;
+                UpdateUI();
+                AnimateResource(RessourceType.Rock);
+            }
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                chicken += 1;
+                UpdateUI();
+                AnimateResource(RessourceType.Chicken);
+            }
+        }
     }
 }
