@@ -221,7 +221,7 @@ public class ShipController : MonoBehaviour
                             // --- Actions selon la ressource principale ---
                             switch (island.mainResource)
                             {
-                                case Island.ResourceType.Food:
+                                case Island.RessourceType.Food:
                                     // 🐔 Gestion des poulets
                                     ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
                                     if (net != null)
@@ -235,7 +235,7 @@ public class ShipController : MonoBehaviour
                                     }
                                     break;
 
-                            case Island.ResourceType.Wood:
+                            case Island.RessourceType.Wood:
                                 Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
                                 WoodHarvestController wood = null;
 
@@ -257,11 +257,11 @@ public class ShipController : MonoBehaviour
                                     }
                                     break;
 
-                            case Island.ResourceType.Stone:
+                            case Island.RessourceType.Stone:
                                 Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
                                 break;
 
-                            case Island.ResourceType.None:
+                            case Island.RessourceType.None:
                             default:
                                 Debug.Log($"ℹ️ L'île {island.islandID} ne contient aucune ressource exploitable.");
                                 break;
@@ -288,7 +288,7 @@ public class ShipController : MonoBehaviour
                 {
                     switch (currentIslandDocked.mainResource)
                     {
-                        case Island.ResourceType.Food:
+                        case Island.RessourceType.Food:
                             ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
                             if (net != null)
                             {
@@ -297,7 +297,7 @@ public class ShipController : MonoBehaviour
                             }
                             break;
 
-                        case Island.ResourceType.Wood:
+                        case Island.RessourceType.Wood:
                             WoodHarvestController wood = currentIslandDocked.islandContent.GetComponentInChildren<WoodHarvestController>(true);
                             if (wood != null)
                             {
@@ -307,7 +307,7 @@ public class ShipController : MonoBehaviour
                             }
                             break;
 
-                        case Island.ResourceType.Stone:
+                        case Island.RessourceType.Stone:
                             Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
                             break;
                     }

@@ -38,15 +38,12 @@ public partial class TeamManager : MonoBehaviour
     public Image pirateBarImage;
     public Image barrelBarImage;
     public Image shipBarImage;
-<<<<<<< HEAD
 
     [Header("Img ressources ")]
     public RawImage woodImage;
     public RawImage rockImage;
     public RawImage chickenImage;
-=======
     public Image healthBarImage;
->>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
     private const float MAX_LEVEL = 5f;
 
     void Start()
@@ -153,19 +150,19 @@ public partial class TeamManager : MonoBehaviour
 
     // --- AJOUTER CECI À LA FIN DE TEAMMANAGER.CS ---
 
-    public void AnimateResource(ResourceType type)
+    public void AnimateResource(RessourceType type)
     {
         RawImage targetImage = null;
 
         switch (type)
         {
-            case ResourceType.Wood:
+            case RessourceType.Wood:
                 targetImage = woodImage;
                 break;
-            case ResourceType.Rock:
+            case RessourceType.Rock:
                 targetImage = rockImage;
                 break;
-            case ResourceType.Chicken:
+            case RessourceType.Chicken:
                 targetImage = chickenImage;
                 break;
         }
