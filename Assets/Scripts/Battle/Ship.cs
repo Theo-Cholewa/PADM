@@ -18,6 +18,11 @@ public class Ship : MonoBehaviour
 
     private int DamageCounter = 0;
 
+    public void ChangeHealth(int offset)
+    {
+        ressources.Add(RessourceType.Health, offset);
+    }
+
     void FixedUpdate()
     {
         if (speed > 0f) waterLevel += speed / 10000f;

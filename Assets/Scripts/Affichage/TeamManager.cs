@@ -38,12 +38,13 @@ public partial class TeamManager : MonoBehaviour
     public Image pirateBarImage;
     public Image barrelBarImage;
     public Image shipBarImage;
-
     [Header("Img ressources ")]
     public RawImage woodImage;
     public RawImage rockImage;
     public RawImage chickenImage;
+
     public Image healthBarImage;
+
     private const float MAX_LEVEL = 5f;
 
     void Start()

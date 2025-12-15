@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4840443091175606860}
   - component: {fileID: 4571056299249811771}
   - component: {fileID: 5891583401315435439}
+  - component: {fileID: 822478618253772581}
   m_Layer: 0
   m_Name: hole
   m_TagString: Untagged
@@ -181,6 +182,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PrefabToSpawn: {fileID: 3350700823569118852, guid: d4016804f935c0a4cafa26397e46c0b6, type: 3}
   timeToSpawn: 500
+--- !u!114 &822478618253772581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6488506888766268491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb90aa595a1876047bb01137c239d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onSpawn: 2
+  onDestroy: 0
 --- !u!1 &9126334609645219834
 GameObject:
   m_ObjectHideFlags: 0

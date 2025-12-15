@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4494621127437526953}
   - component: {fileID: 1639978074768851374}
   - component: {fileID: 8322342975384741345}
+  - component: {fileID: 7785207753080953818}
   m_Layer: 0
   m_Name: repairing_hole
   m_TagString: Untagged
@@ -200,6 +201,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7785207753080953818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6488506888766268491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb90aa595a1876047bb01137c239d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onSpawn: 0
+  onDestroy: 5
+  ship: {fileID: 0}
 --- !u!1 &9126334609645219834
 GameObject:
   m_ObjectHideFlags: 0
