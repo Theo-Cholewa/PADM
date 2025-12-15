@@ -5,7 +5,9 @@ using UnityEngine.UI;
 public partial class TeamManager : MonoBehaviour
 {
     [Header("Identité")]
-    public Team team = Team.RED; 
+    public TeamEnum TeamId; 
+
+    public Team team => Team.Of(TeamId);
 
     public GameObject Popup;
     public GameObject Popdown;
@@ -50,7 +52,7 @@ public partial class TeamManager : MonoBehaviour
 
         sharedDataServer = new PartyTools.ValueServer<RessourceData>(
             Party.current,
-            $"team_{team.id}",
+            $"team_{Team.Of(TeamId).id}",
             new RessourceData
             {
                 gold = gold,
@@ -163,13 +165,23 @@ public partial class TeamManager : MonoBehaviour
         if (message.message.StartsWith("store;add;"))
         {
             var param = message.message.Split(';');
-            if(param[2]!=team.id)return;
+            if(param[2]!=Team.Of(TeamId).id)return;
             var value = int.Parse(param[3]);
             var typeName = param[4];
             var type = Enum.Parse<RessourceType>(typeName);
             ModifyResource(type, value);
             UpdateUI();
             UpdateNetwork();
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            ModifyResource(RessourceType.Wood,10);
+            ModifyResource(RessourceType.Rock,5);
+            ModifyResource(RessourceType.Chicken,3);
         }
     }
 }
