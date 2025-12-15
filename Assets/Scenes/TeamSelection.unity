@@ -672,6 +672,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7481397773700915524, guid: 8e8fc61eb50bc14499f808f277fcc298, type: 3}
+      propertyPath: TeamId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7481397773700915524, guid: 8e8fc61eb50bc14499f808f277fcc298, type: 3}
       propertyPath: targetScene
       value: ModeSelection
       objectReference: {fileID: 0}

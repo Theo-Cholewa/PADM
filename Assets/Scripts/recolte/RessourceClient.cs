@@ -25,7 +25,7 @@ public class RessourceClient : MonoBehaviour
 
     void OnDestroy()
     {
-        foreach(var manager in Teams.Values) manager.Dispose();
+        if(Teams!=null) foreach(var manager in Teams.Values) manager.Dispose();
     }
 
     private Dictionary<Team, TeamClient> Teams;

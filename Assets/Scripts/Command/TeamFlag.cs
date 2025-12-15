@@ -4,8 +4,9 @@ public class TeamFlag : MonoBehaviour
 {
     public MeshRenderer Colored;
 
-    [SerializeField]
-    public Team team;
+    public TeamEnum TeamId;
+
+    public Team team => Team.Of(TeamId);
 
     public string targetScene;
 
@@ -16,7 +17,11 @@ public class TeamFlag : MonoBehaviour
 
     void OnTouchDown(TouchInfo info)
     {
-        if(targetScene.Length>0) UnityEngine.SceneManagement.SceneManager.LoadScene(targetScene);
+        if (targetScene.Length > 0)
+        {
+            Team.currentTeam = team;
+            UnityEngine.SceneManagement.SceneManager.LoadScene(targetScene);
+        }
     }
 
 }
