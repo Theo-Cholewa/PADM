@@ -19,7 +19,13 @@ public struct PartyMessage
 public class PartyPeer
 {
     public string name;
+    /// <summary>
+    /// Appelé quand ce pair est déconnecté
+    /// </summary>
     public UnityEvent<PartyPeer> OnDisconnect = new();
+    /// <summary>
+    /// Appelé quand un message est reçu par ce pair.
+    /// </summary>
     public UnityEvent<(string,string)> OnMessage = new();
 }
 
@@ -47,8 +53,17 @@ public class Party : MonoBehaviour
 
     // PUBLIC API //
     [Header("Events")]
+    /// <summary>
+    /// Appelé quand un message est reçu
+    /// </summary>
     public UnityEvent<PartyMessage> OnMessage = new();
+    /// <summary>
+    /// Appelé aquand un nouveau pair est connecté
+    /// </summary>
     public UnityEvent<PartyPeer> OnConnect = new();
+    /// <summary>
+    /// Appelé quand un pair est déconnecté
+    /// </summary>
     public UnityEvent<PartyPeer> OnDisconnect = new();
 
     public string GetIdentifier()
@@ -61,6 +76,12 @@ public class Party : MonoBehaviour
         return myself;
     }
 
+    /// <summary>
+    /// Envoyer un message à un autre pair de la party.
+    /// </summary>
+    /// <param name="target">La cible</param>
+    /// <param name="message">Le message à envoyer</param>
+    /// <returns></returns>
     public async Task SendMessage(PartyPeer target, string message)
     {
         // Get clients
@@ -73,13 +94,18 @@ public class Party : MonoBehaviour
         await Task.WhenAll(tasks);
     }
 
+    /// <summary>
+    /// Envoyer un message à tous les autres pair de la party
+    /// </summary>
+    /// <param name="message">Le message à envoyer</param>
+    /// <returns></returns>
     public async Task SendMessageToAll(string message)
     {
         var content = $"{message}\n";
         var tasks = clients.Select(client => SendPacket(client, content)).ToList();
         await Task.WhenAll(tasks);
     }
-
+    
     public async Task Close(PartyPeer target)
     {
         var targets = clients.Where(c => c.guest == target).ToList();
@@ -101,6 +127,10 @@ public class Party : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Récupérer tous les pairs.
+    /// </summary>
+    /// <returns></returns>
     public List<PartyPeer> GetPeers()
     {
         return clients.Select(c => c.guest).ToList();

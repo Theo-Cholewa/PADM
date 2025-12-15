@@ -1,4 +1,4 @@
-public enum ResourceType
+public enum RessourceType
 {
     Wood,
     Rock,
@@ -10,4 +10,5 @@ public enum ResourceType
     Ship,
 
     Gold,
+    Health,
 }

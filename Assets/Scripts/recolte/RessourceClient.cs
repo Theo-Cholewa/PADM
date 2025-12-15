@@ -66,7 +66,7 @@ public class RessourceClient : MonoBehaviour
             client.onChange = (a,b)=>onChange.Invoke();
         }
 
-        public Task Add(ResourceType type, int amount)
+        public Task Add(RessourceType type, int amount)
         {
             return Party.current.SendMessageToAll($"store;add;{team.id};{amount};{type}");
         }

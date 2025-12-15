@@ -25,6 +25,8 @@ public class UdpPeer : MonoBehaviour
     private Thread listenThread;
     private bool running = false;
 
+    public System.Action<string> OnUdpMessage;
+
     void Start()
     {
         try
@@ -57,7 +59,8 @@ public class UdpPeer : MonoBehaviour
                 string msg = Encoding.UTF8.GetString(data);
 
                 // ⚠ On évite d'appeler Unity directement depuis le thread (mais Debug.Log passe en général)
-                Debug.Log($"[UDP:{peerId}] Reçu de {remoteEndPoint.Address}:{remoteEndPoint.Port} -> {msg}");
+                //Debug.Log($"[UDP:{peerId}] Reçu de {remoteEndPoint.Address}:{remoteEndPoint.Port} -> {msg}");
+                OnUdpMessage?.Invoke(msg);
 
                 // Si tu veux parser id + message, tu peux faire :
                 // var split = msg.Split(new[] { ':' }, 2);
@@ -108,16 +111,7 @@ public class UdpPeer : MonoBehaviour
         string fullMessage = $"{peerId}: {payload}";
         SendRaw(fullMessage);
     }
-
-    // Juste pour tester facilement : appuie sur Espace pour envoyer un message
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Send("Hello depuis " + peerId);
-        }
-    }
-
+    
     void OnApplicationQuit()
     {
         StopUdp();

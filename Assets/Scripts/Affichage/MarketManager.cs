@@ -204,6 +204,7 @@ public class MarketManager : MonoBehaviour
 
 void SetupButtons()
     {
+<<<<<<< HEAD
         buyWood.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Wood, woodPrice));
         sellWood.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Wood, woodPrice));
 
@@ -212,12 +213,23 @@ void SetupButtons()
 
         buyRock.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Rock, rockPrice));
         sellRock.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Rock, rockPrice));
+=======
+        buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Wood, woodPrice));
+        sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Wood, woodPrice));
 
-        UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Cannon, redCannonPrice));
-        UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Pirate, redPiratePrice));
-        UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Barrel, redBarrelPrice));
-        UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Ship, redShipPrice));
+        buyChickenRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Chicken, chickenPrice));
+        sellChickenRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Chicken, chickenPrice));
 
+        buyRockRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Rock, rockPrice));
+        sellRockRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Rock, rockPrice));
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
+
+        UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
+        UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
+        UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
+        UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
+
+<<<<<<< HEAD
         UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Cannon, blueCannonPrice));
         UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Pirate, bluePiratePrice));
         UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Barrel, blueBarrelPrice));
@@ -226,6 +238,25 @@ void SetupButtons()
 
 
 public void BuyResource(TeamManager team, ResourceType type, int price)
+=======
+        buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Wood, woodPrice));
+        sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Wood, woodPrice));
+
+        buyChickenBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Chicken, chickenPrice));
+        sellChickenBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Chicken, chickenPrice));
+
+        buyRockBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Rock, rockPrice));
+        sellRockBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Rock, rockPrice));
+
+        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Cannon, blueCannonPrice));
+        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Pirate, bluePiratePrice));
+        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Barrel, blueBarrelPrice));
+        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Ship, blueShipPrice));
+    }
+
+
+    public void BuyResource(TeamManager team, RessourceType type, int price)
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
     {
         if (team == null) {
             Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
@@ -234,7 +265,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
 
         if (team.gold >= price)
         {
-            team.ModifyResource(ResourceType.Gold, -price);
+            team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
             
             // --- AJOUT DE L'ANIMATION ICI ---
@@ -249,7 +280,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         }
     }
 
-    public void SellResource(TeamManager team, ResourceType type, int price)
+    public void SellResource(TeamManager team, RessourceType type, int price)
     {
         if (team == null) {
             Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
@@ -259,21 +290,25 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         bool hasResource = false;
         switch (type)
         {
-            case ResourceType.Wood: hasResource = team.wood > 0; break;
-            case ResourceType.Rock: hasResource = team.rock > 0; break;
-            case ResourceType.Chicken: hasResource = team.chicken > 0; break;
+            case RessourceType.Wood: hasResource = team.wood > 0; break;
+            case RessourceType.Rock: hasResource = team.rock > 0; break;
+            case RessourceType.Chicken: hasResource = team.chicken > 0; break;
         }
 
         if (hasResource)
         {
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
+<<<<<<< HEAD
             team.ModifyResource(ResourceType.Gold, sellPrice);
 
             // --- AJOUT DE L'ANIMATION ICI ---
             team.AnimateResource(type);
             // --------------------------------
 
+=======
+            team.ModifyResource(RessourceType.Gold, sellPrice);
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
             Debug.Log(team.team + " sold " + type);
         }
         else
@@ -282,7 +317,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         }
     }
 
-    public void BuyUpgrade(TeamManager team, ResourceType type, int price)
+    public void BuyUpgrade(TeamManager team, RessourceType type, int price)
     {
         if (team == null) {
             Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
@@ -297,10 +332,10 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         
         switch (type)
         {
-            case ResourceType.Cannon: currentLevel = team.cannonLevel; break;
-            case ResourceType.Pirate: currentLevel = team.pirateLevel; break;
-            case ResourceType.Barrel: currentLevel = team.barrelLevel; break;
-            case ResourceType.Ship:   currentLevel = team.shipLevel;   break;
+            case RessourceType.Cannon: currentLevel = team.cannonLevel; break;
+            case RessourceType.Pirate: currentLevel = team.pirateLevel; break;
+            case RessourceType.Barrel: currentLevel = team.barrelLevel; break;
+            case RessourceType.Ship:   currentLevel = team.shipLevel;   break;
             default: return;
         }
 
@@ -312,7 +347,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
 
         if (team.gold >= price)
         {
-            team.ModifyResource(ResourceType.Gold, -price);
+            team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
             Debug.Log(team.team + " upgraded " + type + " to level " + (currentLevel + 1));
         }
@@ -349,16 +384,20 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
     {
         Debug.Log("--- ECONOMIC BOOM STARTED ---");
         bool modifyTwoResources = (Random.value > 0.5f);
-        List<ResourceType> availableTypes = new List<ResourceType> { ResourceType.Wood, ResourceType.Rock, ResourceType.Chicken };
+
+        // Liste des types disponibles
+        List<RessourceType> availableTypes = new List<RessourceType> { RessourceType.Wood, RessourceType.Rock, RessourceType.Chicken };
 
         if (modifyTwoResources)
         {
             int index1 = Random.Range(0, availableTypes.Count);
-            ResourceType type1 = availableTypes[index1];
-            availableTypes.RemoveAt(index1);
+            RessourceType type1 = availableTypes[index1];
+            availableTypes.RemoveAt(index1); // On retire pour ne pas la repiocher
 
             int index2 = Random.Range(0, availableTypes.Count);
-            ResourceType type2 = availableTypes[index2];
+            RessourceType type2 = availableTypes[index2];
+
+            // 2. On décide qui monte et qui descend
             bool firstIsUp = (Random.value > 0.5f);
             float mult1 = firstIsUp ? Random.Range(1.2f, 2.5f) : Random.Range(0.4f, 0.8f);
             float mult2 = firstIsUp ? Random.Range(0.4f, 0.8f) : Random.Range(1.2f, 2.5f);
@@ -368,18 +407,19 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         else
         {           
             int index = Random.Range(0, availableTypes.Count);
-            ResourceType type = availableTypes[index];
-            float randomMult = Random.Range(0.5f, 2.5f);         
+            RessourceType type = availableTypes[index];
+            float randomMult = Random.Range(0.5f, 2.5f);
+            
             ApplyPriceModification(type, randomMult);
         }
         UpdatePriceUI();
     }
 
-    void ApplyPriceModification(ResourceType type, float multiplier)
+    void ApplyPriceModification(RessourceType type, float multiplier)
     {
         switch (type)
         {
-            case ResourceType.Wood:
+            case RessourceType.Wood:
                 woodPrice = Mathf.CeilToInt(baseWoodPrice * multiplier);
                 Debug.Log($"BOIS : {baseWoodPrice} -> {woodPrice} (x{multiplier:F2})");
                 int sellWoodPrice = Mathf.CeilToInt(woodPrice * 0.8f);
@@ -387,7 +427,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
                 UpdateTextColor(sellWoodPrice, baseWoodPrice, sellWoodPriceText);
                 break;
 
-            case ResourceType.Rock:
+            case RessourceType.Rock:
                 rockPrice = Mathf.CeilToInt(baseRockPrice * multiplier);
                 Debug.Log($"PIERRE : {baseRockPrice} -> {rockPrice} (x{multiplier:F2})");
                 int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);
@@ -395,7 +435,7 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
                 UpdateTextColor(sellRockPrice, baseRockPrice, sellRockPriceText);
                 break;
 
-            case ResourceType.Chicken:
+            case RessourceType.Chicken:
                 chickenPrice = Mathf.CeilToInt(baseChickenPrice * multiplier);
                 Debug.Log($"POULET : {baseChickenPrice} -> {chickenPrice} (x{multiplier:F2})");
                 int sellChickenPrice = Mathf.CeilToInt(chickenPrice * 0.8f);

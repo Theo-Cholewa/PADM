@@ -1,17 +1,35 @@
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class Box : MonoBehaviour
 {
 
+    public TeamEnum TeamId;
+
     public GameObject Created;
 
+    public TextMesh CountDisplay;
+
+    public int Cost;
+
+    public RessourceType Material;
+
     private GameObject content;
-    
+        
     private int refillTime =0;
+    private RessourceClient.TeamClient ressources;
 
     void Start()
     {
+        ressources = RessourceClient.current.Get(Team.Of(TeamId));
+        ressources.onChange.AddListener(RecalculateCount);
+        RecalculateCount();
         refill();
+    }
+
+    void Destroy()
+    {
+        ressources.onChange.RemoveListener(RecalculateCount);
     }
 
     void refill()
@@ -25,8 +43,19 @@ public class Box : MonoBehaviour
 
         content.GetComponent<Pullable>().onTake = () =>
         {
-            content.GetComponent<Physic>().hasPhysic = true;
-            content.GetComponent<Pullable>().onTake = null;
+            // Check if has enougth ressources
+            var count = ressources.value.Get(Material)/Cost;
+
+            if (count <= 0)
+            {
+                Destroy(content);
+            }
+            else
+            {
+                content.GetComponent<Physic>().hasPhysic = true;
+                content.GetComponent<Pullable>().onTake = null;   
+                ressources.Add(Material, -Cost);
+            }
             refillTime = 1;
         };
 
@@ -46,8 +75,9 @@ public class Box : MonoBehaviour
         }
     }
 
-    void Update()
+    public void RecalculateCount()
     {
-        
+        var count = ressources.value.Get(Material)/Cost;
+        CountDisplay.text = count.ToString();
     }
 }
