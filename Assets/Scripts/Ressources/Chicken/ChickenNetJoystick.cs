@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class ChickenNetJoystick : MonoBehaviour
 {
@@ -68,7 +67,7 @@ public class ChickenNetJoystick : MonoBehaviour
                     if (shipData != null)
                     {
                         shipData.AddResource("food", 1);
-                        Debug.Log($"🐔 {linkedShip.playerName} a capturé un poulet — nourriture totale : {shipData.food}");
+                        Debug.Log($"🐔 {linkedShip.team} a capturé un poulet — nourriture totale : {shipData.food}");
                     }
                 }
                 else

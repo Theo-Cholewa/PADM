@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -29,7 +27,7 @@ public class NetworkDebugger : MonoBehaviour
 
         public void Init()
         {
-            var party = PartyTools.GetParty(Toggle.gameObject.scene);
+            var party = Party.current;
 
             RoleClient = new(party, s=>s==Role, OnChange, OnChange);
 
@@ -66,11 +64,12 @@ public class NetworkDebugger : MonoBehaviour
 
         public void Init()
         {
-            var party = PartyTools.GetParty(Label.gameObject.scene);
+            var party = Party.current;
 
             Label.text = Name;
             Server = new PartyTools.ValueServer<string>(party, Name, "default", s => s);
-            Client = new PartyTools.ValueClient<string>(party, Name, s => s, OnChange);
+            Client = new PartyTools.ValueClient<string>(party, Name, s => s);
+            Client.onChange = OnChange;
             Input.onSubmit.AddListener(OnInputSubmit);
         }
 
@@ -79,7 +78,7 @@ public class NetworkDebugger : MonoBehaviour
             Server.SetValue(input);
         }
 
-        void OnChange()
+        void OnChange(PartyPeer peer, string value)
         {
             Value.text = string.Join("\n", Client.GetValues().Values);
         }
@@ -94,7 +93,7 @@ public class NetworkDebugger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var party = PartyTools.GetParty(gameObject.scene);
+        var party = Party.current;
         Debug.Log($"Party initialized {party}");
         IPAddressUI.text = party.GetIPAddress().ToString();
         IdentifierUI.text = party.GetIdentifier();

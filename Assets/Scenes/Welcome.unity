@@ -320,12 +320,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 3
-  hasFood: 0
-  hasWood: 0
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -616,12 +610,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 1
-  hasFood: 1
-  hasWood: 0
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -1776,12 +1764,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 2
-  hasFood: 1
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -2174,12 +2156,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 7
-  hasFood: 0
-  hasWood: 1
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -3352,12 +3328,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 4
-  hasFood: 0
-  hasWood: 1
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -3508,6 +3478,116 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 955781750}
   m_CullTransparentMesh: 1
+--- !u!1 &1022340437
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1022340441}
+  - component: {fileID: 1022340440}
+  - component: {fileID: 1022340439}
+  - component: {fileID: 1022340438}
+  m_Layer: 0
+  m_Name: NetworkManager_Hote
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1022340438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022340437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 909533781c3a3a94da4d309ee616cf90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1022340439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022340437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ProtocolType: 0
+  m_MaxPacketQueueSize: 128
+  m_MaxPayloadSize: 6144
+  m_HeartbeatTimeoutMS: 500
+  m_ConnectTimeoutMS: 1000
+  m_MaxConnectAttempts: 60
+  m_DisconnectTimeoutMS: 30000
+  ConnectionData:
+    Address: 192.168.1.8
+    Port: 7777
+    ServerListenAddress: 127.0.0.1
+  DebugSimulator:
+    PacketDelayMS: 0
+    PacketJitterMS: 0
+    PacketDropRate: 0
+--- !u!114 &1022340440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022340437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NetworkConfig:
+    ProtocolVersion: 0
+    NetworkTransport: {fileID: 1022340439}
+    PlayerPrefab: {fileID: 0}
+    Prefabs:
+      NetworkPrefabsLists:
+      - {fileID: 11400000, guid: 0f54c13aef210a549aa59a6800cbfe7b, type: 2}
+    TickRate: 30
+    ClientConnectionBufferTimeout: 10
+    ConnectionApproval: 0
+    ConnectionData: 
+    EnableTimeResync: 0
+    TimeResyncInterval: 30
+    EnsureNetworkVariableLengthSafety: 0
+    EnableSceneManagement: 1
+    ForceSamePrefabs: 1
+    RecycleNetworkIds: 1
+    NetworkIdRecycleDelay: 120
+    RpcHashSize: 0
+    LoadSceneTimeOut: 120
+    SpawnTimeout: 10
+    EnableNetworkLogs: 1
+    OldPrefabList: []
+  RunInBackground: 1
+  LogLevel: 1
+--- !u!4 &1022340441
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022340437}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.418015, y: 234.19215, z: -1.9469732}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1028942846
 GameObject:
   m_ObjectHideFlags: 0
@@ -3571,11 +3651,6 @@ MonoBehaviour:
   - {fileID: 908111332}
   - {fileID: 485573726}
   - {fileID: 578954967}
-  blueShipSelector: b
-  redShipSelector: n
-  foodKey: x
-  woodKey: c
-  stoneKey: v
 --- !u!1 &1053730565
 GameObject:
   m_ObjectHideFlags: 0
@@ -3781,12 +3856,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 6
-  hasFood: 1
-  hasWood: 1
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -4187,12 +4256,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 8
-  hasFood: 1
-  hasWood: 1
-  hasStone: 1
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -5657,12 +5720,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandID: 5
-  hasFood: 0
-  hasWood: 0
-  hasStone: 0
-  foodRenderer: {fileID: 0}
-  woodRenderer: {fileID: 0}
-  stoneRenderer: {fileID: 0}
   isVisited: 0
   islandContent: {fileID: 0}
   resourceCanvas: {fileID: 0}
@@ -7326,6 +7383,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673486eb2e34ade428a16a6d8fe302c3, type: 3}
+--- !u!1001 &1308317975065533843
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6548606126612460181, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: m_Name
+      value: Party
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -7337,3 +7451,4 @@ SceneRoots:
   - {fileID: 1867558776}
   - {fileID: 286307114}
   - {fileID: 1780346583}
+  - {fileID: 1308317975065533843}

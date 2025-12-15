@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
 [RequireComponent(typeof(Physic))]
 public class Bucket2 : MonoBehaviour

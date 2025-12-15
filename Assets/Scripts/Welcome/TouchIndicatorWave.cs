@@ -23,7 +23,6 @@ public class TouchIndicatorWave : MonoBehaviour, IPointerDownHandler, IPointerUp
     public bool isTouched = false;
     private Coroutine waveCoroutine;
     private readonly List<Image> activeWaves = new List<Image>();
-    private bool inputDisabed = false;
 
     void Start()
     {
@@ -73,7 +72,6 @@ public class TouchIndicatorWave : MonoBehaviour, IPointerDownHandler, IPointerUp
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            inputDisabed = true;
             isTouched = !isTouched;
         }
 
