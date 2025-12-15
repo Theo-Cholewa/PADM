@@ -861,6 +861,14 @@ PrefabInstance:
       propertyPath: team
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5258967186690330468, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: TeamId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5568235252745713953, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
+      propertyPath: TeamId
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8916860973734240434, guid: 123aab0f47f75a24f9430a9a90ab6efa, type: 3}
       propertyPath: TeamId
       value: 1

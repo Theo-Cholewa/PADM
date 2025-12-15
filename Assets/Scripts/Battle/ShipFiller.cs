@@ -8,7 +8,7 @@ public class ShipFiller : MonoBehaviour
     void Start()
     {
         var pos = transform.position;
-        this.ship = gameObject.scene.GetRootGameObjects()
+        ship = gameObject.scene.GetRootGameObjects()
             .Select(go =>
             {
                 if (go.TryGetComponent(out Ship ship)) return ship;

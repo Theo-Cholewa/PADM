@@ -25,7 +25,7 @@ public class RessourceClient : MonoBehaviour
 
     void OnDestroy()
     {
-        foreach(var manager in Teams.Values) manager.Dispose();
+        if(Teams!=null) foreach(var manager in Teams.Values) manager.Dispose();
     }
 
     private Dictionary<Team, TeamClient> Teams;
@@ -66,7 +66,7 @@ public class RessourceClient : MonoBehaviour
             client.onChange = (a,b)=>onChange.Invoke();
         }
 
-        public Task Add(ResourceType type, int amount)
+        public Task Add(RessourceType type, int amount)
         {
             return Party.current.SendMessageToAll($"store;add;{team.id};{amount};{type}");
         }

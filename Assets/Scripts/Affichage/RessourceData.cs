@@ -11,40 +11,43 @@ public struct RessourceData
     public int pirateLevel;
     public int barrelLevel;
     public int shipLevel;
+    public int health;
 
-    public int Get(ResourceType type)
+    public int Get(RessourceType type)
     {
         switch (type)
         {
-            case ResourceType.Gold: return gold;
+            case RessourceType.Gold: return gold;
+            case RessourceType.Health: return health;
 
-            case ResourceType.Wood: return wood;
-            case ResourceType.Rock: return rock;
-            case ResourceType.Chicken: return chicken;
+            case RessourceType.Wood: return wood;
+            case RessourceType.Rock: return rock;
+            case RessourceType.Chicken: return chicken;
 
-            case ResourceType.Cannon: return cannonLevel;
-            case ResourceType.Pirate: return pirateLevel;
-            case ResourceType.Barrel: return barrelLevel;
-            case ResourceType.Ship: return shipLevel;
+            case RessourceType.Cannon: return cannonLevel;
+            case RessourceType.Pirate: return pirateLevel;
+            case RessourceType.Barrel: return barrelLevel;
+            case RessourceType.Ship: return shipLevel;
 
             default: return 0;
         }
     }
 
-    public void Set(ResourceType type, int value)
+    public void Set(RessourceType type, int value)
     {
         switch (type)
         {
-            case ResourceType.Gold: gold = value; break;
+            case RessourceType.Gold: gold = value; break;
+            case RessourceType.Health: health = value; break;
 
-            case ResourceType.Wood: wood = value; break;
-            case ResourceType.Rock: rock = value; break;
-            case ResourceType.Chicken: chicken = value; break;
+            case RessourceType.Wood: wood = value; break;
+            case RessourceType.Rock: rock = value; break;
+            case RessourceType.Chicken: chicken = value; break;
 
-            case ResourceType.Cannon: cannonLevel = value; break;
-            case ResourceType.Pirate: pirateLevel = value; break;
-            case ResourceType.Barrel: barrelLevel = value; break;
-            case ResourceType.Ship: shipLevel = value; break;
+            case RessourceType.Cannon: cannonLevel = value; break;
+            case RessourceType.Pirate: pirateLevel = value; break;
+            case RessourceType.Barrel: barrelLevel = value; break;
+            case RessourceType.Ship: shipLevel = value; break;
 
             default: break;
         }
