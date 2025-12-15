@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ShipController : MonoBehaviour
 {
-    public string playerName = "Red";
+    public TeamEnum TeamId = TeamEnum.RED;
+    public Team team => Team.Of(TeamId);
+
     private ShipData data;
     private Rigidbody rb;
 
@@ -15,20 +18,45 @@ public class ShipController : MonoBehaviour
 
     private bool anchorDropped = false;
 
+    [Header("Contrôle réseau")]
+    [Tooltip("Si activé, la rotation vient du mobile plutôt que du clavier.")]
+    public bool useNetworkSteering = false;
+
+    [Tooltip("Si activé, l'accélération vient du mobile plutôt que du clavier.")]
+    public bool useNetworkThrottle = false;
+
+    [Tooltip("Entrée réseau normalisée [-1,1] (mise à jour par TcpReceiver).")]
+    [Range(-1f, 1f)]
+    public float networkSteerInput = 0f;
+
+    [Tooltip("Entrée de throttle réseau [0,1] (0 = coupé, 1 = bouton appuyé).")]
+    [Range(0f, 1f)]
+    public float networkThrottleInput = 0f;
+
+    public void SetNetworkSteer(float value)
+    {
+        networkSteerInput = Mathf.Clamp(value, -1f, 1f);
+    }
+
+    public void SetNetworkThrottle(float value)
+    {
+        networkThrottleInput = Mathf.Clamp01(value);
+    }
+
+    // 🔹 Appelé par TcpReceiver quand il reçoit ANCHOR:TOGGLE
+    public void ToggleAnchorFromNetwork()
+    {
+        ToggleAnchor();
+    }
+
     [Header("UI")]
-    [Tooltip("Image affichée quand le bateau est à l'arrêt")]
     public RawImage stopImage;
-    [Tooltip("Image représentant la ressource bois (barre)")]
     public RawImage woodImage;
-    [Tooltip("Image représentant la ressource nourriture (barre)")]
     public RawImage foodImage;
-    [Tooltip("Image représentant la ressource pierre (barre)")]
     public RawImage stoneImage;
 
     [Header("Taille des barres (px)")]
-    [Tooltip("Largeur minimale (px) d'une image de ressource")]
     public float resourceMinSize = 1f;
-    [Tooltip("Largeur maximale (px) d'une image de ressource")]
     public float resourceMaxSize = 100f;
 
     [Header("Statistiques du bateau")]
@@ -37,18 +65,40 @@ public class ShipController : MonoBehaviour
     public float deceleration = 1f;
 
     [Header("Rotation inertielle")]
-    public float rotationAcceleration = 20f;    // accélération en °/s²
-    public float rotationDeceleration = 20f;    // freinage en °/s²
-    public float maxRotationSpeed = 30f;        // vitesse angulaire max en °/s
+    public float rotationAcceleration = 20f;
+    public float rotationDeceleration = 20f;
+    public float maxRotationSpeed = 30f;
 
     private float currentSpeed = 0f;
-    private float currentRotationSpeed = 0f;    // °/s
+    private float currentRotationSpeed = 0f;
+
+    // 🔹 île actuellement accostée
+    private Island currentIslandDocked = null;
+
+    private PartyTools.ValueClient<(float,float)> directionClient;
+
+
+    private RessourceClient.TeamClient ressources;
 
     void Start()
     {
+        directionClient = new(
+            Party.current,
+            $"direction_{team.id}",
+            v => JsonUtility.FromJson<(float,float)>(v)
+        );
+
+        ressources = RessourceClient.current.Get(team);
+
         rb = GetComponent<Rigidbody>();
         data = GetComponent<ShipData>();
-        // ensure UI images are hidden at start
+
+        if (data != null)
+        {
+            data.OnResourcesChanged += UpdateResourceBars;
+            UpdateResourceBars();
+        }
+
         if (stopImage != null) stopImage.enabled = false;
         if (woodImage != null) woodImage.enabled = false;
         if (foodImage != null) foodImage.enabled = false;
@@ -57,87 +107,227 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
-        // --- Gestion de l’ancre ---
+        var data = ressources.value;
+        var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
+        var volantCount = directionClient?.GetValues()?.Count ?? 1;
+        if(volantCount==0) volantCount = 1;
+        
+
+        // --- Gestion de l’ancre (clavier) ---
         if (Input.GetKeyDown(anchorKey))
         {
-            anchorDropped = !anchorDropped;
-            if (anchorDropped)
-            {
-                currentSpeed = 0f;
-                currentRotationSpeed = 0f;
-                rb.velocity = Vector3.zero;
-                Debug.Log($"{playerName} pose l’ancre ⚓");
-                if (stopImage != null)
-                    stopImage.enabled = true;
-                // show resource images when anchored
-                if (woodImage != null) woodImage.enabled = true;
-                if (foodImage != null) foodImage.enabled = true;
-                if (stoneImage != null) stoneImage.enabled = true;
-            }
-            else
-            {
-                Debug.Log($"{playerName} relève l’ancre ⚓");
-                if (stopImage != null)
-                    stopImage.enabled = false;
-                // hide resource images when not anchored
-                if (woodImage != null) woodImage.enabled = false;
-                if (foodImage != null) foodImage.enabled = false;
-                if (stoneImage != null) stoneImage.enabled = false;
-            }
+            ToggleAnchor();
         }
 
+        // Si l’ancre est posée, le bateau ne bouge plus
         if (anchorDropped) return;
 
-        // --- Gestion de la vitesse avant/arrière ---
-        if (Input.GetKey(moveForward))
-            currentSpeed += acceleration * Time.deltaTime;
-        else
-            currentSpeed -= deceleration * Time.deltaTime;
+        var speed = data.shipLevel;
+        if(speed<=0)speed = 1;
 
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
+        // --- Mouvement avant/arrière ---
+        var addedSpeed = 0f;
 
-        // Mise à jour de l'image d'arrêt : visible seulement si la vitesse est nulle
-        if (stopImage != null)
-            stopImage.enabled = (Mathf.Approximately(currentSpeed, 0f) && anchorDropped);
-
-        // si ancré, mettre à jour la taille des barres de ressources
-        if (anchorDropped)
+            // Network 
+        if (useNetworkThrottle)
         {
-            UpdateResourceImageSize(woodImage, data != null ? data.wood : 0);
-            UpdateResourceImageSize(foodImage, data != null ? data.food : 0);
-            UpdateResourceImageSize(stoneImage, data != null ? data.stone : 0);
+            if (networkThrottleInput > 0.5f) addedSpeed += acceleration;
         }
 
-        // --- Gestion de la rotation inertielle ---
+            // Contrôle clavier classique
+        if (Input.GetKey(moveForward)) addedSpeed += acceleration;
+
+            // Party
+        addedSpeed += volantData.Item2/volantCount * acceleration;
+
+        if (addedSpeed > 0f) currentSpeed += addedSpeed * speed * Time.deltaTime;
+        else currentSpeed -= deceleration * speed * Time.deltaTime;   
+
+        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * speed);
+
+
+        // --- Rotation ---
+        var addedRotationSpeed = 0f;
+        
+            // Network
+        if (useNetworkSteering)
+        {
+            float steer = networkSteerInput;      // -1 à 1
+            addedRotationSpeed += steer;
+        }
+
+            // Keyboard
         if (Input.GetKey(turnLeft))
-            currentRotationSpeed -= rotationAcceleration * Time.deltaTime;
+            addedRotationSpeed += -1f;
         else if (Input.GetKey(turnRight))
-            currentRotationSpeed += rotationAcceleration * Time.deltaTime;
+            addedRotationSpeed += 1f;
+
+            // Party
+        addedRotationSpeed -= volantData.Item1/volantCount;
+
+        if (Math.Abs(addedRotationSpeed) > 0.01f)
+        {
+            currentRotationSpeed += addedRotationSpeed * Time.deltaTime * speed * rotationAcceleration;
+        }
         else
         {
-            // Décélération naturelle de la rotation
             if (currentRotationSpeed > 0)
-                currentRotationSpeed -= rotationDeceleration * Time.deltaTime;
+                currentRotationSpeed -= rotationDeceleration * Time.deltaTime * speed;
             else if (currentRotationSpeed < 0)
-                currentRotationSpeed += rotationDeceleration * Time.deltaTime;
+                currentRotationSpeed += rotationDeceleration * Time.deltaTime * speed;
 
-            // Zone morte
             if (Mathf.Abs(currentRotationSpeed) < 0.5f)
                 currentRotationSpeed = 0;
         }
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed, maxRotationSpeed);
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed * speed, maxRotationSpeed * speed);
+    }
+
+    // 🔹 Toute la logique ancre regroupée ici
+    private void ToggleAnchor()
+    {
+        anchorDropped = !anchorDropped;
+
+            if (anchorDropped)
+            {
+                // Pose de l’ancre
+                currentSpeed = 0f;
+                currentRotationSpeed = 0f;
+                rb.velocity = Vector3.zero;
+                Debug.Log($"{team} pose l’ancre ⚓");
+
+            if (stopImage != null) stopImage.enabled = true;
+            if (woodImage != null) woodImage.enabled = true;
+            if (foodImage != null) foodImage.enabled = true;
+            if (stoneImage != null) stoneImage.enabled = true;
+
+            // 🔹 Recherche d’île proche
+            float detectionRadius = 20f;
+            Island[] allIslands = FindObjectsOfType<Island>();
+            currentIslandDocked = null;
+
+            foreach (Island island in allIslands)
+            {
+                float distance = Vector3.Distance(transform.position, island.transform.position);
+                if (distance <= detectionRadius)
+                {
+                    island.SetVisited(true);
+                    currentIslandDocked = island;
+
+                        Debug.Log($"⚓ {team} est ancré près de l’île {island.islandID} (dist={distance:F1})");
+
+                        if (island.islandContent != null)
+                        {
+                            // --- Actions selon la ressource principale ---
+                            switch (island.mainResource)
+                            {
+                                case Island.RessourceType.Food:
+                                    // 🐔 Gestion des poulets
+                                    ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                                    if (net != null)
+                                    {
+                                        net.SetLinkedShip(this);
+                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {team}");
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
+                                    }
+                                    break;
+
+                            case Island.RessourceType.Wood:
+                                Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
+                                WoodHarvestController wood = null;
+
+                                if (canvas != null)
+                                    wood = canvas.GetComponentInChildren<WoodHarvestController>(true);
+
+                                if (wood == null)
+                                    wood = island.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+
+                                    if (wood != null)
+                                    {
+                                        wood.gameObject.SetActive(true);
+                                        wood.SetLinkedShip(this); // ✅ lie le bateau ici
+                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {team} !");
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
+                                    }
+                                    break;
+
+                            case Island.RessourceType.Stone:
+                                Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
+                                break;
+
+                            case Island.RessourceType.None:
+                            default:
+                                Debug.Log($"ℹ️ L'île {island.islandID} ne contient aucune ressource exploitable.");
+                                break;
+                        }
+                    }
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // Lève l’ancre
+                Debug.Log($"{team} relève l’ancre ⚓");
+
+            if (stopImage != null) stopImage.enabled = false;
+            if (woodImage != null) woodImage.enabled = false;
+            if (foodImage != null) foodImage.enabled = false;
+            if (stoneImage != null) stoneImage.enabled = false;
+
+            if (currentIslandDocked != null)
+            {
+                if (currentIslandDocked.islandContent != null)
+                {
+                    switch (currentIslandDocked.mainResource)
+                    {
+                        case Island.RessourceType.Food:
+                            ChickenNetJoystick net = currentIslandDocked.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                            if (net != null)
+                            {
+                                net.SetLinkedShip(null);
+                                Debug.Log($"🪢 Filet de l’île {currentIslandDocked.islandID} libéré.");
+                            }
+                            break;
+
+                        case Island.RessourceType.Wood:
+                            WoodHarvestController wood = currentIslandDocked.islandContent.GetComponentInChildren<WoodHarvestController>(true);
+                            if (wood != null)
+                            {
+                                wood.SetLinkedShip(null);
+                                wood.gameObject.SetActive(false);
+                                Debug.Log($"🌲 Récolte de bois désactivée sur l’île {currentIslandDocked.islandID}");
+                            }
+                            break;
+
+                        case Island.RessourceType.Stone:
+                            Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
+                            break;
+                    }
+
+                    // 🔹 Remet l’île dans son état initial
+                    currentIslandDocked.SetVisited(false);
+                    Debug.Log($"🏝️ {team} quitte l’île {currentIslandDocked.islandID}, retour à l’état initial.");
+                    currentIslandDocked = null;
+                }
+            }
+        }
     }
 
     void FixedUpdate()
     {
         if (anchorDropped) return;
 
-        // --- Mouvement avant ---
         Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
 
-        // --- Rotation progressive ---
         if (Mathf.Abs(currentRotationSpeed) > 0.01f)
         {
             Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
@@ -145,15 +335,26 @@ public class ShipController : MonoBehaviour
         }
     }
 
-    // met à jour la taille en pixels de l'image de ressource en fonction de la quantité
-    void UpdateResourceImageSize(RawImage image, int amount)
+    // 🔹 Met à jour la hauteur des barres selon les quantités actuelles
+    void UpdateResourceBars()
+    {
+        UpdateResourceImageHeight(foodImage, data.food);
+        UpdateResourceImageHeight(woodImage, data.wood);
+        UpdateResourceImageHeight(stoneImage, data.stone);
+    }
+
+    // 🔹 Hauteur = 100 à 10 ressources, 0 à 0 ressource
+    void UpdateResourceImageHeight(RawImage image, int amount)
     {
         if (image == null) return;
-        // mappe directement 1 unité de ressource = 1 pixel, puis clamp
-        float width = Mathf.Clamp((float)amount, resourceMinSize, resourceMaxSize);
+
         RectTransform rt = image.rectTransform;
         Vector2 size = rt.sizeDelta;
-        size.x = width;
+
+        // 0 ressource → 0 px ; 10 ressources → resourceMaxSize px
+        float t = Mathf.Clamp01(amount / 10f);
+        size.y = Mathf.Lerp(0f, resourceMaxSize, t);
+
         rt.sizeDelta = size;
     }
 }

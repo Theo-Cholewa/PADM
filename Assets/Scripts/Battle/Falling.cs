@@ -1,0 +1,62 @@
+using UnityEngine;
+
+
+/// <summary>
+/// Un objet physique qui chute après avoir été immobile pendant trop longtemps.
+/// Après être tombé, il se transforme en un autre objet.
+/// </summary>
+[RequireComponent(typeof(Physic))]
+public class Falling : MonoBehaviour
+{
+    /// <summary>
+    /// L'objet qui remplace cet objet après sa chute.
+    /// </summary>
+    public GameObject Fell;
+
+    public float TimeToFall = 100f;
+
+    private Physic _physic;
+
+    public float height = 1f;
+
+    private bool canFall = false;
+
+    private void Start()
+    {
+        _physic = GetComponent<Physic>();
+    }
+
+    private void FixedUpdate()
+    {
+        
+        if (canFall)
+        {
+            if (_physic.velocity.magnitude < 0.2f)
+            {
+                height -= 1f/TimeToFall;
+                if (height < 0f)
+                {
+                    var created = Instantiate(Fell, transform);
+                    created.transform.localPosition = new(0f, 0f, -.02f);
+                    created.transform.parent = null;
+                    created.transform.localScale = new(3f, 3f, 3f);
+                    Destroy(gameObject);
+                    return;
+                }
+            }
+            else
+            {
+                height += 0.05f;
+                if (height > 1f) height = 1f;
+            }
+        }
+        else
+        {
+            if(_physic.velocity.magnitude > 0.001f)
+            {
+                canFall = true;
+            }
+        }
+        gameObject.transform.localRotation = Quaternion.Euler(0f, 0f, height*360f);
+    }
+}
