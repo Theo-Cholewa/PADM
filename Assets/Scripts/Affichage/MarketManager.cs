@@ -202,6 +202,13 @@ public class MarketManager : MonoBehaviour
         SetText(p1 + blueShipPrice + g + p2, blueShipPriceText1);
     }
 
+    void UpdateStockUI()
+    {
+        SetText("Stock: " + woodNumber.ToString(), woodStockText);
+        SetText("Stock: " + rockNumber.ToString(), rockStockText);
+        SetText("Stock: " + chickenNumber.ToString(), chickenStockText);
+    }
+
 void SetupButtons()
     {
         buyWood.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Wood, woodPrice));
@@ -235,6 +242,20 @@ void SetupButtons()
         if (team.gold >= price)
         {
             team.ModifyResource(RessourceType.Gold, -price);
+
+            if( type == RessourceType.Wood)
+            {
+                woodNumber = Mathf.Max(0, woodNumber - 1);
+            }
+            else if(type == RessourceType.Rock)
+            {
+                rockNumber = Mathf.Max(0, rockNumber - 1);
+            }
+            else if(type == RessourceType.Chicken)
+            {
+                chickenNumber = Mathf.Max(0, chickenNumber - 1);
+            }
+            UpdateStockUI();
             team.ModifyResource(type, 1);
             
             team.AnimateResource(type);
@@ -268,7 +289,21 @@ void SetupButtons()
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
             team.ModifyResource(RessourceType.Gold, sellPrice);
+            if( type == RessourceType.Wood)
+            {
+                woodNumber += 1;
+            }
+            else if(type == RessourceType.Rock)
+            {
+                rockNumber += 1;
+            }
+            else if(type == RessourceType.Chicken)
+            {
+                chickenNumber += 1;
+            }
+
             team.AnimateResource(type);
+            UpdateStockUI();
 
 
             Debug.Log(team.team + " sold " + type);

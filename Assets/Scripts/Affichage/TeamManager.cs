@@ -83,7 +83,6 @@ public partial class TeamManager : MonoBehaviour
 
     public void ModifyResource(RessourceType type, int amount)
     {
-        // Animation
         GameObject icon = null;
         switch (type)
         {
@@ -149,7 +148,6 @@ public partial class TeamManager : MonoBehaviour
         if (healthBarImage) healthBarImage.fillAmount = health/100f;
     }
 
-    // --- AJOUTER CECI À LA FIN DE TEAMMANAGER.CS ---
 
     public void AnimateResource(RessourceType type)
     {
@@ -185,11 +183,8 @@ public partial class TeamManager : MonoBehaviour
             timer += Time.deltaTime;
             float progress = timer / duration; // De 0 à 1
 
-            // Formule mathématique (Sinus) pour faire un aller-retour fluide : 0 -> 1 -> 0
-            // Cela permet de grossir puis rétrécir
             float scaleAmount = Mathf.Sin(progress * Mathf.PI); 
             
-            // On applique le scale : Base + (Extra * courbe)
             float currentScale = 1f + ( (maxScale - 1f) * scaleAmount );
 
             target.localScale = originalScale * currentScale;
