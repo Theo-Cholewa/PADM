@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public partial class TeamManager : MonoBehaviour
 {
@@ -30,6 +31,11 @@ public partial class TeamManager : MonoBehaviour
     public Image pirateBarImage;
     public Image barrelBarImage;
     public Image shipBarImage;
+
+    [Header("Img ressources ")]
+    public RawImage woodImage;
+    public RawImage rockImage;
+    public RawImage chickenImage;
     private const float MAX_LEVEL = 5f;
 
     void Start()
@@ -98,6 +104,58 @@ public partial class TeamManager : MonoBehaviour
         if (pirateBarImage) pirateBarImage.fillAmount = (pirateLevel - 1) / steps;
         if (barrelBarImage) barrelBarImage.fillAmount = (barrelLevel - 1) / steps;
         if (shipBarImage)   shipBarImage.fillAmount = (shipLevel - 1)   / steps;
+    }
+
+    // --- AJOUTER CECI À LA FIN DE TEAMMANAGER.CS ---
+
+    public void AnimateResource(ResourceType type)
+    {
+        RawImage targetImage = null;
+
+        switch (type)
+        {
+            case ResourceType.Wood:
+                targetImage = woodImage;
+                break;
+            case ResourceType.Rock:
+                targetImage = rockImage;
+                break;
+            case ResourceType.Chicken:
+                targetImage = chickenImage;
+                break;
+        }
+
+        if (targetImage != null)
+        {
+            StopAllCoroutines(); 
+            StartCoroutine(PulseImage(targetImage.rectTransform, 0.5f, 1.5f));
+        }
+    }
+
+    IEnumerator PulseImage(RectTransform target, float duration, float maxScale)
+    {
+        Vector3 originalScale = Vector3.one; // On part du principe que la taille de base est 1,1,1
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float progress = timer / duration; // De 0 à 1
+
+            // Formule mathématique (Sinus) pour faire un aller-retour fluide : 0 -> 1 -> 0
+            // Cela permet de grossir puis rétrécir
+            float scaleAmount = Mathf.Sin(progress * Mathf.PI); 
+            
+            // On applique le scale : Base + (Extra * courbe)
+            float currentScale = 1f + ( (maxScale - 1f) * scaleAmount );
+
+            target.localScale = originalScale * currentScale;
+
+            yield return null;
+        }
+
+        // Sécurité : on remet l'échelle exacte à la fin
+        target.localScale = originalScale;
     }
 
     PartyTools.ValueServer<RessourceData> sharedDataServer;
