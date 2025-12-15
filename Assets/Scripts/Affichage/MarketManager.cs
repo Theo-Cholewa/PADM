@@ -8,13 +8,19 @@ public class MarketManager : MonoBehaviour
     [Header("Team Managers")]
     public TeamManager redTeam;
     public TeamManager blueTeam;
+    private TeamManager activeTeam;
 
     [Header("Resource Prices")]
     public int woodPrice = 12;
     public int rockPrice = 23;
     public int chickenPrice = 10;
 
-    [Header("Upgrades Prices")]
+    [Header("Resource number")]
+    public int woodNumber = 100;
+    public int rockNumber = 100;
+    public int chickenNumber = 100;
+
+    [Header("Upgrade Prices")]
     public int redCannonPrice = 150;
     public int redPiratePrice = 35;
     public int redBarrelPrice = 75;
@@ -26,30 +32,28 @@ public class MarketManager : MonoBehaviour
     public int blueShipPrice = 50;
     
     [Header("UI Text References (Prices)")]
-    public Text woodPrice1; public Text woodPrice2; public Text woodPrice3; public Text woodPrice4;
-    public Text chickenPrice1; public Text chickenPrice2; public Text chickenPrice3; public Text chickenPrice4;
-    public Text rockPrice1; public Text rockPrice2; public Text rockPrice3; public Text rockPrice4;
+    public Text buyWoodPriceText; public Text sellWoodPriceText;
+    public Text buyChickenPriceText; public Text sellChickenPriceText;
+    public Text buyRockPriceText; public Text sellRockPriceText;
     
-    public Text redCannonPriceText1; public Text redCannonPriceText2;
-    public Text redPiratePriceText1; public Text redPiratePriceText2;
-    public Text redBarrelPriceText1; public Text redBarrelPriceText2;
-    public Text redShipPriceText1; public Text redShipPriceText2;
+    public Text redCannonPriceText1; 
+    public Text redPiratePriceText1;
+    public Text redBarrelPriceText1; 
+    public Text redShipPriceText1; 
     
-    public Text blueCannonPriceText1; public Text blueCannonPriceText2;
-    public Text bluePiratePriceText1; public Text bluePiratePriceText2;
-    public Text blueBarrelPriceText1; public Text blueBarrelPriceText2;
-    public Text blueShipPriceText1; public Text blueShipPriceText2;
+    public Text blueCannonPriceText1; 
+    public Text bluePiratePriceText1; 
+    public Text blueBarrelPriceText1; 
+    public Text blueShipPriceText1; 
+
+    public Text woodStockText;
+    public Text rockStockText;
+    public Text chickenStockText;
 
     [Header("Buttons References")]
-    public Button buyWoodRedTeam; public Button sellWoodRedTeam;
-    public Button buyWoodBlueTeam; public Button sellWoodBlueTeam;
-    
-    public Button buyChickenRedTeam; public Button sellChickenRedTeam;
-    public Button buyChickenBlueTeam; public Button sellChickenBlueTeam;
-    
-    public Button buyRockRedTeam; public Button sellRockRedTeam;
-    public Button buyRockBlueTeam; public Button sellRockBlueTeam;
-    
+    public Button buyWood; public Button sellWood;
+    public Button buyChicken; public Button sellChicken;
+    public Button buyRock; public Button sellRock;    
     public Button UpgradeCannonRedTeam; public Button UpgradeCannonBlueTeam;
     public Button UpgradePirateRedTeam; public Button UpgradePirateBlueTeam;
     public Button UpgradeBarrelRedTeam; public Button UpgradeBarrelBlueTeam;
@@ -63,41 +67,153 @@ public class MarketManager : MonoBehaviour
     private int baseRockPrice;
     private int baseChickenPrice;
 
+    [Header("Image Buttons References")]
+    public RawImage  upCannonRed;
+    public RawImage  upPirateRed;
+    public RawImage  upBarrelRed;
+    public RawImage  upShipRed;
+    public RawImage  upCannonBlue;
+    public RawImage  upPirateBlue;
+    public RawImage  upBarrelBlue;
+    public RawImage  upShipBlue;
+    public Texture  GreySprite;
+    public Texture  GreenSprite;
+
+
 
     void Start()
     {
         baseWoodPrice = woodPrice;
         baseRockPrice = rockPrice;
         baseChickenPrice = chickenPrice;
+        activeTeam = null;
 
         UpdatePriceUI();
         SetupButtons();
-
         StartCoroutine(EconomicCycleRoutine());
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            if (activeTeam == blueTeam)
+            {
+                activeTeam = null;
+                UpdateTeamVisuals(null);
+                Debug.Log(">>> Aucune équipe n'est maintenant au marché !");
+            }
+            else
+            {
+                activeTeam = blueTeam;
+                UpdateTeamVisuals(blueTeam);
+                Debug.Log(">>> La Team BLUE est maintenant au marché !");
+            }
+            
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (activeTeam == redTeam)
+            {
+                activeTeam = null;
+                UpdateTeamVisuals(null);
+                Debug.Log(">>> Aucune équipe n'est maintenant au marché !");
+
+            }
+            else
+            {
+                activeTeam = redTeam;
+                UpdateTeamVisuals(redTeam);
+                Debug.Log(">>> La Team RED est maintenant au marché !");
+            }
+        }
+    }
+
+    void UpdateTeamVisuals(TeamManager currentTeam)
+    {
+        if (currentTeam == redTeam)
+        {
+            if (GreySprite != null && GreenSprite != null)
+                upCannonRed.texture = GreenSprite;
+                upBarrelRed.texture = GreenSprite;
+                upPirateRed.texture = GreenSprite;
+                upShipRed.texture = GreenSprite;
+
+                upCannonBlue.texture = GreySprite;
+                upBarrelBlue.texture = GreySprite;
+                upPirateBlue.texture = GreySprite;
+                upShipBlue.texture = GreySprite;
+        }
+        else if (currentTeam == blueTeam)
+        {
+            if (GreySprite != null && GreenSprite != null)
+                upCannonBlue.texture = GreenSprite;
+                upBarrelBlue.texture = GreenSprite;
+                upPirateBlue.texture = GreenSprite;
+                upShipBlue.texture = GreenSprite;
+
+                upCannonRed.texture = GreySprite;
+                upBarrelRed.texture = GreySprite;    
+                upPirateRed.texture = GreySprite;
+                upShipRed.texture = GreySprite;
+        }
+        else if (currentTeam == null)
+        {
+            if (GreySprite != null)
+            {
+                upCannonRed.texture = GreySprite;
+                upBarrelRed.texture = GreySprite;
+                upPirateRed.texture = GreySprite;
+                upShipRed.texture = GreySprite;
+
+                upCannonBlue.texture = GreySprite;
+                upBarrelBlue.texture = GreySprite;
+                upPirateBlue.texture = GreySprite;
+                upShipBlue.texture = GreySprite;
+            }
+        }
     }
 
 
     void UpdatePriceUI()
     {
         string g = "g";
+        string p1 = "(";
+        string p2 = ")";
 
-        SetText(woodPrice + g, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
-        SetText(chickenPrice + g, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
-        SetText(rockPrice + g, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
+        SetText(p1 + woodPrice + g + p2, buyWoodPriceText);
+        int sellWoodPrice = Mathf.CeilToInt(woodPrice * 0.8f);
+        SetText(p1 + sellWoodPrice + g + p2, sellWoodPriceText);
+        SetText(p1 + chickenPrice + g + p2, buyChickenPriceText);
+        int sellChickenPrice = Mathf.CeilToInt(chickenPrice * 0.8f);
+        SetText(p1 + sellChickenPrice + g + p2, sellChickenPriceText);
+        SetText(p1 + rockPrice + g + p2, buyRockPriceText);
+        int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);
+        SetText(p1 + sellRockPrice + g + p2, sellRockPriceText);
 
-        SetText(redCannonPrice + g, redCannonPriceText1, redCannonPriceText2);
-        SetText(redPiratePrice + g, redPiratePriceText1, redPiratePriceText2);
-        SetText(redBarrelPrice + g, redBarrelPriceText1, redBarrelPriceText2);
-        SetText(redShipPrice + g, redShipPriceText1, redShipPriceText2);
+        SetText(p1 + redCannonPrice + g + p2, redCannonPriceText1);
+        SetText(p1 + redPiratePrice + g + p2, redPiratePriceText1);
+        SetText(p1 + redBarrelPrice + g + p2, redBarrelPriceText1);
+        SetText(p1 + redShipPrice + g + p2, redShipPriceText1);
 
-        SetText(blueCannonPrice + g, blueCannonPriceText1, blueCannonPriceText2);
-        SetText(bluePiratePrice + g, bluePiratePriceText1, bluePiratePriceText2);
-        SetText(blueBarrelPrice + g, blueBarrelPriceText1, blueBarrelPriceText2);
-        SetText(blueShipPrice + g, blueShipPriceText1, blueShipPriceText2);
+        SetText(p1 + blueCannonPrice + g + p2, blueCannonPriceText1);
+        SetText(p1 + bluePiratePrice + g + p2, bluePiratePriceText1);
+        SetText(p1 + blueBarrelPrice + g + p2, blueBarrelPriceText1);
+        SetText(p1 + blueShipPrice + g + p2, blueShipPriceText1);
     }
 
-    void SetupButtons()
+void SetupButtons()
     {
+<<<<<<< HEAD
+        buyWood.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Wood, woodPrice));
+        sellWood.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Wood, woodPrice));
+
+        buyChicken.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Chicken, chickenPrice));
+        sellChicken.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Chicken, chickenPrice));
+
+        buyRock.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Rock, rockPrice));
+        sellRock.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Rock, rockPrice));
+=======
         buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Wood, woodPrice));
         sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Wood, woodPrice));
 
@@ -106,12 +222,23 @@ public class MarketManager : MonoBehaviour
 
         buyRockRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Rock, rockPrice));
         sellRockRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Rock, rockPrice));
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
 
         UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
         UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
         UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
         UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
 
+<<<<<<< HEAD
+        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Cannon, blueCannonPrice));
+        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Pirate, bluePiratePrice));
+        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Barrel, blueBarrelPrice));
+        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Ship, blueShipPrice));
+    }
+
+
+public void BuyResource(TeamManager team, ResourceType type, int price)
+=======
         buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Wood, woodPrice));
         sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Wood, woodPrice));
 
@@ -129,11 +256,22 @@ public class MarketManager : MonoBehaviour
 
 
     public void BuyResource(TeamManager team, RessourceType type, int price)
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
     {
+        if (team == null) {
+            Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
+            return;
+        }
+
         if (team.gold >= price)
         {
             team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
+            
+            // --- AJOUT DE L'ANIMATION ICI ---
+            team.AnimateResource(type);
+            // --------------------------------
+
             Debug.Log(team.team + " bought " + type);
         }
         else
@@ -144,6 +282,11 @@ public class MarketManager : MonoBehaviour
 
     public void SellResource(TeamManager team, RessourceType type, int price)
     {
+        if (team == null) {
+            Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
+            return;
+        }
+
         bool hasResource = false;
         switch (type)
         {
@@ -156,7 +299,16 @@ public class MarketManager : MonoBehaviour
         {
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
+<<<<<<< HEAD
+            team.ModifyResource(ResourceType.Gold, sellPrice);
+
+            // --- AJOUT DE L'ANIMATION ICI ---
+            team.AnimateResource(type);
+            // --------------------------------
+
+=======
             team.ModifyResource(RessourceType.Gold, sellPrice);
+>>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
             Debug.Log(team.team + " sold " + type);
         }
         else
@@ -167,6 +319,15 @@ public class MarketManager : MonoBehaviour
 
     public void BuyUpgrade(TeamManager team, RessourceType type, int price)
     {
+        if (team == null) {
+            Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
+            return;
+        }
+        if (team != activeTeam) {
+            Debug.LogWarning(team.team + " ne peut pas acheter d'améliorations car ce n'est pas son tour au marché !");
+            return;
+        }
+
         int currentLevel = 0;
         
         switch (type)
@@ -261,19 +422,25 @@ public class MarketManager : MonoBehaviour
             case RessourceType.Wood:
                 woodPrice = Mathf.CeilToInt(baseWoodPrice * multiplier);
                 Debug.Log($"BOIS : {baseWoodPrice} -> {woodPrice} (x{multiplier:F2})");
-                UpdateTextColor(woodPrice, baseWoodPrice, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
+                int sellWoodPrice = Mathf.CeilToInt(woodPrice * 0.8f);
+                UpdateTextColor(woodPrice, baseWoodPrice, buyWoodPriceText);
+                UpdateTextColor(sellWoodPrice, baseWoodPrice, sellWoodPriceText);
                 break;
 
             case RessourceType.Rock:
                 rockPrice = Mathf.CeilToInt(baseRockPrice * multiplier);
                 Debug.Log($"PIERRE : {baseRockPrice} -> {rockPrice} (x{multiplier:F2})");
-                UpdateTextColor(rockPrice, baseRockPrice, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
+                int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);
+                UpdateTextColor(rockPrice, baseRockPrice, buyRockPriceText);
+                UpdateTextColor(sellRockPrice, baseRockPrice, sellRockPriceText);
                 break;
 
             case RessourceType.Chicken:
                 chickenPrice = Mathf.CeilToInt(baseChickenPrice * multiplier);
                 Debug.Log($"POULET : {baseChickenPrice} -> {chickenPrice} (x{multiplier:F2})");
-                UpdateTextColor(chickenPrice, baseChickenPrice, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
+                int sellChickenPrice = Mathf.CeilToInt(chickenPrice * 0.8f);
+                UpdateTextColor(chickenPrice, baseChickenPrice, buyChickenPriceText);
+                UpdateTextColor(sellChickenPrice, baseChickenPrice, sellChickenPriceText);
                 break;
         }
     }
@@ -299,12 +466,18 @@ public class MarketManager : MonoBehaviour
         Debug.Log("--- FIN DU BOOM ECONOMIQUE ---");
         
         woodPrice = baseWoodPrice;
+        int sellWoodPrice = Mathf.CeilToInt(woodPrice * 0.8f);
         rockPrice = baseRockPrice;
+        int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);
         chickenPrice = baseChickenPrice;
+        int sellChickenPrice = Mathf.CeilToInt(chickenPrice * 0.8f);
 
-        UpdateTextColor(woodPrice, baseWoodPrice, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
-        UpdateTextColor(rockPrice, baseRockPrice, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
-        UpdateTextColor(chickenPrice, baseChickenPrice, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
+        UpdateTextColor(woodPrice, baseWoodPrice, buyWoodPriceText);
+        UpdateTextColor(sellWoodPrice, baseWoodPrice, sellWoodPriceText);
+        UpdateTextColor(rockPrice, baseRockPrice, buyRockPriceText);
+        UpdateTextColor(sellRockPrice, baseRockPrice, sellRockPriceText);
+        UpdateTextColor(chickenPrice, baseChickenPrice, buyChickenPriceText);
+        UpdateTextColor(sellChickenPrice, baseChickenPrice, sellChickenPriceText);
 
         UpdatePriceUI();
     }
