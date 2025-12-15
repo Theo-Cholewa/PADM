@@ -12,7 +12,7 @@ public class SawHoldValidator : MonoBehaviour,
     public SawBackAndForthUI sawAnimation;
 
     [Header("Progression UI")]
-    public Image radialProgress; // Image Filled Radial 360
+    public Image radialProgress; // SawProgress (Image Filled Radial 360)
 
     [Header("Validation")]
     public float requiredHoldTime = 3f;
@@ -26,7 +26,10 @@ public class SawHoldValidator : MonoBehaviour,
     void Start()
     {
         if (radialProgress != null)
+        {
             radialProgress.fillAmount = 0f;
+            radialProgress.enabled = false; // cachée au départ
+        }
     }
 
     void Update()
@@ -45,24 +48,36 @@ public class SawHoldValidator : MonoBehaviour,
             holdsValid = true;
         }
 
+        // ✅ On progresse uniquement si on touche la scie ET que les holds sont valides
         if (sawTouched && holdsValid)
         {
             holdTimer += Time.deltaTime;
 
             if (radialProgress != null)
-                radialProgress.fillAmount = holdTimer / requiredHoldTime;
+            {
+                radialProgress.enabled = true;
+                radialProgress.fillAmount = Mathf.Clamp01(holdTimer / requiredHoldTime);
+            }
 
             if (sawAnimation != null)
                 sawAnimation.SetBoosted(true);
 
             if (holdTimer >= requiredHoldTime)
-            {
                 Finish();
-            }
         }
         else
         {
-            ResetHold();
+            // ✅ On reset uniquement si on avait commencé à remplir
+            if (holdTimer > 0f)
+                ResetHold();
+            else
+            {
+                if (radialProgress != null)
+                    radialProgress.enabled = false;
+
+                if (sawAnimation != null)
+                    sawAnimation.SetBoosted(false);
+            }
         }
     }
 
@@ -72,9 +87,14 @@ public class SawHoldValidator : MonoBehaviour,
             sawAnimation.SetBoosted(false);
 
         if (radialProgress != null)
+        {
             radialProgress.fillAmount = 1f;
+            radialProgress.enabled = false;
+        }
 
-        harvestController.FinishHarvest();
+        if (harvestController != null)
+            harvestController.FinishHarvest();
+
         enabled = false;
     }
 
@@ -83,7 +103,10 @@ public class SawHoldValidator : MonoBehaviour,
         holdTimer = 0f;
 
         if (radialProgress != null)
+        {
             radialProgress.fillAmount = 0f;
+            radialProgress.enabled = false;
+        }
 
         if (sawAnimation != null)
             sawAnimation.SetBoosted(false);
