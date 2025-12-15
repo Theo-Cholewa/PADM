@@ -24,12 +24,6 @@ public partial class TeamManager : MonoBehaviour
     public Text woodText;
     public Text rockText;
     public Text chickenText;
-    
-    [Header("Références UI Upgrades (Optionnel)")]
-    public Text cannonLevelText;
-    public Text pirateLevelText;
-    public Text barrelLevelText;
-    public Text shipLevelText;
 
     [Header("Références UI (Jauges / Barres)")]
     public Image cannonBarImage;
@@ -41,6 +35,13 @@ public partial class TeamManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
+
+        if (Party.current == null)
+        {
+            Debug.LogError("TeamManager: Party.current is NULL! Make sure a Party object is in the scene and initialized.");
+            return;
+        }
+
         sharedDataServer = new PartyTools.ValueServer<RessourceData>(
             Party.current,
             $"team_{team.id}",
@@ -84,19 +85,12 @@ public partial class TeamManager : MonoBehaviour
         UpdateUI();
     }
 
-    // Met à jour l'affichage
     public void UpdateUI()
     {
         if(goldText) goldText.text = gold.ToString() + "g";
         if(woodText) woodText.text = "x" + wood.ToString();
         if(rockText) rockText.text = "x" + rock.ToString();
         if(chickenText) chickenText.text = "x" + chicken.ToString();
-
-        // Mise à jour des niveaux (si tu les as assignés)
-        if(cannonLevelText) cannonLevelText.text = "lvl" + cannonLevel.ToString();
-        if(pirateLevelText) pirateLevelText.text = "lvl" + pirateLevel.ToString();
-        if(barrelLevelText) barrelLevelText.text = "lvl" + barrelLevel.ToString();
-        if(shipLevelText) shipLevelText.text = "lvl" + shipLevel.ToString();
 
         float steps = MAX_LEVEL - 1;
 

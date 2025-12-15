@@ -76,7 +76,6 @@ public class MarketManager : MonoBehaviour
         StartCoroutine(EconomicCycleRoutine());
     }
 
-    // --- SETUP ---
 
     void UpdatePriceUI()
     {
@@ -220,13 +219,9 @@ public class MarketManager : MonoBehaviour
         }
     }
 
-// --- NOUVELLE LOGIQUE DU BOOM ---
-
     void TriggerRandomBoom()
     {
         Debug.Log("--- ECONOMIC BOOM STARTED ---");
-
-        // Pile ou face : modifie-t-on 1 ou 2 ressources ?
         bool modifyTwoResources = (Random.value > 0.5f);
 
         // Liste des types disponibles
@@ -234,9 +229,6 @@ public class MarketManager : MonoBehaviour
 
         if (modifyTwoResources)
         {
-            // --- CAS : 2 RESSOURCES (1 UP, 1 DOWN) ---
-            
-            // 1. On tire 2 ressources au hasard
             int index1 = Random.Range(0, availableTypes.Count);
             RessourceType type1 = availableTypes[index1];
             availableTypes.RemoveAt(index1); // On retire pour ne pas la repiocher
@@ -246,13 +238,8 @@ public class MarketManager : MonoBehaviour
 
             // 2. On décide qui monte et qui descend
             bool firstIsUp = (Random.value > 0.5f);
-
-            // 3. Génération des multiplicateurs
-            // UP : Entre x1.2 et x2.5
-            // DOWN : Entre x0.4 et x0.8
             float mult1 = firstIsUp ? Random.Range(1.2f, 2.5f) : Random.Range(0.4f, 0.8f);
             float mult2 = firstIsUp ? Random.Range(0.4f, 0.8f) : Random.Range(1.2f, 2.5f);
-
             ApplyPriceModification(type1, mult1);
             ApplyPriceModification(type2, mult2);
         }
@@ -260,12 +247,10 @@ public class MarketManager : MonoBehaviour
         {           
             int index = Random.Range(0, availableTypes.Count);
             RessourceType type = availableTypes[index];
-
             float randomMult = Random.Range(0.5f, 2.5f);
             
             ApplyPriceModification(type, randomMult);
         }
-
         UpdatePriceUI();
     }
 
@@ -309,7 +294,7 @@ public class MarketManager : MonoBehaviour
         }
     }
 
-void ResetPrices()
+    void ResetPrices()
     {
         Debug.Log("--- FIN DU BOOM ECONOMIQUE ---");
         
