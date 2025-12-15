@@ -204,49 +204,19 @@ public class MarketManager : MonoBehaviour
 
 void SetupButtons()
     {
-<<<<<<< HEAD
-        buyWood.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Wood, woodPrice));
-        sellWood.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Wood, woodPrice));
+        buyWood.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Wood, woodPrice));
+        sellWood.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Wood, woodPrice));
+    
+        buyChicken.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Chicken, chickenPrice));
+        sellChicken.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Chicken, chickenPrice));
 
-        buyChicken.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Chicken, chickenPrice));
-        sellChicken.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Chicken, chickenPrice));
-
-        buyRock.onClick.AddListener(() => BuyResource(activeTeam, ResourceType.Rock, rockPrice));
-        sellRock.onClick.AddListener(() => SellResource(activeTeam, ResourceType.Rock, rockPrice));
-=======
-        buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Wood, woodPrice));
-        sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Wood, woodPrice));
-
-        buyChickenRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Chicken, chickenPrice));
-        sellChickenRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Chicken, chickenPrice));
-
-        buyRockRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Rock, rockPrice));
-        sellRockRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Rock, rockPrice));
->>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
+        buyRock.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Rock, rockPrice));
+        sellRock.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Rock, rockPrice));
 
         UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
         UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
         UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
         UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
-
-<<<<<<< HEAD
-        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Cannon, blueCannonPrice));
-        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Pirate, bluePiratePrice));
-        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Barrel, blueBarrelPrice));
-        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Ship, blueShipPrice));
-    }
-
-
-public void BuyResource(TeamManager team, ResourceType type, int price)
-=======
-        buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Wood, woodPrice));
-        sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Wood, woodPrice));
-
-        buyChickenBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Chicken, chickenPrice));
-        sellChickenBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Chicken, chickenPrice));
-
-        buyRockBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Rock, rockPrice));
-        sellRockBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Rock, rockPrice));
 
         UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Cannon, blueCannonPrice));
         UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Pirate, bluePiratePrice));
@@ -256,7 +226,6 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
 
 
     public void BuyResource(TeamManager team, RessourceType type, int price)
->>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
     {
         if (team == null) {
             Debug.LogWarning("Aucune équipe n'est active au marché ! Appuyez sur R ou B.");
@@ -268,7 +237,6 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
             team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
             
-            // --- AJOUT DE L'ANIMATION ICI ---
             team.AnimateResource(type);
             // --------------------------------
 
@@ -299,16 +267,10 @@ public void BuyResource(TeamManager team, ResourceType type, int price)
         {
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
-<<<<<<< HEAD
-            team.ModifyResource(ResourceType.Gold, sellPrice);
-
-            // --- AJOUT DE L'ANIMATION ICI ---
-            team.AnimateResource(type);
-            // --------------------------------
-
-=======
             team.ModifyResource(RessourceType.Gold, sellPrice);
->>>>>>> 91d020168e0f721646e067845c6c0d6dc583bf10
+            team.AnimateResource(type);
+
+
             Debug.Log(team.team + " sold " + type);
         }
         else
