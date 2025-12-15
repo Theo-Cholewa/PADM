@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -206,7 +207,7 @@ public class MultiTouchHandler : MonoBehaviour
         }
 
         // On drag
-        foreach (var kvp in dict)
+        foreach (var kvp in dict.ToList())
         {
             if (kvp.Value.obj.IsDestroyed())
             {

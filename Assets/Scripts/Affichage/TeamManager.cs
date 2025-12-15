@@ -65,20 +65,20 @@ public partial class TeamManager : MonoBehaviour
         Party.current.OnMessage.RemoveListener(OnMessage);
     }
 
-    public void ModifyResource(ResourceType type, int amount)
+    public void ModifyResource(RessourceType type, int amount)
     {
         switch (type)
         {
-            case ResourceType.Wood: wood += amount; break;
-            case ResourceType.Rock: rock += amount; break;
-            case ResourceType.Chicken: chicken += amount; break;
+            case RessourceType.Wood: wood += amount; break;
+            case RessourceType.Rock: rock += amount; break;
+            case RessourceType.Chicken: chicken += amount; break;
             
-            case ResourceType.Cannon: cannonLevel += amount; break;
-            case ResourceType.Pirate: pirateLevel += amount; break;
-            case ResourceType.Barrel: barrelLevel += amount; break;
-            case ResourceType.Ship: shipLevel += amount; break;
+            case RessourceType.Cannon: cannonLevel += amount; break;
+            case RessourceType.Pirate: pirateLevel += amount; break;
+            case RessourceType.Barrel: barrelLevel += amount; break;
+            case RessourceType.Ship: shipLevel += amount; break;
 
-            case ResourceType.Gold: gold += amount; break;
+            case RessourceType.Gold: gold += amount; break;
         }
         UpdateNetwork();
         UpdateUI();
@@ -131,7 +131,7 @@ public partial class TeamManager : MonoBehaviour
             if(param[2]!=team.id)return;
             var value = int.Parse(param[3]);
             var typeName = param[4];
-            var type = Enum.Parse<ResourceType>(typeName);
+            var type = Enum.Parse<RessourceType>(typeName);
             ModifyResource(type, value);
             UpdateUI();
             UpdateNetwork();

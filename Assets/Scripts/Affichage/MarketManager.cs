@@ -99,41 +99,41 @@ public class MarketManager : MonoBehaviour
 
     void SetupButtons()
     {
-        buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, ResourceType.Wood, woodPrice));
-        sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, ResourceType.Wood, woodPrice));
+        buyWoodRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Wood, woodPrice));
+        sellWoodRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Wood, woodPrice));
 
-        buyChickenRedTeam.onClick.AddListener(() => BuyResource(redTeam, ResourceType.Chicken, chickenPrice));
-        sellChickenRedTeam.onClick.AddListener(() => SellResource(redTeam, ResourceType.Chicken, chickenPrice));
+        buyChickenRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Chicken, chickenPrice));
+        sellChickenRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Chicken, chickenPrice));
 
-        buyRockRedTeam.onClick.AddListener(() => BuyResource(redTeam, ResourceType.Rock, rockPrice));
-        sellRockRedTeam.onClick.AddListener(() => SellResource(redTeam, ResourceType.Rock, rockPrice));
+        buyRockRedTeam.onClick.AddListener(() => BuyResource(redTeam, RessourceType.Rock, rockPrice));
+        sellRockRedTeam.onClick.AddListener(() => SellResource(redTeam, RessourceType.Rock, rockPrice));
 
-        UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Cannon, redCannonPrice));
-        UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Pirate, redPiratePrice));
-        UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Barrel, redBarrelPrice));
-        UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, ResourceType.Ship, redShipPrice));
+        UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
+        UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
+        UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
+        UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
 
-        buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, ResourceType.Wood, woodPrice));
-        sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, ResourceType.Wood, woodPrice));
+        buyWoodBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Wood, woodPrice));
+        sellWoodBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Wood, woodPrice));
 
-        buyChickenBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, ResourceType.Chicken, chickenPrice));
-        sellChickenBlueTeam.onClick.AddListener(() => SellResource(blueTeam, ResourceType.Chicken, chickenPrice));
+        buyChickenBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Chicken, chickenPrice));
+        sellChickenBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Chicken, chickenPrice));
 
-        buyRockBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, ResourceType.Rock, rockPrice));
-        sellRockBlueTeam.onClick.AddListener(() => SellResource(blueTeam, ResourceType.Rock, rockPrice));
+        buyRockBlueTeam.onClick.AddListener(() => BuyResource(blueTeam, RessourceType.Rock, rockPrice));
+        sellRockBlueTeam.onClick.AddListener(() => SellResource(blueTeam, RessourceType.Rock, rockPrice));
 
-        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Cannon, blueCannonPrice));
-        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Pirate, bluePiratePrice));
-        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Barrel, blueBarrelPrice));
-        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, ResourceType.Ship, blueShipPrice));
+        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Cannon, blueCannonPrice));
+        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Pirate, bluePiratePrice));
+        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Barrel, blueBarrelPrice));
+        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Ship, blueShipPrice));
     }
 
 
-    public void BuyResource(TeamManager team, ResourceType type, int price)
+    public void BuyResource(TeamManager team, RessourceType type, int price)
     {
         if (team.gold >= price)
         {
-            team.ModifyResource(ResourceType.Gold, -price);
+            team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
             Debug.Log(team.team + " bought " + type);
         }
@@ -143,21 +143,21 @@ public class MarketManager : MonoBehaviour
         }
     }
 
-    public void SellResource(TeamManager team, ResourceType type, int price)
+    public void SellResource(TeamManager team, RessourceType type, int price)
     {
         bool hasResource = false;
         switch (type)
         {
-            case ResourceType.Wood: hasResource = team.wood > 0; break;
-            case ResourceType.Rock: hasResource = team.rock > 0; break;
-            case ResourceType.Chicken: hasResource = team.chicken > 0; break;
+            case RessourceType.Wood: hasResource = team.wood > 0; break;
+            case RessourceType.Rock: hasResource = team.rock > 0; break;
+            case RessourceType.Chicken: hasResource = team.chicken > 0; break;
         }
 
         if (hasResource)
         {
             int sellPrice = Mathf.CeilToInt(price * 0.75f); 
             team.ModifyResource(type, -1);
-            team.ModifyResource(ResourceType.Gold, sellPrice);
+            team.ModifyResource(RessourceType.Gold, sellPrice);
             Debug.Log(team.team + " sold " + type);
         }
         else
@@ -166,16 +166,16 @@ public class MarketManager : MonoBehaviour
         }
     }
 
-    public void BuyUpgrade(TeamManager team, ResourceType type, int price)
+    public void BuyUpgrade(TeamManager team, RessourceType type, int price)
     {
         int currentLevel = 0;
         
         switch (type)
         {
-            case ResourceType.Cannon: currentLevel = team.cannonLevel; break;
-            case ResourceType.Pirate: currentLevel = team.pirateLevel; break;
-            case ResourceType.Barrel: currentLevel = team.barrelLevel; break;
-            case ResourceType.Ship:   currentLevel = team.shipLevel;   break;
+            case RessourceType.Cannon: currentLevel = team.cannonLevel; break;
+            case RessourceType.Pirate: currentLevel = team.pirateLevel; break;
+            case RessourceType.Barrel: currentLevel = team.barrelLevel; break;
+            case RessourceType.Ship:   currentLevel = team.shipLevel;   break;
             default: return;
         }
 
@@ -187,7 +187,7 @@ public class MarketManager : MonoBehaviour
 
         if (team.gold >= price)
         {
-            team.ModifyResource(ResourceType.Gold, -price);
+            team.ModifyResource(RessourceType.Gold, -price);
             team.ModifyResource(type, 1);
             Debug.Log(team.team + " upgraded " + type + " to level " + (currentLevel + 1));
         }
@@ -230,7 +230,7 @@ public class MarketManager : MonoBehaviour
         bool modifyTwoResources = (Random.value > 0.5f);
 
         // Liste des types disponibles
-        List<ResourceType> availableTypes = new List<ResourceType> { ResourceType.Wood, ResourceType.Rock, ResourceType.Chicken };
+        List<RessourceType> availableTypes = new List<RessourceType> { RessourceType.Wood, RessourceType.Rock, RessourceType.Chicken };
 
         if (modifyTwoResources)
         {
@@ -238,11 +238,11 @@ public class MarketManager : MonoBehaviour
             
             // 1. On tire 2 ressources au hasard
             int index1 = Random.Range(0, availableTypes.Count);
-            ResourceType type1 = availableTypes[index1];
+            RessourceType type1 = availableTypes[index1];
             availableTypes.RemoveAt(index1); // On retire pour ne pas la repiocher
 
             int index2 = Random.Range(0, availableTypes.Count);
-            ResourceType type2 = availableTypes[index2];
+            RessourceType type2 = availableTypes[index2];
 
             // 2. On décide qui monte et qui descend
             bool firstIsUp = (Random.value > 0.5f);
@@ -259,7 +259,7 @@ public class MarketManager : MonoBehaviour
         else
         {           
             int index = Random.Range(0, availableTypes.Count);
-            ResourceType type = availableTypes[index];
+            RessourceType type = availableTypes[index];
 
             float randomMult = Random.Range(0.5f, 2.5f);
             
@@ -269,23 +269,23 @@ public class MarketManager : MonoBehaviour
         UpdatePriceUI();
     }
 
-    void ApplyPriceModification(ResourceType type, float multiplier)
+    void ApplyPriceModification(RessourceType type, float multiplier)
     {
         switch (type)
         {
-            case ResourceType.Wood:
+            case RessourceType.Wood:
                 woodPrice = Mathf.CeilToInt(baseWoodPrice * multiplier);
                 Debug.Log($"BOIS : {baseWoodPrice} -> {woodPrice} (x{multiplier:F2})");
                 UpdateTextColor(woodPrice, baseWoodPrice, woodPrice1, woodPrice2, woodPrice3, woodPrice4);
                 break;
 
-            case ResourceType.Rock:
+            case RessourceType.Rock:
                 rockPrice = Mathf.CeilToInt(baseRockPrice * multiplier);
                 Debug.Log($"PIERRE : {baseRockPrice} -> {rockPrice} (x{multiplier:F2})");
                 UpdateTextColor(rockPrice, baseRockPrice, rockPrice1, rockPrice2, rockPrice3, rockPrice4);
                 break;
 
-            case ResourceType.Chicken:
+            case RessourceType.Chicken:
                 chickenPrice = Mathf.CeilToInt(baseChickenPrice * multiplier);
                 Debug.Log($"POULET : {baseChickenPrice} -> {chickenPrice} (x{multiplier:F2})");
                 UpdateTextColor(chickenPrice, baseChickenPrice, chickenPrice1, chickenPrice2, chickenPrice3, chickenPrice4);
