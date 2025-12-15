@@ -10,6 +10,8 @@ public partial class TeamManager : MonoBehaviour
     public GameObject Popup;
     public GameObject Popdown;
 
+    public int health = 100;
+
     [Header("Ressources Actuelles")]
     public int gold = 150; 
     public int wood = 0;
@@ -33,6 +35,7 @@ public partial class TeamManager : MonoBehaviour
     public Image pirateBarImage;
     public Image barrelBarImage;
     public Image shipBarImage;
+    public Image healthBarImage;
     private const float MAX_LEVEL = 5f;
 
     void Start()
@@ -85,6 +88,8 @@ public partial class TeamManager : MonoBehaviour
             case RessourceType.Ship: icon = shipBarImage.gameObject; break;
 
             case RessourceType.Gold: icon = goldText.gameObject; break;
+
+            case RessourceType.Health: icon = healthBarImage.gameObject; break;
         }
         if (icon != null)
         {
@@ -113,6 +118,7 @@ public partial class TeamManager : MonoBehaviour
             case RessourceType.Ship: shipLevel += amount; break;
 
             case RessourceType.Gold: gold += amount; break;
+            case RessourceType.Health: health += amount; break;
         }
         UpdateNetwork();
         UpdateUI();
@@ -131,6 +137,7 @@ public partial class TeamManager : MonoBehaviour
         if (pirateBarImage) pirateBarImage.fillAmount = (pirateLevel - 1) / steps;
         if (barrelBarImage) barrelBarImage.fillAmount = (barrelLevel - 1) / steps;
         if (shipBarImage)   shipBarImage.fillAmount = (shipLevel - 1)   / steps;
+        if (healthBarImage) healthBarImage.fillAmount = health/100f;
     }
 
     PartyTools.ValueServer<RessourceData> sharedDataServer;
@@ -146,7 +153,8 @@ public partial class TeamManager : MonoBehaviour
             cannonLevel = cannonLevel,
             pirateLevel = pirateLevel,
             barrelLevel = barrelLevel,
-            shipLevel = shipLevel
+            shipLevel = shipLevel,
+            health = health
         });
     }
 

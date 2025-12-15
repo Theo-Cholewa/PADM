@@ -10,4 +10,5 @@ public enum RessourceType
     Ship,
 
     Gold,
+    Health,
 }
