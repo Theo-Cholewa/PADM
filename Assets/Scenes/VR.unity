@@ -441,6 +441,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 208812105561402756, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 208812105561402756, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 4718151682958012430, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
       propertyPath: m_Camera
       value: 
