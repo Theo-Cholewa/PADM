@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Translation : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float Duration;
+    public Vector3 Movement;
 
-    // Update is called once per frame
+    private float CurrentTime=0f;
+
     void Update()
     {
-        
+        transform.position += Movement * Time.deltaTime;
+        CurrentTime += Time.deltaTime;
+        if(CurrentTime >= Duration)
+        {
+            Destroy(gameObject);
+        }
     }
 }

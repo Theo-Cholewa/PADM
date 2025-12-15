@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1310824138427253261}
   - component: {fileID: 8384241917910954484}
   m_Layer: 0
-  m_Name: ScorePopup
+  m_Name: ScorePopdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62,7 +62,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 0adbedf42aa08774faeb3381ce5965b3, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 53ea2c17d64053847887273652611917, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.008213137, g: 0.6981132, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.082394585, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

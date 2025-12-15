@@ -7,6 +7,9 @@ public partial class TeamManager : MonoBehaviour
     [Header("Identité")]
     public Team team = Team.RED; 
 
+    public GameObject Popup;
+    public GameObject Popdown;
+
     [Header("Ressources Actuelles")]
     public int gold = 150; 
     public int wood = 0;
@@ -68,6 +71,36 @@ public partial class TeamManager : MonoBehaviour
 
     public void ModifyResource(RessourceType type, int amount)
     {
+        // Animation
+        GameObject icon = null;
+        switch (type)
+        {
+            case RessourceType.Wood: icon = woodText.gameObject; break;
+            case RessourceType.Rock: icon = rockText.gameObject; break;
+            case RessourceType.Chicken: icon = chickenText.gameObject; break;
+
+            case RessourceType.Cannon: icon = cannonBarImage.gameObject; break;
+            case RessourceType.Pirate: icon = pirateBarImage.gameObject; break;
+            case RessourceType.Barrel: icon = barrelBarImage.gameObject; break;
+            case RessourceType.Ship: icon = shipBarImage.gameObject; break;
+
+            case RessourceType.Gold: icon = goldText.gameObject; break;
+        }
+        if (icon != null)
+        {
+            if (amount > 0)
+            {
+                var effect = Instantiate(Popup,icon.transform);
+                effect.GetComponentInChildren<Text>().text = amount.ToString();
+            }
+            else if (amount < 0)
+            {
+                var effect = Instantiate(Popdown,icon.transform);
+                effect.GetComponentInChildren<Text>().text = "-"+(-amount).ToString();
+            }
+        }
+
+        // Change value
         switch (type)
         {
             case RessourceType.Wood: wood += amount; break;
