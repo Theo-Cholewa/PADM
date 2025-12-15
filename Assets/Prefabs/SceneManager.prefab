@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scenes:
   - Welcome
-  - Ressource
+  - RessourceTime
   - Recolte
   - Guerre
   - "R\xE9paration"
