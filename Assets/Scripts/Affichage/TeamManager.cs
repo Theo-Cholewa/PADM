@@ -79,6 +79,7 @@ public partial class TeamManager : MonoBehaviour
     void OnDestroy()
     {
         Party.current.OnMessage.RemoveListener(OnMessage);
+        sharedDataServer.Destroy();
     }
 
     public void ModifyResource(RessourceType type, int amount)
