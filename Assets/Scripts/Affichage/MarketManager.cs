@@ -110,6 +110,16 @@ public class MarketManager : MonoBehaviour
         stats.Dispose();
     }
 
+    public void SetActiveTeam(Team team)
+    {
+        TeamManager manager = null;
+        if(team==Team.BLUE) manager = blueTeam;
+        else if(team==Team.RED) manager = redTeam;
+
+        activeTeam = manager;
+        UpdateTeamVisuals(manager);
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.B))
@@ -519,6 +529,26 @@ public class MarketManager : MonoBehaviour
                     IsInFight = false,
                     Winner = null,
                 });
+            }
+        }
+
+        // On Open Shop
+        else if (msg.message.StartsWith("ask_shop;"))
+        {
+            var team = Team.Parse(msg.message.Substring("ask_shop;".Length));
+            if (activeTeam == null)
+            {
+                SetActiveTeam(team);
+            }
+        }
+
+        // On Close Shop
+        else if (msg.message.StartsWith("ask_shop_end;"))
+        {
+            var team = Team.Parse(msg.message.Substring("ask_shop_end;".Length));
+            if (activeTeam.team == team)
+            {
+                SetActiveTeam(null);
             }
         }
     }

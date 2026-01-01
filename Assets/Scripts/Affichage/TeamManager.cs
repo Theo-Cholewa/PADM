@@ -59,7 +59,7 @@ public partial class TeamManager : MonoBehaviour
             return;
         }
 
-        sharedDataServer = new PartyTools.ValueServer<RessourceData>(
+        sharedDataServer = new (
             Party.current,
             $"team_{Team.Of(TeamId).id}",
             new RessourceData
@@ -75,6 +75,7 @@ public partial class TeamManager : MonoBehaviour
             },
             (sharedData) => JsonUtility.ToJson(sharedData)
         );
+
         Party.current.OnMessage.AddListener(OnMessage);
     }
 

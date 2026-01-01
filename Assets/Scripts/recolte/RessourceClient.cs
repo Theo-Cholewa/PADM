@@ -64,7 +64,7 @@ public class RessourceClient : MonoBehaviour
         {
             this.team = team;
 
-            client = new PartyTools.ValueClient<RessourceData>(
+            client = new (
                 Party.current,
                 $"team_{team.id}",
                 v => JsonUtility.FromJson<RessourceData>(v)
@@ -81,6 +81,16 @@ public class RessourceClient : MonoBehaviour
         public Task AskForFight()
         {
             return Party.current.SendMessageToAll($"ask_fight;{team.id}");
+        }
+
+        public Task AskOpenShop()
+        {
+            return Party.current.SendMessageToAll($"ask_shop;{team.id}");
+        }
+
+        public Task AskCloseShop()
+        {
+            return Party.current.SendMessageToAll($"ask_shop_end;{team.id}");
         }
 
         public void Dispose()
