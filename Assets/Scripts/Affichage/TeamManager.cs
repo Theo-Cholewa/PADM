@@ -5,6 +5,8 @@ using System.Collections;
 
 public partial class TeamManager : MonoBehaviour
 {
+    public MarketManager market;
+
     [Header("Identité")]
     public TeamEnum TeamId; 
 
@@ -79,7 +81,7 @@ public partial class TeamManager : MonoBehaviour
     void OnDestroy()
     {
         Party.current.OnMessage.RemoveListener(OnMessage);
-        sharedDataServer.Destroy();
+        sharedDataServer.Dispose();
     }
 
     public void ModifyResource(RessourceType type, int amount)
@@ -232,6 +234,16 @@ public partial class TeamManager : MonoBehaviour
 
     void Update()
     {
+        // Reaction
+        if (health <= 0 && market.stats.GetValue().Winner==null)
+        {
+            market.stats.SetValue(new GameStats{
+                IsInFight = false,
+                Winner = team
+            });
+        }
+
+        // Test keys
         if (Input.GetKeyDown(KeyCode.A))
         {
             ModifyResource(RessourceType.Wood,10);

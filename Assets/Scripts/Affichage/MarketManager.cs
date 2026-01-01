@@ -79,7 +79,7 @@ public class MarketManager : MonoBehaviour
     public Texture  GreySprite;
     public Texture  GreenSprite;
 
-
+    public PartyTools.ValueServer<GameStats> stats;
 
     void Start()
     {
@@ -91,6 +91,23 @@ public class MarketManager : MonoBehaviour
         UpdatePriceUI();
         SetupButtons();
         StartCoroutine(EconomicCycleRoutine());
+        Party.current.OnMessage.AddListener(OnMessage);
+
+        stats = new(
+            Party.current,
+            "game_stats",
+            new GameStats{
+                IsInFight = false,
+                Winner = null,
+            },
+            v => JsonUtility.ToJson(v)
+        );
+    }
+
+    void OnDestroy()
+    {
+        Party.current.OnMessage.RemoveListener(OnMessage);
+        stats.Dispose();
     }
 
     void Update()
@@ -209,7 +226,7 @@ public class MarketManager : MonoBehaviour
         SetText("Stock: " + chickenNumber.ToString(), chickenStockText);
     }
 
-void SetupButtons()
+    void SetupButtons()
     {
         buyWood.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Wood, woodPrice));
         sellWood.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Wood, woodPrice));
@@ -477,5 +494,32 @@ void SetupButtons()
         UpdateTextColor(sellChickenPrice, baseChickenPrice, sellChickenPriceText);
 
         UpdatePriceUI();
+    }
+
+    public void OnMessage(PartyMessage msg)
+    {
+        // Start fight
+        if (msg.message.StartsWith("ask_fight;"))
+        {
+            if (!stats.GetValue().IsInFight)
+            {
+                stats.SetValue(new GameStats{
+                    IsInFight = true,
+                    Winner = null,
+                });
+            }
+        }
+
+        // End fight
+        else if (msg.message.StartsWith("ask_fight_end"))
+        {
+            if (stats.GetValue().IsInFight)
+            {
+                stats.SetValue(new GameStats{
+                    IsInFight = false,
+                    Winner = null,
+                });
+            }
+        }
     }
 }

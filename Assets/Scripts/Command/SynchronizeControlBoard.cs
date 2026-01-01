@@ -18,7 +18,7 @@ public class SynchronizeControlBoard : MonoBehaviour
 
     void OnDestroy()
     {
-        server.Destroy();
+        server.Dispose();
     }
 
     IEnumerator SendData()

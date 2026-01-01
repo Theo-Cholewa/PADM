@@ -230,20 +230,25 @@ public static class PartyTools
             this.party.OnMessage.AddListener(OnMessage);
         }
 
-        public void Destroy()
+        public void Dispose()
         {
-            this.party.OnMessage.RemoveListener(OnMessage);
+            party.OnMessage.RemoveListener(OnMessage);
         }
 
         public Task SetValue(T value)
         {
             this.value = value;
-            return this.party.SendMessageToAll($"value;{name};set;{toStr(value)}");
+            return party.SendMessageToAll($"value;{name};set;{toStr(value)}");
+        }
+
+        public T GetValue()
+        {
+            return this.value;
         }
 
         public Task Remove()
         {
-            return this.party.SendMessageToAll($"value;{name};remove;no");
+            return party.SendMessageToAll($"value;{name};remove;no");
         }
 
         public void OnMessage(PartyMessage msg)
