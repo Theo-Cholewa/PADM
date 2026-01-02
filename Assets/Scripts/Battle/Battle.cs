@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.SearchService;
 using UnityEngine;
 
 public class Battle : MonoBehaviour
@@ -19,7 +16,7 @@ public class Battle : MonoBehaviour
     void FixedUpdate()
     {
         // On Fight End, Change of scene
-        var stats = RessourceClient.current.FightStats.FirstOrDefault();
+        var stats = RessourceClient.current.GameStats.FirstOrDefault();
         if(!stats.IsInFight)
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("RessourceTime");

@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -24,13 +22,13 @@ public class RessourceClient : MonoBehaviour
         current = this;
 
         Teams = new Dictionary<Team, TeamClient>();
-        FightStats = new(Party.current,"fight_stats", v => JsonUtility.FromJson<GameStats>(v));
+        GameStats = new(Party.current,"game_stats", v => JsonUtility.FromJson<GameStats>(v));
     }
 
     void OnDestroy()
     {
         if(Teams!=null) foreach(var manager in Teams.Values) manager.Dispose();
-        if(FightStats!=null) FightStats.Dispose();
+        if(GameStats!=null) GameStats.Dispose();
     }
 
 
@@ -100,7 +98,7 @@ public class RessourceClient : MonoBehaviour
     }
 
     /* PHASE */
-    public PartyTools.ValueClient<GameStats> FightStats;
+    public PartyTools.ValueClient<GameStats> GameStats;
 
     public Task AskForFightEnd()
     {
