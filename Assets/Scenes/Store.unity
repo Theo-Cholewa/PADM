@@ -1603,6 +1603,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   market: {fileID: 904883569}
   TeamId: 1
+  EnnemyTeamId: 0
   Popup: {fileID: 706467497615541217, guid: 9d150a4c539d1a84789e743d940ddd20, type: 3}
   Popdown: {fileID: 706467497615541217, guid: 00694b117442f924c8f0e8e6d92675fd, type: 3}
   health: 100
@@ -5923,6 +5924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   market: {fileID: 904883569}
   TeamId: 0
+  EnnemyTeamId: 1
   Popup: {fileID: 706467497615541217, guid: 9d150a4c539d1a84789e743d940ddd20, type: 3}
   Popdown: {fileID: 706467497615541217, guid: 00694b117442f924c8f0e8e6d92675fd, type: 3}
   health: 100

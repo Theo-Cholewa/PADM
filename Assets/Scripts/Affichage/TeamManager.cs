@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Threading.Tasks;
 
 public partial class TeamManager : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public partial class TeamManager : MonoBehaviour
 
     [Header("Identité")]
     public TeamEnum TeamId; 
+
+    public TeamEnum EnnemyTeamId;
 
     public Team team => Team.Of(TeamId);
 
@@ -233,15 +236,22 @@ public partial class TeamManager : MonoBehaviour
         }
     }
 
+    async Task Kill()
+    {
+        await market.stats.SetValue(new GameStats{
+            IsInFight = false,
+            Winner = Team.Of(EnnemyTeamId)
+        });
+        Victory.Winner = Team.Of(EnnemyTeamId);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Victory");
+    } 
+
     void Update()
     {
         // Reaction
         if (health <= 0 && market.stats.GetValue().Winner==null)
         {
-            market.stats.SetValue(new GameStats{
-                IsInFight = false,
-                Winner = team
-            });
+            Kill();
         }
 
         // Test keys
