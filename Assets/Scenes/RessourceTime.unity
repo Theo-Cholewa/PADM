@@ -1862,6 +1862,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shipColor: {r: 1, g: 0, b: 0, a: 1}
+  Team: 0
   life: 100
   sailors: 3
   food: 0
@@ -3718,7 +3719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16094f4189ba90046b4a4f138db9b9f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TeamId: 0
+  TeamId: 1
   moveForward: w
   turnLeft: a
   turnRight: d
@@ -3778,6 +3779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shipColor: {r: 0, g: 0.07107735, b: 1, a: 1}
+  Team: 1
   life: 100
   sailors: 3
   food: 0

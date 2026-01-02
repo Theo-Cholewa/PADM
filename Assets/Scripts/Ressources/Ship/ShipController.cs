@@ -7,7 +7,6 @@ public class ShipController : MonoBehaviour
     public TeamEnum TeamId = TeamEnum.RED;
     public Team team => Team.Of(TeamId);
 
-    private ShipData data;
     private Rigidbody rb;
 
     [Header("Touches de contrôle")]
@@ -91,18 +90,19 @@ public class ShipController : MonoBehaviour
         ressources = RessourceClient.current.Get(team);
 
         rb = GetComponent<Rigidbody>();
-        data = GetComponent<ShipData>();
-
-        if (data != null)
-        {
-            data.OnResourcesChanged += UpdateResourceBars;
-            UpdateResourceBars();
-        }
+        
+        ressources.onChange.AddListener(UpdateResourceBars);
+        UpdateResourceBars();
 
         if (stopImage != null) stopImage.enabled = false;
         if (woodImage != null) woodImage.enabled = false;
         if (foodImage != null) foodImage.enabled = false;
         if (stoneImage != null) stoneImage.enabled = false;
+    }
+
+    void OnDestroy()
+    {
+        ressources.onChange.RemoveListener(UpdateResourceBars);
     }
 
     void Update()
@@ -338,9 +338,9 @@ public class ShipController : MonoBehaviour
     // 🔹 Met à jour la hauteur des barres selon les quantités actuelles
     void UpdateResourceBars()
     {
-        UpdateResourceImageHeight(foodImage, data.food);
-        UpdateResourceImageHeight(woodImage, data.wood);
-        UpdateResourceImageHeight(stoneImage, data.stone);
+        UpdateResourceImageHeight(foodImage, ressources.value.chicken);
+        UpdateResourceImageHeight(woodImage, ressources.value.wood);
+        UpdateResourceImageHeight(stoneImage, ressources.value.rock);
     }
 
     // 🔹 Hauteur = 100 à 10 ressources, 0 à 0 ressource
