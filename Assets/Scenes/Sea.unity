@@ -1073,9 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1560d0d1d7681a449a9a0e2998d29914, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimerMeshes:
-  - {fileID: 136057436}
-  - {fileID: 1389448852}
+  TimerMeshes: []
   BattleDuration: 120
 --- !u!4 &1333020766
 Transform:

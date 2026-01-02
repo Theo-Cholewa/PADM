@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 public class RessourceClient : MonoBehaviour
 {
     /* LIFETIME */
@@ -103,5 +102,38 @@ public class RessourceClient : MonoBehaviour
     public Task AskForFightEnd()
     {
         return Party.current.SendMessageToAll("ask_fight_end");
+    }
+
+    /// <summary>
+    /// Change de scène selon l'état de la partie.
+    /// </summary>
+    public void GoToGoodScene()
+    {
+        var stats = GameStats.FirstOrDefault();
+        if (stats.IsInFight)
+        {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Battle")
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
+            }
+        }
+        else
+        {
+            if (stats.Winner==null)
+            {
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "RessourceTime")
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("RessourceTime");
+                }
+            }
+            else
+            {
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Sea")
+                {
+                    Sea.Team = stats.Winner;
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("Sea");
+                }
+            }
+        }
     }
 }
