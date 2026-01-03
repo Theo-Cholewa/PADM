@@ -1,6 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
+
+class SavedShipData
+{
+    public Vector3 position;
+    public Quaternion rotation;
+}
 
 public class ShipController : MonoBehaviour
 {
@@ -53,6 +61,7 @@ public class ShipController : MonoBehaviour
     public RawImage woodImage;
     public RawImage foodImage;
     public RawImage stoneImage;
+    public RawImage fightImage;
 
     [Header("Taille des barres (px)")]
     public float resourceMinSize = 1f;
@@ -62,6 +71,7 @@ public class ShipController : MonoBehaviour
     public float acceleration = 2f;
     public float maxSpeed = 3.5f;
     public float deceleration = 1f;
+    public float TimeBeforeFight = 120f;
 
     [Header("Rotation inertielle")]
     public float rotationAcceleration = 20f;
@@ -70,11 +80,12 @@ public class ShipController : MonoBehaviour
 
     private float currentSpeed = 0f;
     private float currentRotationSpeed = 0f;
+    private float fightTimer = 120f;
 
     // 🔹 île actuellement accostée
     private Island currentIslandDocked = null;
 
-    private PartyTools.ValueClient<(float,float)> directionClient;
+    private PartyTools.ValueClient<(float, float)> directionClient;
 
 
     private RessourceClient.TeamClient ressources;
@@ -84,13 +95,13 @@ public class ShipController : MonoBehaviour
         directionClient = new(
             Party.current,
             $"direction_{team.id}",
-            v => JsonUtility.FromJson<(float,float)>(v)
+            v => JsonUtility.FromJson<(float, float)>(v)
         );
 
         ressources = RessourceClient.current.Get(team);
 
         rb = GetComponent<Rigidbody>();
-        
+
         ressources.onChange.AddListener(UpdateResourceBars);
         UpdateResourceBars();
 
@@ -98,20 +109,33 @@ public class ShipController : MonoBehaviour
         if (woodImage != null) woodImage.enabled = false;
         if (foodImage != null) foodImage.enabled = false;
         if (stoneImage != null) stoneImage.enabled = false;
+        if (fightImage != null) fightImage.enabled = false;
+
+        fightTimer = TimeBeforeFight;
+
+        StartSave();
     }
 
     void OnDestroy()
     {
         ressources.onChange.RemoveListener(UpdateResourceBars);
+
+        OnDestroySave();
     }
 
     void Update()
     {
         var data = ressources.value;
-        var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
+        var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
         var volantCount = directionClient?.GetValues()?.Count ?? 1;
-        if(volantCount==0) volantCount = 1;
-        
+        if (volantCount == 0) volantCount = 1;
+
+        // --- Gestion de la baguarre
+        fightTimer -= Time.deltaTime;
+        if (fightTimer < 0)
+        {
+            fightImage.enabled = true;
+        }
 
         // --- Gestion de l’ancre (clavier) ---
         if (Input.GetKeyDown(anchorKey))
@@ -123,47 +147,47 @@ public class ShipController : MonoBehaviour
         if (anchorDropped) return;
 
         var speed = data.shipLevel;
-        if(speed<=0)speed = 1;
+        if (speed <= 0) speed = 1;
 
         // --- Mouvement avant/arrière ---
         var addedSpeed = 0f;
 
-            // Network 
+        // Network 
         if (useNetworkThrottle)
         {
             if (networkThrottleInput > 0.5f) addedSpeed += acceleration;
         }
 
-            // Contrôle clavier classique
+        // Contrôle clavier classique
         if (Input.GetKey(moveForward)) addedSpeed += acceleration;
 
-            // Party
-        addedSpeed += volantData.Item2/volantCount * acceleration;
+        // Party
+        addedSpeed += volantData.Item2 / volantCount * acceleration;
 
         if (addedSpeed > 0f) currentSpeed += addedSpeed * speed * Time.deltaTime;
-        else currentSpeed -= deceleration * speed * Time.deltaTime;   
+        else currentSpeed -= deceleration * speed * Time.deltaTime;
 
         currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * speed);
 
 
         // --- Rotation ---
         var addedRotationSpeed = 0f;
-        
-            // Network
+
+        // Network
         if (useNetworkSteering)
         {
             float steer = networkSteerInput;      // -1 à 1
             addedRotationSpeed += steer;
         }
 
-            // Keyboard
+        // Keyboard
         if (Input.GetKey(turnLeft))
             addedRotationSpeed += -1f;
         else if (Input.GetKey(turnRight))
             addedRotationSpeed += 1f;
 
-            // Party
-        addedRotationSpeed -= volantData.Item1/volantCount;
+        // Party
+        addedRotationSpeed -= volantData.Item1 / volantCount;
 
         if (Math.Abs(addedRotationSpeed) > 0.01f)
         {
@@ -188,13 +212,13 @@ public class ShipController : MonoBehaviour
     {
         anchorDropped = !anchorDropped;
 
-            if (anchorDropped)
-            {
-                // Pose de l’ancre
-                currentSpeed = 0f;
-                currentRotationSpeed = 0f;
-                rb.velocity = Vector3.zero;
-                Debug.Log($"{team} pose l’ancre ⚓");
+        if (anchorDropped)
+        {
+            // Pose de l’ancre
+            currentSpeed = 0f;
+            currentRotationSpeed = 0f;
+            rb.velocity = Vector3.zero;
+            Debug.Log($"{team} pose l’ancre ⚓");
 
             if (stopImage != null) stopImage.enabled = true;
             if (woodImage != null) woodImage.enabled = true;
@@ -209,31 +233,31 @@ public class ShipController : MonoBehaviour
             foreach (Island island in allIslands)
             {
                 float distance = Vector3.Distance(transform.position, island.transform.position);
-                if (distance <= detectionRadius)
+                if (distance <= detectionRadius && !island.isVisited)
                 {
                     island.SetVisited(true);
                     currentIslandDocked = island;
 
-                        Debug.Log($"⚓ {team} est ancré près de l’île {island.islandID} (dist={distance:F1})");
+                    Debug.Log($"⚓ {team} est ancré près de l’île {island.islandID} (dist={distance:F1})");
 
-                        if (island.islandContent != null)
+                    if (island.islandContent != null)
+                    {
+                        // --- Actions selon la ressource principale ---
+                        switch (island.mainResource)
                         {
-                            // --- Actions selon la ressource principale ---
-                            switch (island.mainResource)
-                            {
-                                case Island.RessourceType.Food:
-                                    // 🐔 Gestion des poulets
-                                    ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
-                                    if (net != null)
-                                    {
-                                        net.SetLinkedShip(this);
-                                        Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {team}");
-                                    }
-                                    else
-                                    {
-                                        Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
-                                    }
-                                    break;
+                            case Island.RessourceType.Food:
+                                // 🐔 Gestion des poulets
+                                ChickenNetJoystick net = island.islandContent.GetComponentInChildren<ChickenNetJoystick>(true);
+                                if (net != null)
+                                {
+                                    net.SetLinkedShip(this);
+                                    Debug.Log($"🍗 L'île {island.islandID} contient des poulets — filet lié à {team}");
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"⚠ Aucun filet trouvé sur l’île {island.islandID}");
+                                }
+                                break;
 
                             case Island.RessourceType.Wood:
                                 Canvas canvas = island.islandContent.GetComponentInChildren<Canvas>(true);
@@ -245,18 +269,22 @@ public class ShipController : MonoBehaviour
                                 if (wood == null)
                                     wood = island.islandContent.GetComponentInChildren<WoodHarvestController>(true);
 
-                                    if (wood != null)
-                                    {
-                                        wood.gameObject.SetActive(true);
-                                        wood.SetLinkedShip(this); // ✅ lie le bateau ici
-                                        Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {team} !");
-                                    }
-                                    else
-                                    {
-                                        Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
-                                    }
+                                if (wood != null)
+                                {
+                                    wood.gameObject.SetActive(true);
+                                    wood.SetLinkedShip(this); // ✅ lie le bateau ici
+                                    Debug.Log($"🌲 L'île {island.islandID} contient du bois — récolte activée pour {team} !");
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"⚠ Aucun contrôleur de bois trouvé sur {island.islandID}");
+                                }
+                                break;
+                            case Island.RessourceType.Shop:
+                                {
+                                    ressources.AskOpenShop();
                                     break;
-
+                                }
                             case Island.RessourceType.Stone:
                                 Debug.Log($"🪨 L'île {island.islandID} contient de la pierre — fonctionnalité à venir !");
                                 break;
@@ -268,14 +296,14 @@ public class ShipController : MonoBehaviour
                         }
                     }
 
-                        break;
-                    }
+                    break;
                 }
             }
-            else
-            {
-                // Lève l’ancre
-                Debug.Log($"{team} relève l’ancre ⚓");
+        }
+        else
+        {
+            // Lève l’ancre
+            Debug.Log($"{team} relève l’ancre ⚓");
 
             if (stopImage != null) stopImage.enabled = false;
             if (woodImage != null) woodImage.enabled = false;
@@ -310,6 +338,12 @@ public class ShipController : MonoBehaviour
                         case Island.RessourceType.Stone:
                             Debug.Log($"🪨 Fin de la récolte de pierre sur l’île {currentIslandDocked.islandID}");
                             break;
+
+                        case Island.RessourceType.Shop:
+                            {
+                                ressources.AskCloseShop();
+                                break;
+                            }
                     }
 
                     // 🔹 Remet l’île dans son état initial
@@ -356,5 +390,38 @@ public class ShipController : MonoBehaviour
         size.y = Mathf.Lerp(0f, resourceMaxSize, t);
 
         rt.sizeDelta = size;
+    }
+
+    // FIGHT //
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent<ShipController>(out var otherShip))
+        {
+            if (otherShip.fightTimer < 0f && fightTimer < 0f)
+            {
+                ressources.AskForFight();
+            }
+        }
+    }
+
+    // DATA SAVING //
+    private static Dictionary<Team, SavedShipData> SAVED = new();
+
+    void StartSave()
+    {
+        if (SAVED.TryGetValue(team, out var data))
+        {
+            rb.position = data.position;
+            rb.rotation = data.rotation;
+        }
+    }
+
+    void OnDestroySave()
+    {
+        SAVED.Add(team, new SavedShipData
+        {
+            position = rb.position,
+            rotation = rb.rotation
+        });
     }
 }

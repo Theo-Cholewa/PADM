@@ -510,6 +510,7 @@ public class MarketManager : MonoBehaviour
                     IsInFight = true,
                     Winner = null,
                 });
+                SetActiveTeam(null);
             }
         }
 

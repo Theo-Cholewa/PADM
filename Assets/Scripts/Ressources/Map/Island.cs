@@ -20,7 +20,8 @@ public class Island : MonoBehaviour
         None,
         Food,
         Wood,
-        Stone
+        Stone,
+        Shop,
     }
     [Header("Type de ressource principale")]
     [Tooltip("Choisissez la ressource principale de cette île")]
