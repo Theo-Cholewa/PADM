@@ -97,7 +97,7 @@ public class MarketManager : MonoBehaviour
     public Texture  GreySprite;
     public Texture  GreenSprite;
 
-    public RawImage MarketHider;
+    public GameObject MarketHider;
 
     public PartyTools.ValueServer<GameStats> stats;
 
@@ -191,7 +191,7 @@ public class MarketManager : MonoBehaviour
         BlueShipUpdate.SetActive(this, isBlue);
 
         var isNothing = currentTeam == null;
-        MarketHider.enabled = !isNothing;
+        MarketHider.SetActive(isNothing);
     }
 
 
