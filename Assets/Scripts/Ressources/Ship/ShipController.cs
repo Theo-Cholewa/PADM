@@ -1,6 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
+
+class SavedShipData
+{
+    public Vector3 position;
+    public Quaternion rotation;
+}
 
 public class ShipController : MonoBehaviour
 {
@@ -53,6 +61,7 @@ public class ShipController : MonoBehaviour
     public RawImage woodImage;
     public RawImage foodImage;
     public RawImage stoneImage;
+    public RawImage fightImage;
 
     [Header("Taille des barres (px)")]
     public float resourceMinSize = 1f;
@@ -62,6 +71,7 @@ public class ShipController : MonoBehaviour
     public float acceleration = 2f;
     public float maxSpeed = 3.5f;
     public float deceleration = 1f;
+    public float TimeBeforeFight = 120f;
 
     [Header("Rotation inertielle")]
     public float rotationAcceleration = 20f;
@@ -70,6 +80,7 @@ public class ShipController : MonoBehaviour
 
     private float currentSpeed = 0f;
     private float currentRotationSpeed = 0f;
+    private float fightTimer = 120f;
 
     // 🔹 île actuellement accostée
     private Island currentIslandDocked = null;
@@ -98,11 +109,18 @@ public class ShipController : MonoBehaviour
         if (woodImage != null) woodImage.enabled = false;
         if (foodImage != null) foodImage.enabled = false;
         if (stoneImage != null) stoneImage.enabled = false;
+        if (fightImage != null) fightImage.enabled = false;
+
+        fightTimer = TimeBeforeFight;
+
+        StartSave();
     }
 
     void OnDestroy()
     {
         ressources.onChange.RemoveListener(UpdateResourceBars);
+        
+        OnDestroySave();
     }
 
     void Update()
@@ -111,7 +129,13 @@ public class ShipController : MonoBehaviour
         var volantData = directionClient?.GetAggregate((a,b,c)=>(a.Item1+b.Item1, a.Item2+b.Item2),(0f,0f)) ?? (0f,0f);
         var volantCount = directionClient?.GetValues()?.Count ?? 1;
         if(volantCount==0) volantCount = 1;
-        
+
+        // --- Gestion de la baguarre
+        fightTimer -= Time.deltaTime;
+        if (fightTimer < 0)
+        {
+            fightImage.enabled = true;
+        }     
 
         // --- Gestion de l’ancre (clavier) ---
         if (Input.GetKeyDown(anchorKey))
@@ -356,5 +380,37 @@ public class ShipController : MonoBehaviour
         size.y = Mathf.Lerp(0f, resourceMaxSize, t);
 
         rt.sizeDelta = size;
+    }
+
+    // FIGHT //
+    void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.TryGetComponent<ShipController>(out var otherShip))
+        {
+            if(otherShip.fightTimer<0f && fightTimer < 0f)
+            {
+                ressources.AskForFight();
+            }
+        }     
+    }
+
+    // DATA SAVING //
+    private static Dictionary<Team,SavedShipData> SAVED = new();
+
+    void StartSave()
+    {
+        if(SAVED.TryGetValue(team, out var data))
+        {
+            rb.position = data.position;
+            rb.rotation = data.rotation;
+        }
+    }
+
+    void OnDestroySave()
+    {
+        SAVED.Add(team, new SavedShipData {
+            position = rb.position,
+            rotation = rb.rotation
+        });
     }
 }

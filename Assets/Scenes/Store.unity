@@ -3399,17 +3399,9 @@ MonoBehaviour:
   boomDuration: 45
   minTimeBetweenBooms: 20
   maxTimeBetweenBooms: 60
-  upCannonRed: {fileID: 1093173980}
-  upPirateRed: {fileID: 38072891}
-  upBarrelRed: {fileID: 832287820}
-  upShipRed: {fileID: 1653550289}
-  upCannonBlue: {fileID: 401808449}
-  upPirateBlue: {fileID: 2074529511}
-  upBarrelBlue: {fileID: 1616150390}
-  upShipBlue: {fileID: 710409912}
   GreySprite: {fileID: 2800000, guid: 01c202b1a8f2f9a4b9f40fe2376e4693, type: 3}
   GreenSprite: {fileID: 2800000, guid: 4b5a9b9452f4f64438af73d73f29ccba, type: 3}
-  MarketHider: {fileID: 0}
+  MarketHider: {fileID: 1197908888}
 --- !u!1 &921004406
 GameObject:
   m_ObjectHideFlags: 0

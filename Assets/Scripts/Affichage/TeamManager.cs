@@ -240,7 +240,7 @@ public partial class TeamManager : MonoBehaviour
     {
         await market.stats.SetValue(new GameStats{
             IsInFight = false,
-            Winner = Team.Of(EnnemyTeamId)
+            Winner = EnnemyTeamId
         });
         Victory.Winner = Team.Of(EnnemyTeamId);
         UnityEngine.SceneManagement.SceneManager.LoadScene("Victory");

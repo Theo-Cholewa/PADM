@@ -19,11 +19,11 @@ public class HealthChanger : MonoBehaviour
             .OrderBy(ship => (ship.transform.position - transform.position).magnitude)
             .First();
         
-        if(onSpawn!=0) ship.ChangeHealth(onSpawn);
+        if(onSpawn!=0 && ship!=null) ship.ChangeHealth(onSpawn);
     }
 
     void OnDestroy()
     {
-        if(onDestroy!=0) ship.ChangeHealth(onDestroy);
+        if(onDestroy!=0 && ship!=null) ship.ChangeHealth(onDestroy);
     }
 }
