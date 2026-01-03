@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 87805660}
   - component: {fileID: 87805659}
   m_Layer: 5
-  m_Name: Blue
+  m_Name: BlueShipText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2180,7 +2180,7 @@ GameObject:
   - component: {fileID: 641737856}
   - component: {fileID: 641737855}
   m_Layer: 5
-  m_Name: Blue
+  m_Name: BluePirateText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2669,7 +2669,7 @@ GameObject:
   - component: {fileID: 711593181}
   - component: {fileID: 711593180}
   m_Layer: 5
-  m_Name: TextBlue
+  m_Name: BlueCanonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3286,7 +3286,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 904883567}
-  - component: {fileID: 904883568}
   - component: {fileID: 904883569}
   m_Layer: 5
   m_Name: Market
@@ -3314,6 +3313,7 @@ RectTransform:
   - {fileID: 1594293013}
   - {fileID: 142630940}
   - {fileID: 1575330219}
+  - {fileID: 1197908889}
   m_Father: {fileID: 223983725}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3321,18 +3321,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &904883568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 904883566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0aab459fc803aae41b26139874ee1b9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &904883569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3367,31 +3355,47 @@ MonoBehaviour:
   sellChickenPriceText: {fileID: 1552663236}
   buyRockPriceText: {fileID: 1101480580}
   sellRockPriceText: {fileID: 1353216657}
-  redCannonPriceText1: {fileID: 1693642673}
-  redPiratePriceText1: {fileID: 1581596101}
-  redBarrelPriceText1: {fileID: 2102816778}
-  redShipPriceText1: {fileID: 922337416}
-  blueCannonPriceText1: {fileID: 711593180}
-  bluePiratePriceText1: {fileID: 641737855}
-  blueBarrelPriceText1: {fileID: 1129767346}
-  blueShipPriceText1: {fileID: 87805659}
   woodStockText: {fileID: 984491233}
   rockStockText: {fileID: 309241265}
   chickenStockText: {fileID: 1040572812}
+  RedCanonUpdate:
+    Price: {fileID: 1693642673}
+    Button: {fileID: 2006640742}
+    Image: {fileID: 1093173980}
+  RedPirateUpdate:
+    Price: {fileID: 1581596101}
+    Button: {fileID: 512893322}
+    Image: {fileID: 38072891}
+  RedBarrelUpdate:
+    Price: {fileID: 2102816778}
+    Button: {fileID: 1635842567}
+    Image: {fileID: 832287820}
+  RedShipUpdate:
+    Price: {fileID: 922337416}
+    Button: {fileID: 376132380}
+    Image: {fileID: 1653550289}
+  BlueCanonUpdate:
+    Price: {fileID: 711593180}
+    Button: {fileID: 296515720}
+    Image: {fileID: 401808449}
+  BluePirateUpdate:
+    Price: {fileID: 641737855}
+    Button: {fileID: 1378704214}
+    Image: {fileID: 2074529511}
+  BlueBarrelUpdate:
+    Price: {fileID: 1129767346}
+    Button: {fileID: 1294488377}
+    Image: {fileID: 1616150390}
+  BlueShipUpdate:
+    Price: {fileID: 87805659}
+    Button: {fileID: 377791316}
+    Image: {fileID: 710409912}
   buyWood: {fileID: 1208427633}
   sellWood: {fileID: 782325750}
   buyChicken: {fileID: 753054000}
   sellChicken: {fileID: 539190198}
   buyRock: {fileID: 2100522603}
   sellRock: {fileID: 315753062}
-  UpgradeCannonRedTeam: {fileID: 2006640742}
-  UpgradeCannonBlueTeam: {fileID: 296515720}
-  UpgradePirateRedTeam: {fileID: 512893322}
-  UpgradePirateBlueTeam: {fileID: 1378704214}
-  UpgradeBarrelRedTeam: {fileID: 1635842567}
-  UpgradeBarrelBlueTeam: {fileID: 1294488377}
-  UpgradeShipRedTeam: {fileID: 376132380}
-  UpgradeShipBlueTeam: {fileID: 377791316}
   boomDuration: 45
   minTimeBetweenBooms: 20
   maxTimeBetweenBooms: 60
@@ -3405,6 +3409,7 @@ MonoBehaviour:
   upShipBlue: {fileID: 710409912}
   GreySprite: {fileID: 2800000, guid: 01c202b1a8f2f9a4b9f40fe2376e4693, type: 3}
   GreenSprite: {fileID: 2800000, guid: 4b5a9b9452f4f64438af73d73f29ccba, type: 3}
+  MarketHider: {fileID: 0}
 --- !u!1 &921004406
 GameObject:
   m_ObjectHideFlags: 0
@@ -3496,7 +3501,7 @@ GameObject:
   - component: {fileID: 922337417}
   - component: {fileID: 922337416}
   m_Layer: 5
-  m_Name: Red
+  m_Name: RedShipText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4057,7 +4062,7 @@ GameObject:
   - component: {fileID: 1129767347}
   - component: {fileID: 1129767346}
   m_Layer: 5
-  m_Name: Blue
+  m_Name: BlueBarrelText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4202,6 +4207,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140701400}
+  m_CullTransparentMesh: 1
+--- !u!1 &1197908888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1197908889}
+  - component: {fileID: 1197908891}
+  - component: {fileID: 1197908890}
+  m_Layer: 5
+  m_Name: MarketHider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1197908889
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197908888}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 904883567}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 2.0214996, y: 0.3619995}
+  m_SizeDelta: {x: 174.3828, y: 274.92}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1197908890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197908888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 4728f82c9275cf04fb04f5b4598bc92e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1197908891
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197908888}
   m_CullTransparentMesh: 1
 --- !u!1 &1208427631
 GameObject:
@@ -5333,7 +5413,7 @@ GameObject:
   - component: {fileID: 1581596102}
   - component: {fileID: 1581596101}
   m_Layer: 5
-  m_Name: Red
+  m_Name: RedPirateText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5789,7 +5869,7 @@ GameObject:
   - component: {fileID: 1693642674}
   - component: {fileID: 1693642673}
   m_Layer: 5
-  m_Name: TextRed
+  m_Name: RedCanonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6720,7 +6800,7 @@ GameObject:
   - component: {fileID: 2102816779}
   - component: {fileID: 2102816778}
   m_Layer: 5
-  m_Name: Red
+  m_Name: RedBarrelText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -3,6 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
 
+
+[System.Serializable]
+public class MarketManagerUpgradeButton
+{
+    public Text Price;
+    public Button Button;
+    public RawImage Image;
+
+    public void SetActive(MarketManager market, bool isActive)
+    {
+        if (isActive)
+        {
+            Image.texture = market.GreenSprite;
+            Button.enabled = true;
+        }
+        else
+        {
+            Image.texture = market.GreySprite;
+            Button.enabled = false;
+        }
+    }
+
+    public void SetPrice(MarketManager market, int price)
+    {
+        market.SetText("(" + price + "g)", Price);
+    }
+
+    public Button.ButtonClickedEvent OnClick => Button.onClick;
+}
+
 public class MarketManager : MonoBehaviour
 {
     [Header("Team Managers")]
@@ -35,29 +65,25 @@ public class MarketManager : MonoBehaviour
     public Text buyWoodPriceText; public Text sellWoodPriceText;
     public Text buyChickenPriceText; public Text sellChickenPriceText;
     public Text buyRockPriceText; public Text sellRockPriceText;
-    
-    public Text redCannonPriceText1; 
-    public Text redPiratePriceText1;
-    public Text redBarrelPriceText1; 
-    public Text redShipPriceText1; 
-    
-    public Text blueCannonPriceText1; 
-    public Text bluePiratePriceText1; 
-    public Text blueBarrelPriceText1; 
-    public Text blueShipPriceText1; 
 
     public Text woodStockText;
     public Text rockStockText;
     public Text chickenStockText;
 
-    [Header("Buttons References")]
+    [Header("Market Buttons")]
+    public MarketManagerUpgradeButton RedCanonUpdate;
+    public MarketManagerUpgradeButton RedPirateUpdate;
+    public MarketManagerUpgradeButton RedBarrelUpdate;
+    public MarketManagerUpgradeButton RedShipUpdate;
+
+    public MarketManagerUpgradeButton BlueCanonUpdate;
+    public MarketManagerUpgradeButton BluePirateUpdate;
+    public MarketManagerUpgradeButton BlueBarrelUpdate;
+    public MarketManagerUpgradeButton BlueShipUpdate;
+
     public Button buyWood; public Button sellWood;
     public Button buyChicken; public Button sellChicken;
     public Button buyRock; public Button sellRock;    
-    public Button UpgradeCannonRedTeam; public Button UpgradeCannonBlueTeam;
-    public Button UpgradePirateRedTeam; public Button UpgradePirateBlueTeam;
-    public Button UpgradeBarrelRedTeam; public Button UpgradeBarrelBlueTeam;
-    public Button UpgradeShipRedTeam; public Button UpgradeShipBlueTeam;
 
     [Header("Economic System")]
     public float boomDuration = 45f;
@@ -68,16 +94,10 @@ public class MarketManager : MonoBehaviour
     private int baseChickenPrice;
 
     [Header("Image Buttons References")]
-    public RawImage  upCannonRed;
-    public RawImage  upPirateRed;
-    public RawImage  upBarrelRed;
-    public RawImage  upShipRed;
-    public RawImage  upCannonBlue;
-    public RawImage  upPirateBlue;
-    public RawImage  upBarrelBlue;
-    public RawImage  upShipBlue;
     public Texture  GreySprite;
     public Texture  GreenSprite;
+
+    public RawImage MarketHider;
 
     public PartyTools.ValueServer<GameStats> stats;
 
@@ -158,47 +178,20 @@ public class MarketManager : MonoBehaviour
 
     void UpdateTeamVisuals(TeamManager currentTeam)
     {
-        if (currentTeam == redTeam)
-        {
-            if (GreySprite != null && GreenSprite != null)
-                upCannonRed.texture = GreenSprite;
-                upBarrelRed.texture = GreenSprite;
-                upPirateRed.texture = GreenSprite;
-                upShipRed.texture = GreenSprite;
+        var isRed = currentTeam == redTeam;
+        RedCanonUpdate.SetActive(this, isRed);
+        RedPirateUpdate.SetActive(this, isRed);
+        RedBarrelUpdate.SetActive(this, isRed);
+        RedShipUpdate.SetActive(this, isRed);
 
-                upCannonBlue.texture = GreySprite;
-                upBarrelBlue.texture = GreySprite;
-                upPirateBlue.texture = GreySprite;
-                upShipBlue.texture = GreySprite;
-        }
-        else if (currentTeam == blueTeam)
-        {
-            if (GreySprite != null && GreenSprite != null)
-                upCannonBlue.texture = GreenSprite;
-                upBarrelBlue.texture = GreenSprite;
-                upPirateBlue.texture = GreenSprite;
-                upShipBlue.texture = GreenSprite;
+        var isBlue = currentTeam == blueTeam;
+        BlueCanonUpdate.SetActive(this, isBlue);
+        BluePirateUpdate.SetActive(this, isBlue);
+        BlueBarrelUpdate.SetActive(this, isBlue);
+        BlueShipUpdate.SetActive(this, isBlue);
 
-                upCannonRed.texture = GreySprite;
-                upBarrelRed.texture = GreySprite;    
-                upPirateRed.texture = GreySprite;
-                upShipRed.texture = GreySprite;
-        }
-        else if (currentTeam == null)
-        {
-            if (GreySprite != null)
-            {
-                upCannonRed.texture = GreySprite;
-                upBarrelRed.texture = GreySprite;
-                upPirateRed.texture = GreySprite;
-                upShipRed.texture = GreySprite;
-
-                upCannonBlue.texture = GreySprite;
-                upBarrelBlue.texture = GreySprite;
-                upPirateBlue.texture = GreySprite;
-                upShipBlue.texture = GreySprite;
-            }
-        }
+        var isNothing = currentTeam == null;
+        MarketHider.enabled = !isNothing;
     }
 
 
@@ -218,15 +211,15 @@ public class MarketManager : MonoBehaviour
         int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);
         SetText(p1 + sellRockPrice + g + p2, sellRockPriceText);
 
-        SetText(p1 + redCannonPrice + g + p2, redCannonPriceText1);
-        SetText(p1 + redPiratePrice + g + p2, redPiratePriceText1);
-        SetText(p1 + redBarrelPrice + g + p2, redBarrelPriceText1);
-        SetText(p1 + redShipPrice + g + p2, redShipPriceText1);
+        RedCanonUpdate.SetPrice(this, redCannonPrice);
+        RedPirateUpdate.SetPrice(this, redPiratePrice);
+        RedBarrelUpdate.SetPrice(this, redBarrelPrice);
+        RedShipUpdate.SetPrice(this, redShipPrice);
 
-        SetText(p1 + blueCannonPrice + g + p2, blueCannonPriceText1);
-        SetText(p1 + bluePiratePrice + g + p2, bluePiratePriceText1);
-        SetText(p1 + blueBarrelPrice + g + p2, blueBarrelPriceText1);
-        SetText(p1 + blueShipPrice + g + p2, blueShipPriceText1);
+        BlueCanonUpdate.SetPrice(this, blueCannonPrice);
+        BluePirateUpdate.SetPrice(this, bluePiratePrice);
+        BlueBarrelUpdate.SetPrice(this, blueBarrelPrice);
+        BlueShipUpdate.SetPrice(this, blueShipPrice);
     }
 
     void UpdateStockUI()
@@ -247,15 +240,15 @@ public class MarketManager : MonoBehaviour
         buyRock.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Rock, rockPrice));
         sellRock.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Rock, rockPrice));
 
-        UpgradeCannonRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
-        UpgradePirateRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
-        UpgradeBarrelRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
-        UpgradeShipRedTeam.onClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
+        RedCanonUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
+        RedPirateUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
+        RedBarrelUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Barrel, redBarrelPrice));
+        RedShipUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Ship, redShipPrice));
 
-        UpgradeCannonBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Cannon, blueCannonPrice));
-        UpgradePirateBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Pirate, bluePiratePrice));
-        UpgradeBarrelBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Barrel, blueBarrelPrice));
-        UpgradeShipBlueTeam.onClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Ship, blueShipPrice));
+        BlueCanonUpdate.OnClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Cannon, blueCannonPrice));
+        BluePirateUpdate.OnClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Pirate, bluePiratePrice));
+        BlueBarrelUpdate.OnClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Barrel, blueBarrelPrice));
+        BlueShipUpdate.OnClick.AddListener(() => BuyUpgrade(blueTeam, RessourceType.Ship, blueShipPrice));
     }
 
 
@@ -381,7 +374,7 @@ public class MarketManager : MonoBehaviour
         }
     }
 
-    void SetText(string text, params Text[] textComponents)
+    public void SetText(string text, params Text[] textComponents)
     {
         foreach(Text t in textComponents)
         {
