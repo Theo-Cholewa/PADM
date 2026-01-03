@@ -19,8 +19,7 @@ public class ChickenNetJoystick : MonoBehaviour
 
     void Update()
     {
-        if (!CanMove())
-            return;
+        if (!CanMove()) return;
 
         // Moyenne des directions des 4 joysticks
         Vector2 avgDir = GetAverageDirection();
@@ -63,12 +62,8 @@ public class ChickenNetJoystick : MonoBehaviour
 
                 if (linkedShip != null)
                 {
-                    ShipData shipData = linkedShip.GetComponent<ShipData>();
-                    if (shipData != null)
-                    {
-                        shipData.AddResource("food", 1);
-                        Debug.Log($"🐔 {linkedShip.team} a capturé un poulet — nourriture totale : {shipData.food}");
-                    }
+                    RessourceClient.current.Get(linkedShip.team).Add(RessourceType.Chicken,1);
+                    Debug.Log($"🐔 {linkedShip.team} a capturé un poulet — nourriture totale");
                 }
                 else
                 {

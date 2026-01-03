@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class ChickenSpawner : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class ChickenSpawner : MonoBehaviour
         // Nettoyage des poulets détruits
         for (int i = activeChickens.Count - 1; i >= 0; i--)
         {
-            if (activeChickens[i] == null)
+            if (activeChickens[i] == null || activeChickens[i].IsDestroyed())
                 activeChickens.RemoveAt(i);
         }
     }
@@ -39,7 +40,7 @@ public class ChickenSpawner : MonoBehaviour
     void TrySpawnChicken()
     {
         // Vérifie la limite max
-        if (activeChickens.Count >= maxChickens)
+        if (activeChickens.Count >= maxChickens && Input.GetKeyDown(KeyCode.H))
             return;
 
         Vector2 randomPos = Random.insideUnitCircle * spawnRadius;
