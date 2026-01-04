@@ -2573,6 +2573,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 300
       objectReference: {fileID: 0}
+    - target: {fileID: 1568935293312099289, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: remoteIp
+      value: 10.92.13.255
+      objectReference: {fileID: 0}
     - target: {fileID: 3248567367277631004, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 100
