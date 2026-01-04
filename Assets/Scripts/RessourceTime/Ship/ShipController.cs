@@ -204,9 +204,9 @@ public class ShipController : MonoBehaviour
                 currentRotationSpeed = 0;
         }
 
-        var maxSpeed = Math.Abs(addedRotationSpeed)*maxRotationSpeed*speed;
+        var maxRotatSpeed = Math.Abs(addedRotationSpeed)*maxRotationSpeed*speed;
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxSpeed, maxSpeed);
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotatSpeed, maxRotatSpeed);
     }
 
     // 🔹 Toute la logique ancre regroupée ici
