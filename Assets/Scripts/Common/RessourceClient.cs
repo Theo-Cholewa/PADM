@@ -57,6 +57,7 @@ public class RessourceClient : MonoBehaviour
             get => client.GetValues().FirstOrDefault().Value;
         }
 
+
         public TeamClient(Team team)
         {
             this.team = team;

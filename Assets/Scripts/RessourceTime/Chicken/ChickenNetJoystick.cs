@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChickenNetJoystick : MonoBehaviour
+public class ChickenNetJoystick : MonoBehaviour, IslandBehaviour
 {
     [Header("Références des joysticks (coins du filet)")]
     public FixedJoystick topLeft;
@@ -74,9 +74,14 @@ public class ChickenNetJoystick : MonoBehaviour
     }
 
     // 🔹 Méthode appelée par le bateau ou l'île
-    public void SetLinkedShip(ShipController ship)
+    public void Dock(ShipController ship)
     {
         linkedShip = ship;
+    }
+
+    public void Undock(ShipController ship)
+    {
+        linkedShip = null;
     }
 
 #if UNITY_EDITOR

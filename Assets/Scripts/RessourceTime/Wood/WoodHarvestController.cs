@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class WoodHarvestController : MonoBehaviour
+public class WoodHarvestController : MonoBehaviour, IslandBehaviour
 {
     [Header("Premiers indicateurs")]
     public GameObject[] firstIndicators;
@@ -21,29 +21,6 @@ public class WoodHarvestController : MonoBehaviour
     private ShipController linkedShip;
 
     private bool allActivated = false;
-    /*
-    void Awake()
-    {
-        if (firstIndicators != null)
-        {
-            foreach (var indicator in firstIndicators)
-            {
-                if (indicator == null) continue;
-
-                // On tente de désactiver le GameObject
-                indicator.SetActive(false);
-
-                // On ajoute aussi une sécurité avec CanvasGroup pour les UI
-                var cg = indicator.GetComponent<CanvasGroup>();
-                if (cg == null)
-                    cg = indicator.AddComponent<CanvasGroup>();
-
-                cg.alpha = 0; // invisible
-                cg.interactable = false;
-                cg.blocksRaycasts = false;
-            }
-        }
-    }*/
 
     void Start()
     {
@@ -183,9 +160,15 @@ public class WoodHarvestController : MonoBehaviour
     }
 
     // 🔹 Lien avec le bateau accosté (appelé depuis ShipController)
-    public void SetLinkedShip(ShipController ship)
+    public void Dock(ShipController ship)
     {
         linkedShip = ship;
+        gameObject.SetActive(true);
     }
 
+    public void Undock(ShipController ship)
+    {
+        linkedShip = null;
+        gameObject.SetActive(false);
+    }
 }
