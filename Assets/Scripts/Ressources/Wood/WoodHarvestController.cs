@@ -21,29 +21,6 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
     private ShipController linkedShip;
 
     private bool allActivated = false;
-    /*
-    void Awake()
-    {
-        if (firstIndicators != null)
-        {
-            foreach (var indicator in firstIndicators)
-            {
-                if (indicator == null) continue;
-
-                // On tente de désactiver le GameObject
-                indicator.SetActive(false);
-
-                // On ajoute aussi une sécurité avec CanvasGroup pour les UI
-                var cg = indicator.GetComponent<CanvasGroup>();
-                if (cg == null)
-                    cg = indicator.AddComponent<CanvasGroup>();
-
-                cg.alpha = 0; // invisible
-                cg.interactable = false;
-                cg.blocksRaycasts = false;
-            }
-        }
-    }*/
 
     void Start()
     {
