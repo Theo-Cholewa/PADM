@@ -110,6 +110,8 @@ public class RessourceClient : MonoBehaviour
     /// </summary>
     public void GoToGoodScene()
     {
+        if(GameStats.GetValues().Count == 0) return;
+        
         var stats = GameStats.FirstOrDefault();
         if (stats.IsInFight)
         {
