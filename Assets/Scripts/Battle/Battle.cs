@@ -27,7 +27,7 @@ public class Battle : MonoBehaviour
         }
 
         var minute = (int)(RemainingTime/60);
-        var seconds = (int)(RemainingTime-minute);
+        var seconds = (int)(RemainingTime-minute*60);
         var TextRemainingTime = $"{minute.ToString().PadLeft(2,'0')}:{seconds.ToString().PadLeft(2,'0')}";
         foreach(var mesh in TimerMeshes)
         {

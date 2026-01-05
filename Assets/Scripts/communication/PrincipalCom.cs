@@ -5,7 +5,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PrincipalCom : MonoBehaviour
+public class PrincipalCom : MonoBehaviour, IslandBehaviour
 {
     [Header("Réseau")]
     public UdpPeer udpPeer;
@@ -424,4 +424,13 @@ public class PrincipalCom : MonoBehaviour
 
     bool TryParse(string s, out float v) =>
         float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out v);
+
+    public void Dock(ShipController ship)
+    {
+        
+    }
+
+    public void Undock(ShipController ship)
+    {
+    }
 }

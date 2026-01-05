@@ -1,8 +1,14 @@
+using System.Collections;
 using System.Linq;
+using System.Transactions;
 using UnityEngine;
 
 public class ShipFiller : MonoBehaviour
 {
+    public float SinkRate = 0.5f;
+
+    public int SinkDamage = 1;
+
     private Ship ship;
 
     void Start()
@@ -17,11 +23,16 @@ public class ShipFiller : MonoBehaviour
             .Where(ship => ship != null)
             .OrderBy(ship => (ship.transform.position - pos).magnitude)
             .First();
-        ship.speed += 4f;
+        
+        StartCoroutine(Sink());
     }
 
-    void OnDestroy()
+    IEnumerator Sink()
     {
-        ship.speed -= 4f;
+        while (true)
+        {
+            yield return new WaitForSeconds(SinkRate);
+            ship.ChangeHealth(-SinkDamage);
+        }
     }
 }

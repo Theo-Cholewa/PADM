@@ -9,7 +9,7 @@ public class HealthChanger : MonoBehaviour
 
     void Start()
     {
-        var ship = gameObject.scene.GetRootGameObjects()
+        ship = gameObject.scene.GetRootGameObjects()
             .Select(go =>
             {
                 if (go.TryGetComponent(out Ship ship)) return ship;

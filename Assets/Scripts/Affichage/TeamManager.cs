@@ -106,17 +106,22 @@ public partial class TeamManager : MonoBehaviour
 
             case RessourceType.Health: icon = healthBarImage.gameObject; break;
         }
+        GameObject effect=null;
         if (icon != null)
         {
             if (amount > 0)
             {
-                var effect = Instantiate(Popup,icon.transform);
-                effect.GetComponentInChildren<Text>().text = amount.ToString();
+                effect = Instantiate(Popup,icon.transform);
+                effect.GetComponentInChildren<Text>().text = "+"+amount.ToString();
             }
             else if (amount < 0)
             {
-                var effect = Instantiate(Popdown,icon.transform);
+                effect = Instantiate(Popdown,icon.transform);
                 effect.GetComponentInChildren<Text>().text = "-"+(-amount).ToString();
+            }
+            if (effect!=null && type == RessourceType.Health)
+            {
+                effect.GetComponent<AudioSource>().mute = false;
             }
         }
 

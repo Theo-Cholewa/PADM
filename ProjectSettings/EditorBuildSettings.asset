@@ -10,7 +10,7 @@ EditorBuildSettings:
     guid: f0ccb1f79776d384783107662af6bd7f
   - enabled: 1
     path: Assets/Scenes/ModeSelection.unity
-    guid: a8b5d90d090624b4585074d5f27178ac
+    guid: da8390b9b4ba1474ca484caa4c2ecc51
   - enabled: 1
     path: Assets/Scenes/Welcome.unity
     guid: f504c0d9976a05a4292be16018501b10
@@ -32,9 +32,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Volant.unity
     guid: 901defd891c554b42b7c2dfbdba98d3f
-  - enabled: 1
-    path: Assets/Scenes/Ressource.unity
-    guid: a4f4ca744ab48fe4e9bec1feb06031e0
   - enabled: 1
     path: Assets/Scenes/Store.unity
     guid: b5a61c65a3ba95346901721fe41d3b98

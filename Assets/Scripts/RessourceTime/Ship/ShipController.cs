@@ -204,7 +204,9 @@ public class ShipController : MonoBehaviour
                 currentRotationSpeed = 0;
         }
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotationSpeed * speed, maxRotationSpeed * speed);
+        var maxRotatSpeed = Math.Abs(addedRotationSpeed)*maxRotationSpeed*speed;
+
+        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotatSpeed, maxRotatSpeed);
     }
 
     // 🔹 Toute la logique ancre regroupée ici
@@ -255,10 +257,10 @@ public class ShipController : MonoBehaviour
 
             if (CurrentDockedIsland != null)
             {
+                Debug.Log($"🏝️ {team} quitte l’île {CurrentDockedIsland.Name}, retour à l’état initial.");
                 CurrentDockedIsland.SetDocked(false);
                 CurrentDockedIsland.Behaviour?.Undock(this);
                 CurrentDockedIsland = null;
-                Debug.Log($"🏝️ {team} quitte l’île {CurrentDockedIsland.Name}, retour à l’état initial.");
             }
         }
     }
