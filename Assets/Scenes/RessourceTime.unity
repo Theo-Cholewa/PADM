@@ -1337,6 +1337,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
+--- !u!1 &465654822 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8695315268085854077, guid: 6a150084458e24e44b561bb8cebb9ae4, type: 3}
+  m_PrefabInstance: {fileID: 465654821}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &492422848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1460,7 +1465,7 @@ MonoBehaviour:
   Name: Wood
   DockedContent: {fileID: 407506500}
   UndockedContent: {fileID: 1833996162}
-  BehaviourObject: {fileID: 0}
+  BehaviourObject: {fileID: 465654822}
   IsDocked: 0
 --- !u!1 &561945683
 GameObject:
@@ -3044,7 +3049,7 @@ MonoBehaviour:
   Name: Chicken
   DockedContent: {fileID: 1969062316}
   UndockedContent: {fileID: 375071668}
-  BehaviourObject: {fileID: 0}
+  BehaviourObject: {fileID: 269320791}
   IsDocked: 0
 --- !u!135 &1219909877
 SphereCollider:
