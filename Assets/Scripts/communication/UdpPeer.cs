@@ -33,6 +33,7 @@ public class UdpPeer : MonoBehaviour
         {
             // On crée un client UDP bindé sur listenPort pour recevoir
             udpClient = new UdpClient(listenPort);
+            udpClient.EnableBroadcast = true;
             running = true;
 
             listenThread = new Thread(ListenLoop);
