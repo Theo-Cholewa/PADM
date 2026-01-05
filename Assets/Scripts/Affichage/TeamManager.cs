@@ -112,7 +112,7 @@ public partial class TeamManager : MonoBehaviour
             if (amount > 0)
             {
                 effect = Instantiate(Popup,icon.transform);
-                effect.GetComponentInChildren<Text>().text = amount.ToString();
+                effect.GetComponentInChildren<Text>().text = "+"+amount.ToString();
             }
             else if (amount < 0)
             {
