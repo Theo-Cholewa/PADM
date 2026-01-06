@@ -984,7 +984,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912be43f646bcfc43b2a7e1233a539f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultState: 0
+  DefaultState: 2
   Market: {fileID: 1777160236}
   InBattle: {fileID: 105098695}
   InTravel: {fileID: 1643855286}

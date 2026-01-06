@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,8 +6,17 @@ public class Popup : MonoBehaviour
 {
     public float Duration;
     public Vector3 Movement;
+    public List<Text> Texts;
 
     private float CurrentTime=0f;
+
+    public void SetText(string value)
+    {
+        foreach(var text in Texts)
+        {
+            text.text = value;
+        }
+    }
 
     void Update()
     {
@@ -23,12 +33,12 @@ public class Popup : MonoBehaviour
         if (offset > 0)
         {
             var effect = Instantiate(UpPrefab, transform);
-            effect.GetComponentInChildren<Text>().text = "+"+offset.ToString();
+            effect.GetComponent<Popup>().SetText("+"+offset.ToString());
         }
         else if (offset < 0)
         {
             var effect = Instantiate(DownPrefab, transform);
-            effect.GetComponentInChildren<Text>().text = "-"+(-offset).ToString();
+            effect.GetComponent<Popup>().SetText("-"+(-offset).ToString());
         }
     }
 
