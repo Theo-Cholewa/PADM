@@ -19,18 +19,16 @@ public class Center : MonoBehaviour
 
     public async void SetState(CenterState state)
     {
-        Debug.Log("Avant " + state);
         await Hider.HideAndShow();
-        Debug.Log("Après " + state);
-        Market.SetActive(state == CenterState.MARKET);
-        InBattle.SetActive(state == CenterState.IN_BATTLE);
-        InTravel.SetActive(state == CenterState.IN_TRAVEL);
+        Market.transform.localScale = state == CenterState.MARKET ? Vector3.one : Vector3.zero;
+        InBattle.transform.localScale = state == CenterState.IN_BATTLE ? Vector3.one : Vector3.zero;
+        InTravel.transform.localScale = state == CenterState.IN_TRAVEL ? Vector3.one : Vector3.zero;
     }
 
     void Start()
     {
-        Market.SetActive(DefaultState == CenterState.MARKET);
-        InBattle.SetActive(DefaultState == CenterState.IN_BATTLE);
-        InTravel.SetActive(DefaultState == CenterState.IN_TRAVEL);
+        Market.transform.localScale = DefaultState == CenterState.MARKET ? Vector3.one : Vector3.zero;
+        InBattle.transform.localScale = DefaultState == CenterState.IN_BATTLE ? Vector3.one : Vector3.zero;
+        InTravel.transform.localScale = DefaultState == CenterState.IN_TRAVEL ? Vector3.one : Vector3.zero;
     }
 }

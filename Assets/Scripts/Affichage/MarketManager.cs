@@ -126,7 +126,7 @@ public class MarketManager : MonoBehaviour
 
     void OnDestroy()
     {
-        Party.current.OnMessage.RemoveListener(OnMessage);
+        Party.current?.OnMessage?.RemoveListener(OnMessage);
         stats.Dispose();
     }
 

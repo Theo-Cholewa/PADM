@@ -44,9 +44,9 @@ public class TeamInventory : MonoBehaviour
         Popup.Spawn(Health.transform, PopupPrefab, PopdownPrefab, offset);
     }
 
-    public void SetMoney(int value)
+    public void SetGold(int value)
     {
-        var newValue = Math.Clamp(value, 0, 100);
+        var newValue = Math.Clamp(value, 0, 9999);
         var offset = value-currentMoney;
 
         currentMoney = newValue;

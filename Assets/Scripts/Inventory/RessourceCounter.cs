@@ -12,7 +12,7 @@ public class RessourceCounter : MonoBehaviour
 
     private int CurrentCount = 1;
 
-    void Start()
+    void Awake()
     {
         CurrentCount = 0;
         Text.text = "x0";

@@ -35,7 +35,7 @@ public class InventoryServer : MonoBehaviour
     void OnDestroy()
     {
         server.Dispose();
-        Party.current.OnMessage.RemoveListener(OnMessage);
+        Party.current?.OnMessage?.RemoveListener(OnMessage);
     }
 
     void Update()

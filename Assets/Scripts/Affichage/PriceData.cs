@@ -1,7 +1,7 @@
 using System;
 
 [Serializable]
-public struct PriceData
+public struct ResData
 {
     public int wood;
     public int rock;

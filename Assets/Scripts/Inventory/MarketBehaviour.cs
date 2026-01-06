@@ -16,7 +16,7 @@ public class MarketBehaviour : MonoBehaviour
     public UnityEvent<RessourceType> OnBuy;
     
 
-    public float BuyPriceRation = 0.8f;
+    public float SellPriceRation = 0.8f;
     
     [Header("Economic System")]
     public float MinimumChangeInterval = 20f;
@@ -25,13 +25,16 @@ public class MarketBehaviour : MonoBehaviour
     public int MaximumPrice = 20;
     public int RessourceMultiplier;
     public int UpgradeMultiplier;
-    public PriceData Prices;
+
+    public RessourceData Prices;
+    public RessourceData Stocks;
 
     void Start()
     {
         foreach(RessourceType type in Enum.GetValues(typeof(RessourceType)))
         {
             SetPrice(type, GetPrice(type));
+            SetStock(type, GetStock(type));
         }
 
         StartCoroutine(PriceChangeLoop());
@@ -45,12 +48,14 @@ public class MarketBehaviour : MonoBehaviour
 
     public int GetSellPrice(RessourceType type)
     {
-        return (int)(GetPrice(type) * BuyPriceRation);
+        return (int)(GetPrice(type) * SellPriceRation);
     }
 
     public void SetPrice(RessourceType type, int price)
     {
-        int sellPrice = (int)(price*BuyPriceRation);
+        Prices.Set(type, price);
+
+        int sellPrice = GetSellPrice(type);
 
         var counter = MarketGUI.Get(type);
         if (counter != null)
@@ -69,14 +74,26 @@ public class MarketBehaviour : MonoBehaviour
         }
     }
 
+    public void SetStock(RessourceType type, int value)
+    {
+        Stocks.Set(type, value);
+
+        var counter = MarketGUI.Get(type);
+        if (counter != null)
+        {
+            counter.SetStock(value);
+        }
+    }
+
+    public int GetStock(RessourceType type)
+    {
+        return Stocks.Get(type);
+    }
+
     IEnumerator PriceChangeLoop()
     {
         while (true)
         {
-            // Wait
-            var interval = MinimumChangeInterval + (MaximumChangeInterval - MinimumChangeInterval) * UnityEngine.Random.value;
-            yield return new WaitForSeconds(interval);
-
             // Change prices
             foreach(RessourceType type in Enum.GetValues(typeof(RessourceType)))
             {
@@ -93,6 +110,10 @@ public class MarketBehaviour : MonoBehaviour
 
                 SetPrice(type, Math.Max(1,(int)newPrice));
             }
+
+            // Wait
+            var interval = MinimumChangeInterval + (MaximumChangeInterval - MinimumChangeInterval) * UnityEngine.Random.value;
+            yield return new WaitForSeconds(interval);
         }
     }
 
@@ -105,6 +126,7 @@ public class MarketBehaviour : MonoBehaviour
             {
                 var counter = team.TeamGUI.GetUpgradeCounter(type);
                 counter.Button.onClick.AddListener(() =>{
+                    Debug.Log("Button");
                     if (Inventory.TeamOnShop?.enumValue != team.TeamId)return;
 
                     var price = GetPrice(type);
@@ -132,9 +154,11 @@ public class MarketBehaviour : MonoBehaviour
                 var values = team.server.GetValue();
 
                 if(values.gold < price) return;
+                if(GetStock(type) <= 0) return;
 
                 team.SetResource(RessourceType.Gold, values.gold - price);
                 team.SetResource(type, values.Get(type) + 1);
+                SetStock(type, GetStock(type) - 1);
             });
 
             item.SellButton.onClick.AddListener(() =>{
@@ -149,6 +173,7 @@ public class MarketBehaviour : MonoBehaviour
 
                 team.SetResource(RessourceType.Gold, values.gold + price);
                 team.SetResource(type, values.Get(type) - 1);
+                SetStock(type, GetStock(type) + 1);
             });
         }
     }

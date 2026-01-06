@@ -32,7 +32,7 @@ public class Timer : MonoBehaviour
 
     void OnDestroy()
     {
-        Party.current.OnMessage.RemoveListener(OnMessage);
+        Party.current?.OnMessage?.RemoveListener(OnMessage);
     }
 
     void OnMessage(PartyMessage msg)

@@ -37,7 +37,7 @@ public class TeamServer : MonoBehaviour
     void OnDestroy()
     {
         server.Dispose();
-        Party.current.OnMessage.RemoveListener(OnMessage);
+        Party.current?.OnMessage?.RemoveListener(OnMessage);
     }
 
     void OnMessage(PartyMessage message)
@@ -58,12 +58,27 @@ public class TeamServer : MonoBehaviour
         var newValue = server.GetValue();
         newValue.Set(type, value);
 
+        // Update Health
+        if(type == RessourceType.Health)
+        {
+            newValue.health = value;
+            TeamGUI.SetHealth(value);
+        }
+
+        // Update Money
+        if(type == RessourceType.Gold)
+        {
+            newValue.gold = value;
+            TeamGUI.SetGold(value);
+        }
+
         // Update GUI
         var res = TeamGUI.GetRessourceCounter(type);
         if(res != null) res.SetCount(newValue.Get(type));
 
         var up = TeamGUI.GetUpgradeCounter(type);
         if(up != null) up.SetLevel(newValue.Get(type));
+        
         
         server.SetValue(newValue);
     }
@@ -91,6 +106,11 @@ public class TeamServer : MonoBehaviour
             SetResource(RessourceType.Wood, server.GetValue().wood + 10);
             SetResource(RessourceType.Stone, server.GetValue().rock + 5);
             SetResource(RessourceType.Chicken, server.GetValue().chicken + 3);
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            SetResource(RessourceType.Gold, server.GetValue().gold + 2);
         }
     }
 }
