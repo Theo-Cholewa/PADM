@@ -1,8 +1,11 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class RessourceCounter : MonoBehaviour
 {
+    public GameObject Icon;
     public Text Text;
     public GameObject PopupPrefab;
     public GameObject PodownPrefab;
@@ -19,18 +22,25 @@ public class RessourceCounter : MonoBehaviour
     {
         // Offset
         var offset = count-CurrentCount;
-        if (offset > 0)
-        {
-            var effect = Instantiate(PopupPrefab, Text.transform);
-            effect.GetComponentInChildren<Text>().text = "+"+offset.ToString();
-        }
-        else if (offset < 0)
-        {
-            var effect = Instantiate(PodownPrefab, Text.transform);
-            effect.GetComponentInChildren<Text>().text = "-"+(-offset).ToString();
-        }
+        Popup.Spawn(Text.transform, PopupPrefab, PodownPrefab, offset);
+
+        CurrentCount = count;
 
         // Set text
         Text.text = $"x{count}";
+
+        // Animate
+        StartCoroutine(Pwomp());
+    }
+
+    IEnumerator Pwomp()
+    {
+        for(float i=0f; i<.25f; i+=Time.deltaTime)
+        {
+            var animation = Mathf.Sin(i * Mathf.PI * 4)*.25f;
+            Icon.transform.localScale = new Vector3(1 + animation, 1 + animation, 1 + animation);
+            yield return null;
+        }
+        Icon.transform.localScale = Vector3.one;
     }
 }

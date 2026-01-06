@@ -88,9 +88,9 @@ public class TeamServer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            SetResource(RessourceType.Wood,10);
-            SetResource(RessourceType.Stone,5);
-            SetResource(RessourceType.Chicken,3);
+            SetResource(RessourceType.Wood, server.GetValue().wood + 10);
+            SetResource(RessourceType.Stone, server.GetValue().rock + 5);
+            SetResource(RessourceType.Chicken, server.GetValue().chicken + 3);
         }
     }
 }

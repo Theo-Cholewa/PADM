@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a20bbcd06d30a4a836973f9150bb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Icon: {fileID: 6421182622487475202}
   Text: {fileID: 282495909669536938}
   PopupPrefab: {fileID: 706467497615541217, guid: 9d150a4c539d1a84789e743d940ddd20, type: 3}
   PodownPrefab: {fileID: 706467497615541217, guid: 00694b117442f924c8f0e8e6d92675fd, type: 3}
