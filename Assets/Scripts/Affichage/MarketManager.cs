@@ -237,8 +237,8 @@ public class MarketManager : MonoBehaviour
         buyChicken.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Chicken, chickenPrice));
         sellChicken.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Chicken, chickenPrice));
 
-        buyRock.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Rock, rockPrice));
-        sellRock.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Rock, rockPrice));
+        buyRock.onClick.AddListener(() => BuyResource(activeTeam, RessourceType.Stone, rockPrice));
+        sellRock.onClick.AddListener(() => SellResource(activeTeam, RessourceType.Stone, rockPrice));
 
         RedCanonUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Cannon, redCannonPrice));
         RedPirateUpdate.OnClick.AddListener(() => BuyUpgrade(redTeam, RessourceType.Pirate, redPiratePrice));
@@ -267,7 +267,7 @@ public class MarketManager : MonoBehaviour
             {
                 woodNumber = Mathf.Max(0, woodNumber - 1);
             }
-            else if(type == RessourceType.Rock)
+            else if(type == RessourceType.Stone)
             {
                 rockNumber = Mathf.Max(0, rockNumber - 1);
             }
@@ -300,7 +300,7 @@ public class MarketManager : MonoBehaviour
         switch (type)
         {
             case RessourceType.Wood: hasResource = team.wood > 0; break;
-            case RessourceType.Rock: hasResource = team.rock > 0; break;
+            case RessourceType.Stone: hasResource = team.rock > 0; break;
             case RessourceType.Chicken: hasResource = team.chicken > 0; break;
         }
 
@@ -313,7 +313,7 @@ public class MarketManager : MonoBehaviour
             {
                 woodNumber += 1;
             }
-            else if(type == RessourceType.Rock)
+            else if(type == RessourceType.Stone)
             {
                 rockNumber += 1;
             }
@@ -403,7 +403,7 @@ public class MarketManager : MonoBehaviour
         bool modifyTwoResources = (Random.value > 0.5f);
 
         // Liste des types disponibles
-        List<RessourceType> availableTypes = new List<RessourceType> { RessourceType.Wood, RessourceType.Rock, RessourceType.Chicken };
+        List<RessourceType> availableTypes = new List<RessourceType> { RessourceType.Wood, RessourceType.Stone, RessourceType.Chicken };
 
         if (modifyTwoResources)
         {
@@ -444,7 +444,7 @@ public class MarketManager : MonoBehaviour
                 UpdateTextColor(sellWoodPrice, baseWoodPrice, sellWoodPriceText);
                 break;
 
-            case RessourceType.Rock:
+            case RessourceType.Stone:
                 rockPrice = Mathf.CeilToInt(baseRockPrice * multiplier);
                 Debug.Log($"PIERRE : {baseRockPrice} -> {rockPrice} (x{multiplier:F2})");
                 int sellRockPrice = Mathf.CeilToInt(rockPrice * 0.8f);

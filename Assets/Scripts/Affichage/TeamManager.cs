@@ -94,7 +94,7 @@ public partial class TeamManager : MonoBehaviour
         switch (type)
         {
             case RessourceType.Wood: icon = woodText.gameObject; break;
-            case RessourceType.Rock: icon = rockText.gameObject; break;
+            case RessourceType.Stone: icon = rockText.gameObject; break;
             case RessourceType.Chicken: icon = chickenText.gameObject; break;
 
             case RessourceType.Cannon: icon = cannonBarImage.gameObject; break;
@@ -129,7 +129,7 @@ public partial class TeamManager : MonoBehaviour
         switch (type)
         {
             case RessourceType.Wood: wood += amount; break;
-            case RessourceType.Rock: rock += amount; break;
+            case RessourceType.Stone: rock += amount; break;
             case RessourceType.Chicken: chicken += amount; break;
             
             case RessourceType.Cannon: cannonLevel += amount; break;
@@ -170,7 +170,7 @@ public partial class TeamManager : MonoBehaviour
             case RessourceType.Wood:
                 targetImage = woodImage;
                 break;
-            case RessourceType.Rock:
+            case RessourceType.Stone:
                 targetImage = rockImage;
                 break;
             case RessourceType.Chicken:
@@ -263,7 +263,7 @@ public partial class TeamManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             ModifyResource(RessourceType.Wood,10);
-            ModifyResource(RessourceType.Rock,5);
+            ModifyResource(RessourceType.Stone,5);
             ModifyResource(RessourceType.Chicken,3);
         }
                 if (TeamId == TeamEnum.RED)
@@ -278,7 +278,7 @@ public partial class TeamManager : MonoBehaviour
             {
                 rock += 1;
                 UpdateUI(); 
-                AnimateResource(RessourceType.Rock);               
+                AnimateResource(RessourceType.Stone);               
             }
             if (Input.GetKeyDown(KeyCode.P))
             {
@@ -299,7 +299,7 @@ public partial class TeamManager : MonoBehaviour
             {
                 rock += 1;
                 UpdateUI();
-                AnimateResource(RessourceType.Rock);
+                AnimateResource(RessourceType.Stone);
             }
             if (Input.GetKeyDown(KeyCode.L))
             {

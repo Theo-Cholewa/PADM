@@ -1,0 +1,96 @@
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+public class TeamServer : MonoBehaviour
+{
+    public TeamEnum TeamId;
+    public TeamEnum EnnemyTeamId;
+    public TeamInventory TeamGUI;
+    public InventoryServer Inventory;
+
+    public PartyTools.ValueServer<RessourceData> server;
+
+    void Start()
+    {
+        server = new (
+            Party.current,
+            $"team_{Team.Of(TeamId).id}",
+            new RessourceData
+            {
+                gold = 0,
+                wood = 0,
+                rock = 0,
+                chicken = 0,
+                cannonLevel = 0,
+                pirateLevel = 0,
+                barrelLevel = 0,
+                shipLevel = 0,
+                health = 100,
+            },
+            (sharedData) => JsonUtility.ToJson(sharedData)
+        );
+
+        Party.current.OnMessage.AddListener(OnMessage);
+    }
+
+    void OnDestroy()
+    {
+        server.Dispose();
+        Party.current.OnMessage.RemoveListener(OnMessage);
+    }
+
+    void OnMessage(PartyMessage message)
+    {
+        if (message.message.StartsWith("store;add;"))
+        {
+            var param = message.message.Split(';');
+            if(param[2]!=Team.Of(TeamId).id)return;
+            var value = int.Parse(param[3]);
+            var typeName = param[4];
+            var type = Enum.Parse<RessourceType>(typeName);
+            SetResource(type, value);
+        }
+    }
+
+    public void SetResource(RessourceType type, int value)
+    {
+        var newValue = server.GetValue();
+        newValue.Set(type, value);
+
+        // Update GUI
+        var res = TeamGUI.GetRessourceCounter(type);
+        if(res != null) res.SetCount(newValue.Get(type));
+
+        var up = TeamGUI.GetUpgradeCounter(type);
+        if(up != null) up.SetLevel(newValue.Get(type));
+        
+        server.SetValue(newValue);
+    }
+
+    async Task Kill()
+    {
+        await Inventory.server.SetValue(new GameStats{
+            IsInFight = false,
+            Winner = EnnemyTeamId
+        });
+        Victory.Winner = Team.Of(EnnemyTeamId);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Victory");
+    } 
+
+    void Update()
+    {
+        var health = server.GetValue().health;
+        if (health <= 0 && Inventory.server.GetValue().Winner==null)
+        {
+            Kill();
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            SetResource(RessourceType.Wood,10);
+            SetResource(RessourceType.Stone,5);
+            SetResource(RessourceType.Chicken,3);
+        }
+    }
+}
