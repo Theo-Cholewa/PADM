@@ -29,12 +29,13 @@ public class MarketBehaviour : MonoBehaviour
 
     void Start()
     {
-        foreach(var type in Enum.GetValues(typeof(RessourceType)))
+        foreach(RessourceType type in Enum.GetValues(typeof(RessourceType)))
         {
-            SetPrice((RessourceType)type, 10);
+            SetPrice(type, GetPrice(type));
         }
 
         StartCoroutine(PriceChangeLoop());
+        SetupButton();
     }
 
     public int GetPrice(RessourceType type)

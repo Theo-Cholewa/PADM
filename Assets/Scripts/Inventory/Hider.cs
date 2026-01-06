@@ -44,7 +44,7 @@ public class Hider : MonoBehaviour
 
             var animation = 1-Mathf.Sin(advancement * Mathf.PI);
 
-            if (animation < .5 && !resolved)
+            if (advancement>.5f && !resolved)
             {
                 resolved = true;
                 completion.SetResult(true);

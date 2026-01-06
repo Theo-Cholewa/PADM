@@ -38,6 +38,22 @@ public class InventoryServer : MonoBehaviour
         Party.current.OnMessage.RemoveListener(OnMessage);
     }
 
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.K))
+        {
+            SetTeamOnShop(Team.RED);
+        }
+        if (Input.GetKey(KeyCode.L))
+        {
+            SetTeamOnShop(Team.BLUE);
+        }
+        if (Input.GetKey(KeyCode.M))
+        {
+            SetBattle();
+        }
+    }
+
     void OnMessage(PartyMessage msg)
     {
          // Start fight

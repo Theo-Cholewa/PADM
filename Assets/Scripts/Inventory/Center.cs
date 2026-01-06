@@ -19,7 +19,9 @@ public class Center : MonoBehaviour
 
     public async void SetState(CenterState state)
     {
+        Debug.Log("Avant " + state);
         await Hider.HideAndShow();
+        Debug.Log("Après " + state);
         Market.SetActive(state == CenterState.MARKET);
         InBattle.SetActive(state == CenterState.IN_BATTLE);
         InTravel.SetActive(state == CenterState.IN_TRAVEL);
