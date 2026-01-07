@@ -11,7 +11,7 @@ using UnityEngine.Events;
 public class MarketBehaviour : MonoBehaviour
 {
     public InventoryServer Inventory;
-    public Market MarketGUI;
+    public MarketGUI MarketGUI;
     public List<TeamServer> Teams;
     public UnityEvent<RessourceType> OnBuy;
     

@@ -1,17 +1,18 @@
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class InventoryGUI : MonoBehaviour
 {
-    public TeamInventory Red;
-    public TeamInventory Blue;
+    public TeamGUI Red;
+    public TeamGUI Blue;
     public Center Center;
 
-    private TeamInventory TeamOnShop;
+    private TeamGUI TeamOnShop;
 
-    public TeamInventory GetInventory(Team team)
+    public TeamGUI GetInventory(Team team)
     {
         if(team == Team.RED) return Red;
-        else return Blue;
+        else if(team == Team.BLUE) return Blue;
+        else return null;
     }
 
     public void SetShopper(Team team)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Market : MonoBehaviour
+public class MarketGUI : MonoBehaviour
 {
     [Header("Content")]
     public ShopItem Stone;

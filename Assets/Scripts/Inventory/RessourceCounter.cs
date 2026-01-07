@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,24 +21,12 @@ public class RessourceCounter : MonoBehaviour
         // Offset
         var offset = count-CurrentCount;
         Popup.Spawn(Text.transform, PopupPrefab, PodownPrefab, offset);
+        if(offset!=0) Popup.Pwomp(this, Icon.transform);
 
         CurrentCount = count;
 
         // Set text
         Text.text = $"x{count}";
 
-        // Animate
-        StartCoroutine(Pwomp());
-    }
-
-    IEnumerator Pwomp()
-    {
-        for(float i=0f; i<.25f; i+=Time.deltaTime)
-        {
-            var animation = Mathf.Sin(i * Mathf.PI * 4)*.25f;
-            Icon.transform.localScale = new Vector3(1 + animation, 1 + animation, 1 + animation);
-            yield return null;
-        }
-        Icon.transform.localScale = Vector3.one;
     }
 }

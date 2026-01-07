@@ -130,13 +130,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1565280161617828918, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565280161617828918, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1634455991450397727, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 1d28ee021bf62234b8852889a9c73eee, type: 2}
+      objectReference: {fileID: 2100000, guid: 4687ada443cf6a54ab4e6371012435e4, type: 2}
     - target: {fileID: 1912402308698125265, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: targetScene
-      value: Store
+      value: Inventory
       objectReference: {fileID: 0}
     - target: {fileID: 3505069603090154249, guid: d421ed8f2a4622b448eb3a86797caca3, type: 3}
       propertyPath: m_Materials.Array.data[0]

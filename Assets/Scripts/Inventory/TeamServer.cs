@@ -6,7 +6,7 @@ public class TeamServer : MonoBehaviour
 {
     public TeamEnum TeamId;
     public TeamEnum EnnemyTeamId;
-    public TeamInventory TeamGUI;
+    public TeamGUI TeamGUI;
     public InventoryServer Inventory;
 
     public PartyTools.ValueServer<RessourceData> server;
@@ -49,7 +49,7 @@ public class TeamServer : MonoBehaviour
             var value = int.Parse(param[3]);
             var typeName = param[4];
             var type = Enum.Parse<RessourceType>(typeName);
-            SetResource(type, value);
+            SetResource(type, server.GetValue().Get(type) + value);
         }
     }
 

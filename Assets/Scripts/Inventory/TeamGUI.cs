@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TeamInventory : MonoBehaviour
+public class TeamGUI : MonoBehaviour
 {
     [Header("Resources")]
     public GameObject PopupPrefab;
@@ -20,6 +20,7 @@ public class TeamInventory : MonoBehaviour
     public UpgradeCounter Ship;
 
     public Text Gold;
+    public GameObject GoldIcon;
     public Jauge Health;
 
 
@@ -41,7 +42,8 @@ public class TeamInventory : MonoBehaviour
         currentHealth = newValue;
         Health.Value = currentHealth / 100f;
 
-        Popup.Spawn(Health.transform, PopupPrefab, PopdownPrefab, offset);
+        Popup.Spawn(Health.transform, PopupPrefab, PopdownPrefab, offset, hasSound: false);
+        if(offset!=0) Popup.Pwomp(this, Health.transform);
     }
 
     public void SetGold(int value)
@@ -53,6 +55,7 @@ public class TeamInventory : MonoBehaviour
         Gold.text = currentMoney.ToString();
 
         Popup.Spawn(Gold.transform, PopupPrefab, PopdownPrefab, offset);
+        if(offset!=0) Popup.Pwomp(this, GoldIcon.transform);
     }
 
     public void SetRessource(RessourceType type, int value)

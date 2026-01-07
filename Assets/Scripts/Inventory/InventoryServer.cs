@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class InventoryServer : MonoBehaviour
 {
-    public Inventory InventoryGUI;
+    public InventoryGUI InventoryGUI;
     public PartyTools.ValueServer<GameStats> server;
     public Team TeamOnShop = null;
 

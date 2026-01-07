@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.771, y: 76.23681}
+  m_AnchoredPosition: {x: 0.771, y: 87}
   m_SizeDelta: {x: 203.8465, y: 102.1033}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3507881750477174049
@@ -182,6 +182,7 @@ MonoBehaviour:
   Barrel: {fileID: 4361684428140179824}
   Ship: {fileID: 7453882061210768593}
   Gold: {fileID: 7790118692190617081}
+  GoldIcon: {fileID: 8778129102651262293}
   Health: {fileID: 364169133793155314}
 --- !u!114 &6461344651307185882
 MonoBehaviour:
@@ -316,7 +317,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.12661, y: -75.4}
+  m_AnchoredPosition: {x: 0.12661, y: -64.63681}
   m_SizeDelta: {x: 270.48, y: 248.0907}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3675616069921543913
@@ -391,7 +392,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2, y: -186.17}
+  m_AnchoredPosition: {x: -2, y: -175.40681}
   m_SizeDelta: {x: 92.9185, y: 42.5434}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8778129102651262293

@@ -137,6 +137,7 @@ MonoBehaviour:
   - {fileID: 2362430962487469564}
   - {fileID: 4106988265075535347}
   - {fileID: 6231843592557550353}
+  Source: {fileID: 8384241917910954484}
 --- !u!82 &8384241917910954484
 AudioSource:
   m_ObjectHideFlags: 0
@@ -148,7 +149,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 53ea2c17d64053847887273652611917, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
