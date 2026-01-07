@@ -52,9 +52,12 @@ public class RessourceClient : MonoBehaviour
 
         public readonly UnityEvent onChange = new UnityEvent();
 
-        public RessourceData value
+        public RessourceData? value
         {
-            get => client.GetValues().FirstOrDefault().Value;
+            get{
+                var values = client.GetValues();
+                return values.Count==0 ? null : values.First().Value;
+            }
         }
 
 

@@ -10,17 +10,13 @@ public class Ship : MonoBehaviour
 
     void Awake()
     {
-        foreach(var level in gameObject.GetComponentsInChildren<LevelDependant>())
-            level.TeamId = TeamId;
+        foreach(var level in GetComponentsInChildren<LevelDependant>()) level.TeamId = TeamId;
 
-        foreach(var flag in gameObject.GetComponentsInChildren<Flag>())
-            flag.TeamId = TeamId;
+        foreach(var flag in GetComponentsInChildren<Flag>()) flag.TeamId = TeamId;
 
-        foreach(var flag in gameObject.GetComponentsInChildren<Canon>())
-            flag.team = TeamId;
+        foreach(var canon in GetComponentsInChildren<Canon>()) canon.team = TeamId;
 
-        foreach(var box in gameObject.GetComponentsInChildren<Box>())
-            box.TeamId = TeamId;
+        foreach(var box in GetComponentsInChildren<Box>()) box.TeamId = TeamId;
     }
 
     void Start()

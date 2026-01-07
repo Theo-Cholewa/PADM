@@ -110,7 +110,7 @@ public class TeamServer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            SetResource(RessourceType.Gold, server.GetValue().gold + 2);
+            SetResource(RessourceType.Gold, server.GetValue().gold + 10);
         }
     }
 }
