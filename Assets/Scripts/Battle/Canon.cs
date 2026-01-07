@@ -27,7 +27,7 @@ public class Canon : MonoBehaviour
 
     public void TryToShoot(float LocalPower)
     {
-        var powerLevel = client.value.cannonLevel;
+        var powerLevel = client.value?.cannonLevel ?? 1;
         if(powerLevel<=0) powerLevel = 1;
         var RealPower = MinimumPower + LocalPower * (MaximumPower - MinimumPower) * (.5f+powerLevel/2f);
         if (isLoaded)

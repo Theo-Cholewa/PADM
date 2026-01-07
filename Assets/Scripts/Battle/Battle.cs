@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class Battle : MonoBehaviour
     void Start()
     {
         RemainingTime = BattleDuration;
+        StartCoroutine(SyncTime());
     }
 
     void FixedUpdate()
@@ -32,6 +34,15 @@ public class Battle : MonoBehaviour
         foreach(var mesh in TimerMeshes)
         {
             mesh.text = TextRemainingTime;
+        }
+    }
+
+    IEnumerator SyncTime()
+    {
+        while (true)
+        {
+            Party.current.SendMessageToAll($"set_time;{RemainingTime}");
+            yield return new WaitForSeconds(5);
         }
     }
 

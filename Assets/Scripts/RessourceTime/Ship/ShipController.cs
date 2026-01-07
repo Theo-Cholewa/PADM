@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -125,7 +124,7 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
-        var data = ressources.value;
+        var data = ressources.value ?? new();
         var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
         var volantCount = directionClient?.GetValues()?.Count ?? 1;
         if (volantCount == 0) volantCount = 1;
@@ -282,9 +281,9 @@ public class ShipController : MonoBehaviour
     // 🔹 Met à jour la hauteur des barres selon les quantités actuelles
     void UpdateResourceBars()
     {
-        UpdateResourceImageHeight(foodImage, ressources.value.chicken);
-        UpdateResourceImageHeight(woodImage, ressources.value.wood);
-        UpdateResourceImageHeight(stoneImage, ressources.value.rock);
+        UpdateResourceImageHeight(foodImage, ressources.value?.chicken ?? 0);
+        UpdateResourceImageHeight(woodImage, ressources.value?.wood ?? 0);
+        UpdateResourceImageHeight(stoneImage, ressources.value?.rock ?? 0);
     }
 
     // 🔹 Hauteur = 100 à 10 ressources, 0 à 0 ressource
