@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 7848875744112663421}
   - component: {fileID: 1310824138427253261}
   - component: {fileID: 8384241917910954484}
+  - component: {fileID: 6782109378743763975}
   m_Layer: 0
   m_Name: ScorePopdown
   m_TagString: Untagged
@@ -234,6 +235,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!225 &6782109378743763975
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706467497615541217}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1165143398808622736
 GameObject:
   m_ObjectHideFlags: 0
