@@ -136,7 +136,7 @@ public class RessourceClient : MonoBehaviour
             {
                 if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Sea")
                 {
-                    Sea.Team = stats.Winner.HasValue ? Team.Of(stats.Winner.Value) : null;
+                    Sea.Team = stats.HasWinner ? Team.Of(stats.Winner) : null;
                     UnityEngine.SceneManagement.SceneManager.LoadScene("Sea");
                 }
             }

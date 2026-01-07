@@ -21,7 +21,7 @@ public class MarketGUI : MonoBehaviour
             "game_stats",
             new GameStats{
                 IsInFight = false,
-                Winner = null,
+                HasWinner = false,
             },
             v => JsonUtility.ToJson(v)
         );

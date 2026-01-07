@@ -20,12 +20,17 @@ public class InventoryServer : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(JsonUtility.ToJson(new GameStats
+        {
+            IsInFight = true,
+            Winner = TeamEnum.RED
+        }));
         server = new(
             Party.current,
             "game_stats",
             new GameStats{
                 IsInFight = false,
-                Winner = null,
+                HasWinner = false,
             },
             v => JsonUtility.ToJson(v)
         );
@@ -63,7 +68,7 @@ public class InventoryServer : MonoBehaviour
             {
                 server.SetValue(new GameStats{
                     IsInFight = true,
-                    Winner = null,
+                    HasWinner = false
                 });
                 SetBattle();
             }
@@ -76,7 +81,7 @@ public class InventoryServer : MonoBehaviour
             {
                 server.SetValue(new GameStats{
                     IsInFight = false,
-                    Winner = null,
+                    HasWinner = false,
                 });
                 SetTeamOnShop(null);
             }

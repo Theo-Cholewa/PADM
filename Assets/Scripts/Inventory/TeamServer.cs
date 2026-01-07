@@ -87,7 +87,8 @@ public class TeamServer : MonoBehaviour
     {
         await Inventory.server.SetValue(new GameStats{
             IsInFight = false,
-            Winner = EnnemyTeamId
+            Winner = EnnemyTeamId,
+            HasWinner = true,
         });
         Victory.Winner = Team.Of(EnnemyTeamId);
         UnityEngine.SceneManagement.SceneManager.LoadScene("Victory");
