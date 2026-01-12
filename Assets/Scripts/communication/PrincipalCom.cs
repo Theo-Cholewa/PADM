@@ -286,6 +286,13 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
             ApplyCubeGrabbed(msg);
             return;
         }
+
+        if (msg.StartsWith("STONE_CRAFT"))
+        {
+            Debug.Log("+1 pierre craftée !");
+            RessourceClient.current.Get(ship.team).Add(RessourceType.Stone, 4);
+            return;
+        }
     }
 
     // ---------------------- CACHES ----------------------
@@ -425,9 +432,11 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     bool TryParse(string s, out float v) =>
         float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out v);
 
+    ShipController ship;
+
     public void Dock(ShipController ship)
     {
-        
+        this.ship = ship;
     }
 
     public void Undock(ShipController ship)

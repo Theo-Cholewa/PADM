@@ -561,10 +561,10 @@ public class Party : MonoBehaviour
     IPAddress LocalIPAddress()
     {
         // If editor
-        if (Application.isEditor)
+        /*if (Application.isEditor)
         {
             return IPAddress.Parse("127.0.0.1");
-        }
+        }*/
 
         // Get from args
         var ip_str = GetArg("--myself-ip");
