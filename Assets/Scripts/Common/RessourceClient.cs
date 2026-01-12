@@ -125,7 +125,7 @@ public class RessourceClient : MonoBehaviour
         }
         else
         {
-            if (stats.Winner==null)
+            if (!stats.HasWinner)
             {
                 if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "RessourceTime")
                 {
