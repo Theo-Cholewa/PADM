@@ -563,7 +563,7 @@ public class Party : MonoBehaviour
         // If editor
         if (Application.isEditor)
         {
-            return IPAddress.Parse("127.0.0.1");
+            //return IPAddress.Parse("127.0.0.1");
         }
 
         // Get from args

@@ -97,7 +97,8 @@ public class TeamServer : MonoBehaviour
     void Update()
     {
         var health = server.GetValue().health;
-        if (health <= 0 && Inventory.server.GetValue().Winner==null)
+        Debug.Log("Health: "+health);
+        if (health <= 0 && !Inventory.server.GetValue().HasWinner)
         {
             Kill();
         }
