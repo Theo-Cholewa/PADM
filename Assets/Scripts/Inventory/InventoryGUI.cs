@@ -7,6 +7,7 @@ public class InventoryGUI : MonoBehaviour
     public Center Center;
 
     private TeamGUI TeamOnShop;
+    private bool IsBattle=false;
 
     public TeamGUI GetInventory(Team team)
     {
@@ -18,7 +19,7 @@ public class InventoryGUI : MonoBehaviour
     public void SetShopper(Team team)
     {
         var NewTeamOnShop = GetInventory(team);
-        if (TeamOnShop != NewTeamOnShop)
+        if (TeamOnShop != NewTeamOnShop || IsBattle)
         {
             if(TeamOnShop!=null) TeamOnShop.SetUpgradable(false);
             if (NewTeamOnShop != null)
@@ -32,6 +33,7 @@ public class InventoryGUI : MonoBehaviour
             }
         }
         TeamOnShop = NewTeamOnShop;
+        IsBattle = false;
     }
 
     public void SetInBattle()
@@ -39,6 +41,7 @@ public class InventoryGUI : MonoBehaviour
         if(TeamOnShop!=null) TeamOnShop.SetUpgradable(false);
         Center.SetState(CenterState.IN_BATTLE);
         TeamOnShop = null;
+        IsBattle = true;
     }
 
 
