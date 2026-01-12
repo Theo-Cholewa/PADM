@@ -2071,7 +2071,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5302136035111932124, guid: d2324243453331f4f90633e529d1aa0b, type: 3}
       propertyPath: m_Text
-      value: Stone
+      value: CanonBall
       objectReference: {fileID: 0}
     - target: {fileID: 6657437130004017737, guid: d2324243453331f4f90633e529d1aa0b, type: 3}
       propertyPath: m_Name
