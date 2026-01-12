@@ -5,6 +5,7 @@ public class InventoryGUI : MonoBehaviour
     public TeamGUI Red;
     public TeamGUI Blue;
     public Center Center;
+    public MarketGUI Market;
 
     private TeamGUI TeamOnShop;
     private bool IsBattle=false;
@@ -26,6 +27,7 @@ public class InventoryGUI : MonoBehaviour
             {
                 NewTeamOnShop.SetUpgradable(true);
                 Center.SetState(CenterState.MARKET);
+                Market.SetColor(Color.Lerp(team.color,Color.white,0.4f));
             }
             else
             {
