@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/PositionSelection.unity
+    guid: 3c8c3c32dd4773444823e848ceb16c10
+  - enabled: 1
     path: Assets/Scenes/TeamSelection.unity
     guid: f0ccb1f79776d384783107662af6bd7f
   - enabled: 1

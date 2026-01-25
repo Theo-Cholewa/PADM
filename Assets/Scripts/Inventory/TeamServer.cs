@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TeamServer : MonoBehaviour
@@ -10,6 +11,11 @@ public class TeamServer : MonoBehaviour
     public InventoryServer Inventory;
 
     public PartyTools.ValueServer<RessourceData> server;
+
+    void Awake()
+    {
+        foreach(var iconTarget in TeamGUI.IconTargets) iconTarget.Value.Name = $"{iconTarget.Key}_{Team.Of(TeamId).id}";
+    }
 
     void Start()
     {

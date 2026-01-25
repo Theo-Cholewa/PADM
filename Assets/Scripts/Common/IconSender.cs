@@ -1,15 +1,19 @@
 
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class IconSender : MonoBehaviour
 {
     public string Name;
-
-    public UDictionary<string,Vector2> Targets;
     
     public RectTransform Zone;
 
     public UDictionary<string,IconSenderIcon> Icons;
+
+    [HideInInspector] public Dictionary<string,IconTarget> Targets = new();
+
 
     [HideInInspector] public PlacementInfo placement;
 
@@ -22,6 +26,45 @@ public class IconSender : MonoBehaviour
     void OnDestroy()
     {
         Party.current?.OnMessage.RemoveListener(OnMessage);
+    }
+
+    public Vector2 LocalToWorld(Vector2 pos) => placement.Position + pos;
+    public Vector2 WorldToLocal(Vector2 pos) => pos - placement.Position;
+
+    public Vector2 SceneToWorld(Vector3 pos) => LocalToWorld(SceneToLocal(pos));
+
+    public Vector3 WorldToScene(Vector2 pos) => LocalToScene(WorldToLocal(pos));
+
+    public Vector2 SceneToLocal(Vector3 pos)
+    {
+        // Récupérer les coins du RectTransform
+        Vector3[] corners = new Vector3[4];
+        Zone.GetWorldCorners(corners);
+
+        Vector3 bottomLeft = corners[0];
+        Vector3 horizontal = corners[3] - corners[0];
+        Vector3 vertical = corners[1] - corners[0];
+
+        // Calculer les coordonnées locales normalisées
+        Vector3 delta = pos - bottomLeft;
+
+        float x = Vector3.Dot(delta, horizontal) / horizontal.sqrMagnitude;
+        float y = Vector3.Dot(delta, vertical) / vertical.sqrMagnitude;
+
+        return new Vector2(x, y);
+    }
+
+    public Vector3 LocalToScene(Vector2 pos)
+    {
+        // Get rect transform
+        Vector3[] corners = new Vector3[4];
+        Zone.GetWorldCorners(corners);
+
+        Vector3 initial = corners[0];
+        Vector3 x = corners[3]-corners[0];
+        Vector3 y = corners[1]-corners[0];
+
+        return initial + x * pos.x + y * pos.y;
     }
 
     /// <summary>
@@ -53,6 +96,7 @@ public class IconSender : MonoBehaviour
     /// <param name="to">la position d'arrivée</param>
     public void SpawnIcon(string icon, Vector2 from, Vector2 to)
     {
+        SpawnIconLocally(icon,from,to);
         var msg = $"icon_sender_summon;{JsonUtility.ToJson((icon, from, to))}";
         Party.current.SendMessageToAll(msg);
     }
@@ -66,16 +110,19 @@ public class IconSender : MonoBehaviour
     /// <param name="from">la position de départ</param>
     /// <param name="to">la position d'arrivée</param>
     /// <param name="to2">une autre position d'arrivée</param>
-    public void SpawnIcon(string icon, Vector2 from, string to, string to2)
+    public void SpawnIcon(string icon, Vector2 from, string to)
     {
+        Debug.Log(Targets.Keys.ToList().ToCommaSeparatedString());
+
         // Try locally
-        if (Name == to && Targets.TryGetValue(to2, out var target))
+        if (Targets.TryGetValue(to, out var target))
         {
-            SpawnIcon(icon, from, placement.Position + target);
+            SpawnIcon(icon, from, target.GetWorldPosition());
         }
 
         // Try online
-        var msg = $"icon_sender_propose;{JsonUtility.ToJson((icon, from, to, to2))}";
+        var msg = $"icon_sender_propose;{JsonUtility.ToJson((icon, from, to))}";
+        Debug.Log(msg);
         Party.current.SendMessageToAll(msg);
     }
 
@@ -84,24 +131,9 @@ public class IconSender : MonoBehaviour
         var msg = packet.message;
         if (msg.StartsWith("icon_sender_summon;"))
         {
+            Debug.Log("aaaaaaaaaa");
             var (id,from,to) = JsonUtility.FromJson<(string,Vector3,Vector3)>(msg.Substring("icon_sender_summon;".Length));
             SpawnIconLocally(id, from, to);
-        }
-        else if (msg.StartsWith("icon_sender_propose;"))
-        {
-            var (id,from,name,name2) = JsonUtility.FromJson<(string,Vector3,string,string)>(msg.Substring("icon_sender_propose;".Length));
-            if (Name == name && Targets.TryGetValue(name2, out var target))
-            {
-                SpawnIcon(id, from, placement.Position + target);
-            }
-        }
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            SpawnIconLocally("canon_ball", Vector2.zero, Vector2.one*100);
         }
     }
 

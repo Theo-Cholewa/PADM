@@ -88,11 +88,14 @@ public class ShipController : MonoBehaviour
 
     [HideInInspector]
     public RessourceClient.TeamClient ressources;
+    private PartyTools.ValueClient<(float,float)> directionClient;
 
     private static Dictionary<Team, SavedShipData> SAVED = new();
 
     void Start()
     {
+        directionClient = new(Party.current, $"direction_{Team.currentTeam.id}", it=>JsonUtility.FromJson<(float,float)>(it));
+
         ressources = RessourceClient.current.Get(team);
         rb = GetComponent<Rigidbody>();
 
@@ -118,8 +121,8 @@ public class ShipController : MonoBehaviour
 
     void OnDestroy()
     {
-        if (ressources != null)
-            ressources.onChange.RemoveListener(UpdateResourceBars);
+        directionClient?.Dispose();
+        ressources?.onChange.RemoveListener(UpdateResourceBars);
 
         OnDestroySave();
     }
@@ -178,6 +181,11 @@ public class ShipController : MonoBehaviour
         // lissage
         float smooth = Mathf.Max(0.001f, rotationSmoothing);
         currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, targetRotSpeed, Time.deltaTime / smooth);
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            RessourceClient.current.Get(Team.BLUE).SendIcon(transform.position, RessourceType.Stone);
+        }
     }
 
     void FixedUpdate()
@@ -309,4 +317,5 @@ public class ShipController : MonoBehaviour
             rotation = rb.rotation
         };
     }
+    
 }

@@ -1,10 +1,13 @@
+using System;
 using UnityEngine;
 
 public class IconSenderIcon : MonoBehaviour
 {
-    public static float ICON_MOVE_SPEED = 0.02f;
+    public static float ICON_MOVE_SPEED = 0.01f;
 
     public GameObject Display;
+
+    public bool GonnaDie = false;
 
     [HideInInspector] public IconSender sender;
     [HideInInspector] public Vector2 worldPosition;
@@ -12,21 +15,25 @@ public class IconSenderIcon : MonoBehaviour
 
     void Start()
     {
-        var IconPos = Vector2Int.FloorToInt(worldPosition);
-        var localPosition = worldPosition-IconPos;
-        transform.localPosition = (localPosition-new Vector2(.5f,.5f))*sender.Zone.rect.size;
+        transform.position = sender.WorldToScene(worldPosition);
     }
 
     void Update()
     {
+        if (GonnaDie)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Move
         var delta = targetPosition - worldPosition;
 
         // Kill
         if (delta.sqrMagnitude < ICON_MOVE_SPEED)
         {
-            Destroy(gameObject);
-            return;
+            
+            GonnaDie = true;
         }
 
         // Move
@@ -41,8 +48,7 @@ public class IconSenderIcon : MonoBehaviour
         // Move on screen
         if (MyPosition==IconPos)
         {
-            var localPosition = worldPosition-IconPos;
-            transform.localPosition = (localPosition-new Vector2(.5f,.5f))*sender.Zone.rect.size;
+            transform.position = sender.WorldToScene(worldPosition);
             Display.SetActive(true);
         }
         else Display.SetActive(false);

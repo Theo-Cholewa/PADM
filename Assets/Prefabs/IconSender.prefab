@@ -54,24 +54,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: Inventory
-  Targets:
-    keys:
-    - canon
-    - wood
-    - chicken
-    - gold
-    values:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
   Zone: {fileID: 2568912348038637171}
   Icons:
     keys:
-    - canon_ball
-    - wood
-    - chicken
-    - gold
+    - Stone
+    - Wood
+    - Chicken
+    - Gold
     values:
     - {fileID: 4038564806430127637}
     - {fileID: 2160349377299802659}
@@ -87,7 +76,7 @@ Canvas:
   m_GameObject: {fileID: 3544226074140703070}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 2
   m_Camera: {fileID: 0}
   m_PlaneDistance: 190
   m_PixelPerfect: 0

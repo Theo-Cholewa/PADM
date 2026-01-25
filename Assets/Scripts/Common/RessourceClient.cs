@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class RessourceClient : MonoBehaviour
 {
+    public IconSender Sender;
+
     /* LIFETIME */
     public static RessourceClient current;
 
@@ -40,7 +42,7 @@ public class RessourceClient : MonoBehaviour
         if(Teams.TryGetValue(team, out var manager)) return manager;
         else
         {
-            var man = new TeamClient(team);
+            var man = new TeamClient(team,this);
             Teams[team] = man;
             return man;
         }
@@ -50,6 +52,7 @@ public class RessourceClient : MonoBehaviour
     {
         public Team team;
         public PartyTools.ValueClient<RessourceData> client;
+        public RessourceClient root;
 
         public readonly UnityEvent onChange = new UnityEvent();
 
@@ -62,9 +65,10 @@ public class RessourceClient : MonoBehaviour
         }
 
 
-        public TeamClient(Team team)
+        public TeamClient(Team team, RessourceClient root)
         {
             this.team = team;
+            this.root = root;
 
             client = new (
                 Party.current,
@@ -78,6 +82,11 @@ public class RessourceClient : MonoBehaviour
         public Task Add(RessourceType type, int amount)
         {
             return Party.current.SendMessageToAll($"store;add;{team.id};{amount};{type}");
+        }
+
+        public void SendIcon(Vector3 From, RessourceType type)
+        {
+            root.Sender.SpawnIcon(type.ToString(), root.Sender.SceneToWorld(From), $"{type}_{team.id}");
         }
 
         public Task AskForFight()

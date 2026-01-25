@@ -13,7 +13,13 @@ public class PlacementButton : MonoBehaviour
     void Start()
     {
         Menu.onChange.AddListener(OnRoleChange);
+        Button.onClick.AddListener(OnClick);
         OnRoleChange();
+    }
+
+    void OnClick()
+    {
+        Menu.Select(Position);
     }
 
     void OnDestroy()
