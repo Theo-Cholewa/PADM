@@ -88,6 +88,7 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
             if (linkedShip != null)
             {
                 Debug.Log($"🌲 {linkedShip.team} a récolté du bois");
+                RessourceClient.current.Get(linkedShip.team).SendIcon(transform.position, RessourceType.Wood);
                 RessourceClient.current.Get(linkedShip.team).Add(RessourceType.Wood, 3);
             }
             else
