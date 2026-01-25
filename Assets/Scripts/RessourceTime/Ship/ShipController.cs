@@ -13,6 +13,7 @@ public class ShipController : MonoBehaviour
 {
     public TeamEnum TeamId = TeamEnum.RED;
     public Team team => Team.Of(TeamId);
+    public RessourceTime World;
 
     private Rigidbody rb;
 
@@ -155,7 +156,11 @@ public class ShipController : MonoBehaviour
 
         // Fight
         fightTimer -= Time.deltaTime;
-        if (fightTimer < 0 && fightImage != null) fightImage.enabled = true;
+        if (fightTimer < 0 && fightImage != null)
+        {
+            fightImage.enabled = true;
+            World.ReadyToFightCount++;
+        }
 
         // Anchor clavier
         if (Input.GetKeyDown(anchorKey))
