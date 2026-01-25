@@ -41,4 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Inventory.unity
     guid: 4ff0bbfe7d1b74b46b4fd58ef56c9841
+  - enabled: 1
+    path: Assets/Scenes/Sea.unity
+    guid: aea468db191adbb419849a4e84f4b5b0
   m_configObjects: {}

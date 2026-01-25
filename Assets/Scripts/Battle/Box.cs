@@ -54,7 +54,7 @@ public class Box : MonoBehaviour
                 content.GetComponent<Physic>().hasPhysic = true;
                 content.GetComponent<Pullable>().onTake = null;   
                 ressources.Add(Material, -Cost);
-                ressources.SendIcon(content.transform.position, Material, true);
+                ressources.SendIcon(transform.position, Material, true);
             }
             refillTime = 1;
         };
