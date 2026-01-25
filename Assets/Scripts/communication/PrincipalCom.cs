@@ -27,7 +27,7 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     [Header("UI Start / Overlay (sur l'île)")]
     public RawImage overlayImage;    // l'image à afficher
     public Button startButton;       // bouton qui apparaît après 3s min si VR ready
-    public float minOverlaySecondsIfConnected = 3f;
+    public float minOverlaySecondsIfConnected = 1f;
     
     [Header("Handshake VR")]
     public float helloInterval = 0.5f;
@@ -42,6 +42,10 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     public Vector2 uiOffset = new Vector2(3f, 6f);
     public float rotationMultiplier = -1f;
     public float rotationOffsetDeg = 0f;
+
+    [Header("Audio - Overlay")]
+    public AudioSource overlayAudioSource;
+    public AudioClip overlayLoopClip;
 
     // --- Thread-safe queue ---
     private readonly Queue<string> messageQueue = new Queue<string>();
@@ -63,6 +67,8 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     private Coroutine connectRoutine;
     private Coroutine overlayRoutine;
 
+    private bool cubeResyncRequested = false;
+
     void Awake()
     {
         // Build stone dict
@@ -83,6 +89,16 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
             udpPeer.OnUdpMessage += ThreadSafeReceive;
 
         // On tente la connexion VR dès le début (même si l'île n'est pas visible)
+        //connectRoutine = StartCoroutine(ConnectToVrLoop());
+    }
+
+    private void StartVrHandshake()
+    {
+        if (vrReady) return; // déjà connecté
+
+        if (connectRoutine != null)
+            StopCoroutine(connectRoutine);
+
         connectRoutine = StartCoroutine(ConnectToVrLoop());
     }
 
@@ -106,11 +122,13 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
 
     void OnDisable()
     {
-        if (overlayRoutine != null)
+        if (connectRoutine != null)
         {
-            StopCoroutine(overlayRoutine);
-            overlayRoutine = null;
+            StopCoroutine(connectRoutine);
+            connectRoutine = null;
         }
+        StopOverlaySound();
+        vrReady = false; // si tu veux forcer une reconnexion à la prochaine visite
     }
 
     void Update()
@@ -177,17 +195,20 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     IEnumerator OverlayFlowWhenIslandVisible()
     {
         Debug.Log("[PrincipalCom] Overlay flow started");
+        
 
         // 1) L'image est visible
         if (overlayImage != null)
             overlayImage.gameObject.SetActive(true);
-
+        PlayOverlaySound();
+        /*
         if (startButton != null)
         {
             startButton.gameObject.SetActive(false);
             startButton.interactable = false;
-        }
+        }*/
 
+        StartVrHandshake();
         // 2) Tant que le VR n'est PAS prêt → on garde l'image
         while (!vrReady)
         {
@@ -202,13 +223,13 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
         // 4) Transition UI
         if (overlayImage != null)
             overlayImage.gameObject.SetActive(false);
-
+        /*
         if (startButton != null)
         {
             startButton.gameObject.SetActive(true);
             startButton.interactable = true;
-        }
-
+        }*/
+        OnStartButtonClicked();
         Debug.Log("[PrincipalCom] Overlay hidden, Start button shown");
     }
 
@@ -224,11 +245,11 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
 
         // UI: cache overlay + bouton, montre le labyrinthe (si tu as un panel)
         if (overlayImage != null) overlayImage.gameObject.SetActive(false);
-        if (startButton != null)
+        /*if (startButton != null)
         {
             startButton.interactable = false;
             startButton.gameObject.SetActive(false);
-        }
+        }*/
 
         gameplayStarted = true;
 
@@ -260,9 +281,34 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
             vrReady = true;
             Debug.Log("[PrincipalCom] Received: VR_READY");
 
-            // Si l'île est visible, le bouton sera débloqué après le timer (coroutine)
+            // Optionnel : confirme au VR que Principal a bien reçu
+            udpPeer?.SendRaw("HELLO_ACK");
+
+            StopOverlaySound();
+
+            // Optionnel mais utile : resync cubes si ton VR envoie CUBE_INIT au démarrage
+            // StartCoroutine(SendCubeReqBurst());
+
             return;
-        }
+        }/*
+        if (msg == "VR_READY")
+        {
+            vrReady = true;
+            Debug.Log("[PrincipalCom] Received: VR_READY");
+
+            // ✅ (optionnel) accusé de réception
+            udpPeer?.SendRaw("HELLO_ACK");
+
+            // ✅ IMPORTANT : si Principal a démarré après, il a raté les CUBE_INIT du boot VR.
+            // On force un resync via CUBE_REQ (une seule fois).
+            if (!cubeResyncRequested)
+            {
+                cubeResyncRequested = true;
+                StartCoroutine(SendCubeReqBurst());
+            }
+
+            return;
+        }*/
 
         if (msg.StartsWith("POS;"))
         {
@@ -284,6 +330,13 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
         if (msg.StartsWith("CUBE_GRABBED;"))
         {
             ApplyCubeGrabbed(msg);
+            return;
+        }
+
+        if (msg.StartsWith("STONE_CRAFT"))
+        {
+            Debug.Log("+1 pierre craftée !" + ship.team);
+            RessourceClient.current.Get(ship.team).Add(RessourceType.Stone, 4);
             return;
         }
     }
@@ -425,12 +478,36 @@ public class PrincipalCom : MonoBehaviour, IslandBehaviour
     bool TryParse(string s, out float v) =>
         float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out v);
 
+    ShipController ship;
     public void Dock(ShipController ship)
     {
-        
+        this.ship = ship;
     }
 
     public void Undock(ShipController ship)
     {
+        StopOverlaySound();
+    }
+
+    void PlayOverlaySound()
+    {
+        if (overlayAudioSource == null || overlayLoopClip == null)
+            return;
+
+        if (overlayAudioSource.isPlaying)
+            return;
+
+        overlayAudioSource.clip = overlayLoopClip;
+        overlayAudioSource.loop = true;
+        overlayAudioSource.Play();
+    }
+
+    void StopOverlaySound()
+    {
+        if (overlayAudioSource == null)
+            return;
+
+        if (overlayAudioSource.isPlaying)
+            overlayAudioSource.Stop();
     }
 }
