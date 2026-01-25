@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,50 +8,95 @@ using UnityEngine;
 
 public class UdpPeer : MonoBehaviour
 {
+    private static UdpPeer Instance;
+
     [Header("Identité")]
-    [Tooltip("Identifiant qui sera préfixé à chaque message envoyé (ex: Phone, VR, Table1...)")]
     public string peerId = "A";
 
     [Header("Réseau")]
-    [Tooltip("Adresse IP de l'autre projet Unity (machine distante, ou 127.0.0.1 en local)")]
     public string remoteIp = "127.0.0.1";
-
-    [Tooltip("Port UDP sur lequel l'autre projet écoute")]
     public int remotePort = 8888;
-
-    [Tooltip("Port UDP sur lequel CE projet écoute")]
     public int listenPort = 8888;
+
+    [Header("Ships Controllers")]
+    public ShipController redShipController;
+    public ShipController blueShipController;
 
     private UdpClient udpClient;
     private Thread listenThread;
-    private bool running = false;
+    private volatile bool running = false;
 
-    public System.Action<string> OnUdpMessage;
+    public Action<string> OnUdpMessage;
+
+    [Header("Debug")]
+    public bool verboseLogs = true;
+
+    [Header("Network timeouts")]
+    [Tooltip("Si aucun message WHEEL n'arrive pendant ce délai, on reset steer à 0.")]
+    public float wheelTimeout = 0.25f;
+
+    [Tooltip("Si aucun message THROTTLE n'arrive pendant ce délai, on reset throttle à 0.")]
+    public float throttleTimeout = 0.25f;
+
+    [Tooltip("Si true: après timeout, on remet useNetworkX=false (retour clavier).")]
+    public bool releaseToKeyboardOnTimeout = false;
+
+    private SynchronizationContext unityContext;
+
+    private float lastWheelBlue = -999f;
+    private float lastWheelRed = -999f;
+    private float lastThrottleBlue = -999f;
+    private float lastThrottleRed = -999f;
+
+    private float nextTimeoutCheck = 0f;
+
+    void Awake()
+    {
+        // ✅ Anti-instances fantômes (prefab instancié, DontDestroyOnLoad, reload scène, etc.)
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning($"[UDP:{peerId}] DUPLICATE UdpPeer detected. Keeping '{Instance.gameObject.name}' (id={Instance.GetInstanceID()}), destroying '{gameObject.name}' (id={GetInstanceID()}).");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        unityContext = SynchronizationContext.Current;
+
+        if (verboseLogs)
+            Debug.Log($"[UDP:{peerId}] Awake OK | obj={gameObject.name} id={GetInstanceID()} active={gameObject.activeInHierarchy} enabled={enabled}");
+    }
 
     void Start()
     {
         try
         {
-            // On crée un client UDP bindé sur listenPort pour recevoir
+            if (unityContext == null)
+                unityContext = SynchronizationContext.Current;
+
+            Debug.Log($"[UDP:{peerId}] Start | listenPort={listenPort} remote={remoteIp}:{remotePort} | obj={gameObject.name} id={GetInstanceID()} active={gameObject.activeInHierarchy} enabled={enabled} timeScale={Time.timeScale}");
+
             udpClient = new UdpClient(listenPort);
             udpClient.EnableBroadcast = true;
+
             running = true;
 
-            listenThread = new Thread(ListenLoop);
-            listenThread.IsBackground = true;
+            listenThread = new Thread(ListenLoop) { IsBackground = true };
             listenThread.Start();
 
-            Debug.Log($"[UDP:{peerId}] Écoute sur le port {listenPort}");
+            Debug.Log($"[UDP:{peerId}] Écoute OK sur le port {listenPort}");
         }
         catch (Exception e)
         {
-            Debug.LogError($"[UDP:{peerId}] Erreur d'initialisation: {e.Message}");
+            Debug.LogError($"[UDP:{peerId}] Erreur d'initialisation UDP: {e}");
         }
     }
 
     private void ListenLoop()
     {
-        IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+        var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
         while (running)
         {
@@ -59,37 +105,98 @@ public class UdpPeer : MonoBehaviour
                 byte[] data = udpClient.Receive(ref remoteEndPoint);
                 string msg = Encoding.UTF8.GetString(data);
 
-                // ⚠ On évite d'appeler Unity directement depuis le thread (mais Debug.Log passe en général)
-                //Debug.Log($"[UDP:{peerId}] Reçu de {remoteEndPoint.Address}:{remoteEndPoint.Port} -> {msg}");
-                OnUdpMessage?.Invoke(msg);
+                if (verboseLogs)
+                    Debug.Log($"[UDP:{peerId}] (THREAD) Reçu <- {remoteEndPoint.Address}:{remoteEndPoint.Port} | {msg}");
 
-                // Si tu veux parser id + message, tu peux faire :
-                // var split = msg.Split(new[] { ':' }, 2);
-                // string senderId = split[0];
-                // string payload = split.Length > 1 ? split[1].TrimStart() : "";
+                // ✅ bascule vers Main Thread Unity
+                unityContext?.Post(_ =>
+                {
+                    if (!running || this == null) return;
+
+                    if (verboseLogs)
+                        Debug.Log($"[UDP:{peerId}] (MAIN) Handling -> {msg} | obj={gameObject.name} active={gameObject.activeInHierarchy} enabled={enabled}");
+
+                    OnUdpMessage?.Invoke(msg);
+                    CallShipControllers(msg);
+                }, null);
             }
-            catch (ObjectDisposedException)
-            {
-                // udpClient fermé -> on sort
-                break;
-            }
-            catch (SocketException)
-            {
-                if (!running) break;
-            }
+            catch (ObjectDisposedException) { break; }
+            catch (SocketException) { if (!running) break; }
             catch (Exception e)
             {
-                Debug.LogWarning($"[UDP:{peerId}] Erreur réception: {e.Message}");
+                Debug.LogWarning($"[UDP:{peerId}] Erreur réception: {e}");
             }
         }
     }
 
-    /// <summary>
-    /// Envoie un message brut (sans préfixer par l'id).
-    /// </summary>
+    void Update()
+    {
+        // ✅ check timeouts (unscaled) pour éviter "steer bloqué"
+        if (Time.unscaledTime >= nextTimeoutCheck)
+        {
+            nextTimeoutCheck = Time.unscaledTime + 0.05f;
+            ApplyTimeouts();
+        }
+    }
+
+    private void ApplyTimeouts()
+    {
+        float now = Time.unscaledTime;
+
+        if (blueShipController != null)
+        {
+            if (blueShipController.useNetworkSteering && (now - lastWheelBlue) > wheelTimeout)
+            {
+                if (verboseLogs)
+                    Debug.Log($"[UDP:{peerId}] (MAIN) WHEEL timeout BLUE -> steer=0 (last={lastWheelBlue:F2} now={now:F2})");
+
+                blueShipController.SetNetworkSteer(0f);
+                if (releaseToKeyboardOnTimeout) blueShipController.useNetworkSteering = false;
+                lastWheelBlue = now;
+            }
+
+            if (blueShipController.useNetworkThrottle && (now - lastThrottleBlue) > throttleTimeout)
+            {
+                if (verboseLogs)
+                    Debug.Log($"[UDP:{peerId}] (MAIN) THROTTLE timeout BLUE -> thr=0 (last={lastThrottleBlue:F2} now={now:F2})");
+
+                blueShipController.SetNetworkThrottle(0f);
+                if (releaseToKeyboardOnTimeout) blueShipController.useNetworkThrottle = false;
+                lastThrottleBlue = now;
+            }
+        }
+
+        if (redShipController != null)
+        {
+            if (redShipController.useNetworkSteering && (now - lastWheelRed) > wheelTimeout)
+            {
+                if (verboseLogs)
+                    Debug.Log($"[UDP:{peerId}] (MAIN) WHEEL timeout RED -> steer=0 (last={lastWheelRed:F2} now={now:F2})");
+
+                redShipController.SetNetworkSteer(0f);
+                if (releaseToKeyboardOnTimeout) redShipController.useNetworkSteering = false;
+                lastWheelRed = now;
+            }
+
+            if (redShipController.useNetworkThrottle && (now - lastThrottleRed) > throttleTimeout)
+            {
+                if (verboseLogs)
+                    Debug.Log($"[UDP:{peerId}] (MAIN) THROTTLE timeout RED -> thr=0 (last={lastThrottleRed:F2} now={now:F2})");
+
+                redShipController.SetNetworkThrottle(0f);
+                if (releaseToKeyboardOnTimeout) redShipController.useNetworkThrottle = false;
+                lastThrottleRed = now;
+            }
+        }
+    }
+
     public void SendRaw(string msg)
     {
-        if (udpClient == null) return;
+        if (udpClient == null)
+        {
+            Debug.LogWarning($"[UDP:{peerId}] SendRaw ignored: udpClient null");
+            return;
+        }
 
         try
         {
@@ -99,42 +206,122 @@ public class UdpPeer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"[UDP:{peerId}] Erreur envoi: {e.Message}");
+            Debug.LogWarning($"[UDP:{peerId}] Erreur envoi: {e}");
         }
     }
 
-    /// <summary>
-    /// Envoie un message en le préfixant par "id: ".
-    /// Exemple : "Phone: Hello" si peerId = "Phone".
-    /// </summary>
-    public void Send(string payload)
+    public void Send(string payload) => SendRaw($"{peerId}: {payload}");
+
+    private static bool TryParseFloatAny(string s, out float value)
     {
-        string fullMessage = $"{peerId}: {payload}";
-        SendRaw(fullMessage);
-    }
-    
-    void OnApplicationQuit()
-    {
-        StopUdp();
+        s = s.Trim().Replace(',', '.');
+        return float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 
-    void OnDestroy()
+    private void CallShipControllers(string msg)
     {
-        StopUdp();
+        // Supporte:
+        // "BLUE:ANCHOR:ON" ou "A: BLUE:ANCHOR:ON"
+        // "A: BLUE:THROTTLE:OFF"
+        // "A: BLUE:WHEEL:9,6"
+        var parts = msg.Split(':');
+        if (parts.Length < 3)
+        {
+            if (verboseLogs) Debug.LogWarning($"[UDP:{peerId}] Parse ignored (parts<3): {msg}");
+            return;
+        }
+
+        int i = 0;
+        string first = parts[0].Trim();
+
+        bool firstIsColor =
+            first.Equals("RED", StringComparison.OrdinalIgnoreCase) ||
+            first.Equals("BLUE", StringComparison.OrdinalIgnoreCase);
+
+        if (!firstIsColor)
+        {
+            i = 1;
+            if (parts.Length < 4)
+            {
+                if (verboseLogs) Debug.LogWarning($"[UDP:{peerId}] Parse ignored (prefixed but parts<4): {msg}");
+                return;
+            }
+        }
+
+        string shipColor = parts[i].Trim();
+        string commandType = parts[i + 1].Trim();
+        string commandValue = parts[i + 2].Trim();
+
+        ShipController target =
+            shipColor.Equals("RED", StringComparison.OrdinalIgnoreCase) ? redShipController :
+            shipColor.Equals("BLUE", StringComparison.OrdinalIgnoreCase) ? blueShipController :
+            null;
+
+        if (verboseLogs)
+            Debug.Log($"[UDP:{peerId}] Parsed -> ship={shipColor} type={commandType} value={commandValue} | target={(target != null ? target.gameObject.name : "NULL")}");
+
+        if (target == null) return;
+
+        if (commandType.Equals("ANCHOR", StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.Log($"[UDP:{peerId}] -> {shipColor} ANCHOR TOGGLE");
+            target.ToggleAnchorFromNetwork();
+            
+            return;
+        }
+
+        if (commandType.Equals("THROTTLE", StringComparison.OrdinalIgnoreCase))
+        {
+            float throttle;
+            if (commandValue.Equals("ON", StringComparison.OrdinalIgnoreCase)) throttle = 1f;
+            else if (commandValue.Equals("OFF", StringComparison.OrdinalIgnoreCase)) throttle = 0f;
+            else if (TryParseFloatAny(commandValue, out var v)) throttle = Mathf.Clamp01(v);
+            else return;
+
+            target.useNetworkThrottle = true;
+            target.SetNetworkThrottle(throttle);
+
+            float now = Time.unscaledTime;
+            if (shipColor.Equals("BLUE", StringComparison.OrdinalIgnoreCase)) lastThrottleBlue = now;
+            else lastThrottleRed = now;
+
+            if (verboseLogs)
+                Debug.Log($"[UDP:{peerId}] -> {shipColor} THROTTLE={throttle:F2} applied (t={now:F2})");
+            return;
+        }
+
+        if (commandType.Equals("WHEEL", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!TryParseFloatAny(commandValue, out var wheelRaw)) return;
+
+            float steer = Mathf.Clamp(wheelRaw / 30f, -1f, 1f);
+
+            target.useNetworkSteering = true;
+            target.SetNetworkSteer(steer);
+
+            float now = Time.unscaledTime;
+            if (shipColor.Equals("BLUE", StringComparison.OrdinalIgnoreCase)) lastWheelBlue = now;
+            else lastWheelRed = now;
+
+            if (verboseLogs)
+                Debug.Log($"[UDP:{peerId}] -> {shipColor} WHEEL raw={wheelRaw:F2} steer={steer:F2} applied (t={now:F2})");
+            return;
+        }
     }
+
+    void OnApplicationQuit() => StopUdp();
+    void OnDestroy() => StopUdp();
 
     private void StopUdp()
     {
         if (!running) return;
         running = false;
 
-        try
-        {
-            udpClient?.Close();
-        }
-        catch { }
+        if (verboseLogs)
+            Debug.Log($"[UDP:{peerId}] StopUdp called.");
 
-        // Pas besoin d'Abort, le thread sortira quand Receive lèvera une exception
+        try { udpClient?.Close(); } catch { }
+        udpClient = null;
         listenThread = null;
     }
 }
