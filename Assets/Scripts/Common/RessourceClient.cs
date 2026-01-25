@@ -6,8 +6,6 @@ using UnityEngine.Events;
 
 public class RessourceClient : MonoBehaviour
 {
-    public IconSender Sender;
-
     /* LIFETIME */
     public static RessourceClient current;
 
@@ -84,9 +82,9 @@ public class RessourceClient : MonoBehaviour
             return Party.current.SendMessageToAll($"store;add;{team.id};{amount};{type}");
         }
 
-        public void SendIcon(Vector3 From, RessourceType type)
+        public void SendIcon(Vector3 From, RessourceType type, bool isReversed=false)
         {
-            root.Sender.SpawnIcon(type.ToString(), root.Sender.SceneToWorld(From), $"{type}_{team.id}");
+            IconSender.current?.SpawnIcon(type.ToString(), IconSender.current.SceneToWorld(From), $"{type}_{team.id}", isReversed);
         }
 
         public Task AskForFight()

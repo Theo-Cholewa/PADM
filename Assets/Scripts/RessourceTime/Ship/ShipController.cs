@@ -228,6 +228,16 @@ public class ShipController : MonoBehaviour
         // lissage
         float smooth = Mathf.Max(0.001f, rotationSmoothing);
         currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, targetRotSpeed, Time.deltaTime / smooth);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            fightTimer -= 10;
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            ressources.SendIcon(transform.position, RessourceType.Wood, true);
+        }
     }
 
     void FixedUpdate()

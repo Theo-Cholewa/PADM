@@ -19,6 +19,14 @@ public class Ship : MonoBehaviour
         foreach(var box in GetComponentsInChildren<Box>()) box.TeamId = TeamId;
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            IconSender.current?.SpawnIcon("Wood", new Vector2(0.5f,0.5f), new Vector2(1f,1f));
+        }
+    }
+
     void Start()
     {
         ressources = RessourceClient.current.Get(Team.Of(TeamId));

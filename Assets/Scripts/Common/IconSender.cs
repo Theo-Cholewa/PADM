@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class IconSender : MonoBehaviour
 {
+    public static IconSender current;
+
+
     public string Name;
     
     public RectTransform Zone;
@@ -21,11 +24,13 @@ public class IconSender : MonoBehaviour
     {
         placement = PlacementInfo.current;
         Party.current.OnMessage.AddListener(OnMessage);
+        current = this;
     }
 
     void OnDestroy()
     {
         Party.current?.OnMessage.RemoveListener(OnMessage);
+        if(current==this)current=null;
     }
 
     public Vector2 LocalToWorld(Vector2 pos) => placement.Position + pos;
@@ -110,19 +115,19 @@ public class IconSender : MonoBehaviour
     /// <param name="from">la position de départ</param>
     /// <param name="to">la position d'arrivée</param>
     /// <param name="to2">une autre position d'arrivée</param>
-    public void SpawnIcon(string icon, Vector2 from, string to)
+    public void SpawnIcon(string icon, Vector2 from, string to, bool isReversed=false)
     {
         Debug.Log(Targets.Keys.ToList().ToCommaSeparatedString());
 
         // Try locally
         if (Targets.TryGetValue(to, out var target))
         {
-            SpawnIcon(icon, from, target.GetWorldPosition());
+            if(isReversed) SpawnIcon(icon, target.GetWorldPosition(), from);
+            else SpawnIcon(icon, from, target.GetWorldPosition());
         }
 
         // Try online
-        var msg = $"icon_sender_propose;{JsonUtility.ToJson((icon, from, to))}";
-        Debug.Log(msg);
+        var msg = $"icon_sender_propose;{JsonUtility.ToJson((icon, from, to, isReversed))}";
         Party.current.SendMessageToAll(msg);
     }
 
