@@ -1,2 +1,2 @@
 cd Build
-PADM.exe --myself-ip 127.0.0.3
+PADM.exe --myself-ip 127.0.0.3 --screen-fullscreen 0

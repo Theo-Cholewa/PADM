@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public static class PartyTools
 {
@@ -257,6 +259,116 @@ public static class PartyTools
             {
                 party.SendMessage(msg.peer, $"value;{name};set;{toStr(value)}");
             }
+        }
+    }
+    
+    /// <summary>
+    /// Permet de définir un "role" qu'un seule Peer peut avoir dans la Party.
+    /// Le callback onAcquired est appelé si le rôle est ascquis.
+    /// 
+    /// Normalement il y a peu de chance que le role soit ensuite retiré.
+    /// Mais si c'est le cas, le callback onWithdraw est appelé.
+    /// 
+    /// Le callback onRefused est appelé si le rôle est refusé initialement. Il est possible
+    /// que le rôle soit finalement donné après coups.
+    /// 
+    /// </summary>
+    public class UniqueRole{
+
+        Party party;
+
+        string role;
+
+        ValueServer<long> server;
+
+        ValueClient<long> client;
+
+        Action onAcquired;
+
+        Action onRefused;
+
+        Action onWithdraw;
+
+        long id;
+
+        bool canAcquire = false;
+        bool firstTest = true;
+
+        bool haveTheRole = false;
+
+        bool isDisposed = false;
+
+        public UniqueRole(Party party, MonoBehaviour behav, string role, Action onAcquired, Action onRefused, Action onWithdraw)
+        {
+            this.party = party;
+            this.role = role;
+            this.onAcquired = onAcquired;
+            this.onWithdraw = onWithdraw;
+            this.onRefused = onRefused;
+
+            id = DateTime.UtcNow.Ticks;
+
+            client = new(party, $"unique_role_{role}", it=>long.Parse(it));
+            client.onChange = onChange;
+            
+            server = new(party, $"unique_role_{role}", id, it=>it.ToString());
+
+            behav.StartCoroutine(WaitForAcquire());
+        }
+
+        public void Dispose()
+        {
+            isDisposed = true;
+            client.Dispose();
+            server.Dispose();
+        }
+
+        public bool HaveTheRole => haveTheRole;
+
+        private void onChange(PartyPeer rpeer, long value)
+        {
+            if(!canAcquire)return;
+
+            Debug.Log(id+" : "+client.GetValues().Values.Select(it=>it.ToString()).Aggregate("",(a,b)=>a+","+b));
+
+            // If someone already have this role, I cannot get the role
+            if (client.GetValues().Values.Any(it => it < id))
+            {
+                if(haveTheRole) onWithdraw?.Invoke();
+                haveTheRole = false;
+            }
+
+            // If no one already have this role, I take it
+            else if (client.GetValues().Values.All(it => it > id))
+            {
+                if(!haveTheRole) onAcquired?.Invoke();
+                haveTheRole = true;
+            }
+
+            // If someone have the same id, I get a new id
+            else if (client.GetValues().Values.Any(it => it == id))
+            {
+                id = DateTime.UtcNow.Ticks+UnityEngine.Random.Range(0,5);
+                server.SetValue(id);
+            }
+
+            if(firstTest)
+            {
+                Debug.Log($"FIRST TEST ${haveTheRole}");
+                firstTest = false;
+                if(!haveTheRole) onRefused?.Invoke();
+            }
+        }
+
+        private IEnumerator WaitForAcquire()
+        {
+            yield return new WaitForSeconds(.5f);
+            if (!isDisposed)
+            {
+                canAcquire = true;
+                onChange(null, 0);
+            }
+            
         }
     }
 

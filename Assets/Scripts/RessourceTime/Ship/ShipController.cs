@@ -295,7 +295,15 @@ public class ShipController : MonoBehaviour
         Vector2 size = rt.sizeDelta;
 
         // 0 ressource → 0 px ; 10 ressources → resourceMaxSize px
-        float t = Mathf.Clamp01(amount / 10f);
+        float sum = 0;
+        if (ressources.value.HasValue)
+        {
+            var value = ressources.value.Value;
+            sum = value.chicken + value.wood + value.rock;
+        }
+        if(sum<10f)sum = 10f;
+
+        float t = Mathf.Clamp01(amount / sum);
         size.y = Mathf.Lerp(0f, resourceMaxSize, t);
 
         rt.sizeDelta = size;

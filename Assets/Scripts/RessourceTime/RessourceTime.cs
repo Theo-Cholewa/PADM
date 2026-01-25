@@ -2,6 +2,19 @@ using UnityEngine;
 
 public class RessourceTime : MonoBehaviour
 {
+
+    PartyTools.UniqueRole Role;
+
+    void Start()
+    {
+        Role = new(Party.current, this, "ressource_time", null, ()=>General.Reset(), ()=>General.Reset());
+    }
+
+    void OnDestroy()
+    {
+        Role.Dispose();
+    }
+
     void FixedUpdate()
     {
         RessourceClient.current.GoToGoodScene();

@@ -5,6 +5,7 @@ public class InventoryServer : MonoBehaviour
     public InventoryGUI InventoryGUI;
     public PartyTools.ValueServer<GameStats> server;
     public Team TeamOnShop = null;
+    PartyTools.UniqueRole Role;
 
     void SetTeamOnShop(Team team)
     {
@@ -20,11 +21,8 @@ public class InventoryServer : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(JsonUtility.ToJson(new GameStats
-        {
-            IsInFight = true,
-            Winner = TeamEnum.RED
-        }));
+        Role = new(Party.current, this, "inventory", null, ()=>General.Reset(), ()=>General.Reset());
+
         server = new(
             Party.current,
             "game_stats",
@@ -34,11 +32,13 @@ public class InventoryServer : MonoBehaviour
             },
             v => JsonUtility.ToJson(v)
         );
+
         Party.current.OnMessage.AddListener(OnMessage);
     }
 
     void OnDestroy()
     {
+        Role.Dispose();
         server.Dispose();
         Party.current?.OnMessage?.RemoveListener(OnMessage);
     }

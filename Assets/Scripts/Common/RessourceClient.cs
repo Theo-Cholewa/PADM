@@ -28,6 +28,7 @@ public class RessourceClient : MonoBehaviour
     {
         if(Teams!=null) foreach(var manager in Teams.Values) manager.Dispose();
         if(GameStats!=null) GameStats.Dispose();
+        if(current == this) current = null;
     }
 
 

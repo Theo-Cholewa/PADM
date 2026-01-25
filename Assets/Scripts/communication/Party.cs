@@ -109,10 +109,8 @@ public class Party : MonoBehaviour
     public async Task Close(PartyPeer target)
     {
         var targets = clients.Where(c => c.guest == target).ToList();
-        Debug.Log($"Got from list {targets.Count}");
         foreach (var client in targets)
         {
-            Debug.Log("Before event");
             try
             {
                 OnDisconnect.Invoke(client.guest);
@@ -121,9 +119,8 @@ public class Party : MonoBehaviour
             {
                 Debug.LogError($"Error during disconnect event: {e.Message}");
             }
-            Debug.Log("After event");
             await ClosePacket(client);
-            Debug.Log($"Client disconnected: {client.guest.name}");
+            Log($"Client disconnected: {client.guest.name}", true);
         }
     }
 
@@ -165,7 +162,7 @@ public class Party : MonoBehaviour
         Identifier = PartyName+new int[]{0,0,0,0,0,0,0,0}.Select(_ => CHARACTERS[random.Next(CHARACTERS.Length)]).Aggregate("", (a,b) => a+b);
 
         myself = LocalIPAddress();
-        Debug.Log($"My IP Address: {myself}");
+        Log($"My IP Address: {myself}", true);
         
         InitListenTcp();
         InitBroadcast();
@@ -586,9 +583,10 @@ public class Party : MonoBehaviour
         throw new Exception("No network adapters with an IPv4 address in the system!");
     }
 
-    private void Log(string msg)
+    private void Log(string msg, bool important = false)
     {
         Debug.Log($"[PARTY] {msg}");
+        if(important) Console.WriteLine($"[PARTY] {msg}");
     }
 
     private static string GetArg(string name)
@@ -614,4 +612,5 @@ public class Party : MonoBehaviour
             if(!doContinue)throw task.Exception;
         }
     }
+
 }
