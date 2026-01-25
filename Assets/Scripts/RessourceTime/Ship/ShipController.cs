@@ -25,7 +25,10 @@ public class ShipController : MonoBehaviour
     private bool anchorDropped = false;
 
     [Header("Contrôle réseau")]
+    [Tooltip("Si true, le steer réseau peut être utilisé (si aucun input clavier prioritaire).")]
     public bool useNetworkSteering = false;
+
+    [Tooltip("Si true, le throttle réseau peut être utilisé (si aucun input clavier prioritaire).")]
     public bool useNetworkThrottle = false;
 
     [Range(-1f, 1f)]
@@ -33,6 +36,10 @@ public class ShipController : MonoBehaviour
 
     [Range(0f, 1f)]
     public float networkThrottleInput = 0f;
+
+    [Header("Priorités d'input")]
+    [Tooltip("Si activé, le clavier override le réseau/legacy quand une touche est pressée.")]
+    public bool keyboardOverridesNetwork = true;
 
     [Header("Debug")]
     public bool verboseLogs = true;
@@ -88,9 +95,12 @@ public class ShipController : MonoBehaviour
 
     [HideInInspector]
     public RessourceClient.TeamClient ressources;
-    private PartyTools.ValueClient<(float,float)> directionClient;
 
     private static Dictionary<Team, SavedShipData> SAVED = new();
+
+    [Header("Legacy wheel (directionClient)")]
+    [Tooltip("Objet optionnel (ancien système). Si présent et compatible, il fournit steer/throttle agrégés. Sinon fallback réseau/clavier.")]
+    private PartyTools.ValueClient<(float,float)> directionClient;
 
     void Start()
     {
@@ -131,15 +141,16 @@ public class ShipController : MonoBehaviour
     {
         var data = ressources.value ?? new();
         float shipLevel = Mathf.Max(1, data.shipLevel);
-        var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
-        var volantCount = directionClient?.GetValues()?.Count ?? 1;
-        if (volantCount == 0) volantCount = 1;
+
+        // 🔁 Legacy directionClient (si présent et compatible)
+        bool hasLegacy = TryGetDirectionClientInputs(out float legacySteer, out float legacyThrottle, out int legacyCount);
 
         if (verboseLogs && Time.time >= nextDebugTime)
         {
             nextDebugTime = Time.time + 1f;
             Debug.Log($"[SHIP:{team}] state anchor={anchorDropped} speed={currentSpeed:F2} rot={currentRotationSpeed:F2} " +
-                      $"useNetThr={useNetworkThrottle} thr={networkThrottleInput:F2} useNetSteer={useNetworkSteering} steer={networkSteerInput:F2}");
+                      $"useNetThr={useNetworkThrottle} thr={networkThrottleInput:F2} useNetSteer={useNetworkSteering} steer={networkSteerInput:F2} " +
+                      $"legacy={(hasLegacy ? $"ON count={legacyCount} steer={legacySteer:F2} thr={legacyThrottle:F2}" : "OFF")}");
         }
 
         // Fight
@@ -155,11 +166,35 @@ public class ShipController : MonoBehaviour
 
         if (anchorDropped) return;
 
+        // =========================
+        // INPUT SELECTION
+        // =========================
+        bool kbForward = Input.GetKey(moveForward);
+        bool kbLeft = Input.GetKey(turnLeft);
+        bool kbRight = Input.GetKey(turnRight);
+
+        bool kbHasThrottle = kbForward;
+        bool kbHasSteer = kbLeft || kbRight;
+
         // ========== THROTTLE ==========
         float throttle = 0f;
 
-        if (useNetworkThrottle) throttle = networkThrottleInput;
-        else if (Input.GetKey(moveForward)) throttle = 1f;
+        if (keyboardOverridesNetwork && kbHasThrottle)
+        {
+            throttle = 1f;
+        }
+        else if (useNetworkThrottle)
+        {
+            throttle = networkThrottleInput;
+        }
+        else if (hasLegacy)
+        {
+            throttle = legacyThrottle;
+        }
+        else if (kbHasThrottle)
+        {
+            throttle = 1f;
+        }
 
         currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
         currentSpeed -= deceleration * shipLevel * Time.deltaTime;
@@ -168,14 +203,26 @@ public class ShipController : MonoBehaviour
         // ========== STEER ==========
         float steer = 0f;
 
-        if (useNetworkSteering) steer = networkSteerInput;
+        if (keyboardOverridesNetwork && kbHasSteer)
+        {
+            if (kbLeft) steer -= 1f;
+            if (kbRight) steer += 1f;
+        }
+        else if (useNetworkSteering)
+        {
+            steer = networkSteerInput;
+        }
+        else if (hasLegacy)
+        {
+            steer = legacySteer;
+        }
         else
         {
-            if (Input.GetKey(turnLeft)) steer -= 1f;
-            if (Input.GetKey(turnRight)) steer += 1f;
+            if (kbLeft) steer -= 1f;
+            if (kbRight) steer += 1f;
         }
 
-        // ✅ Rotation pilotable : vitesse cible (deg/s), plus d’accumulation infinie
+        // Rotation pilotable : vitesse cible (deg/s)
         float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
 
         // lissage
@@ -194,7 +241,7 @@ public class ShipController : MonoBehaviour
 
         Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
-        
+
         if (Mathf.Abs(currentRotationSpeed) > 0.01f)
         {
             Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
@@ -304,18 +351,142 @@ public class ShipController : MonoBehaviour
     {
         if (SAVED.TryGetValue(team, out var data))
         {
-            rb.position = data.position;
-            rb.rotation = data.rotation;
+            if (rb != null)
+            {
+                rb.position = data.position;
+                rb.rotation = data.rotation;
+            }
         }
     }
 
     void OnDestroySave()
     {
+        if (rb == null) return;
+
         SAVED[team] = new SavedShipData
         {
             position = rb.position,
             rotation = rb.rotation
         };
     }
-    
+
+    // =========================================================
+    // Legacy directionClient compatibility layer (safe)
+    // =========================================================
+
+    private bool TryGetDirectionClientInputs(out float steerAvg, out float throttleAvg, out int count)
+    {
+        steerAvg = 0f;
+        throttleAvg = 0f;
+        count = 0;
+
+        if (directionClient == null) return false;
+
+        try
+        {
+            // directionClient.GetValues()?.Count
+            var values = directionClient.GetValues();
+            if (values is System.Collections.ICollection coll)
+                count = coll.Count;
+            else if (values is System.Collections.IEnumerable enumerable)
+            {
+                int c = 0;
+                foreach (var _ in enumerable) c++;
+                count = c;
+            }
+
+            if (count <= 0) count = 1;
+
+            // Try to read aggregate without passing lambdas (safe / reflection-only).
+            var agg = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f));
+
+            if (agg != null)
+            {
+                if (TryReadTuple2(agg, out float a, out float b))
+                {
+                    steerAvg = Mathf.Clamp(a / count, -1f, 1f);
+                    throttleAvg = Mathf.Clamp01(b / count);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception e)
+        {
+            if (verboseLogs)
+                Debug.LogWarning($"[SHIP:{team}] directionClient incompatible/failed: {e.Message}");
+            return false;
+        }
+    }
+
+    private static object InvokeMethod(UnityEngine.Object obj, string methodName)
+    {
+        if (obj == null) return null;
+        var t = obj.GetType();
+        var m = t.GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        if (m == null) return null;
+
+        // For safety: only call parameterless methods.
+        if (m.GetParameters().Length != 0) return null;
+
+        return m.Invoke(obj, null);
+    }
+
+    private static object GetMemberValue(UnityEngine.Object obj, string memberName)
+    {
+        if (obj == null) return null;
+        var t = obj.GetType();
+
+        var p = t.GetProperty(memberName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        if (p != null && p.GetIndexParameters().Length == 0) return p.GetValue(obj);
+
+        var f = t.GetField(memberName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        if (f != null) return f.GetValue(obj);
+
+        return null;
+    }
+
+    private static bool TryReadTuple2(object tuple, out float item1, out float item2)
+    {
+        item1 = 0f;
+        item2 = 0f;
+        if (tuple == null) return false;
+
+        var t = tuple.GetType();
+
+        // fields Item1/Item2
+        var f1 = t.GetField("Item1");
+        var f2 = t.GetField("Item2");
+        if (f1 != null && f2 != null)
+        {
+            object a = f1.GetValue(tuple);
+            object b = f2.GetValue(tuple);
+
+            if (a is float af && b is float bf)
+            {
+                item1 = af;
+                item2 = bf;
+                return true;
+            }
+        }
+
+        // properties Item1/Item2
+        var p1 = t.GetProperty("Item1");
+        var p2 = t.GetProperty("Item2");
+        if (p1 != null && p2 != null)
+        {
+            object a = p1.GetValue(tuple);
+            object b = p2.GetValue(tuple);
+
+            if (a is float af && b is float bf)
+            {
+                item1 = af;
+                item2 = bf;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
