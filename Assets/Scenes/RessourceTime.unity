@@ -1462,6 +1462,17 @@ MonoBehaviour:
   UndockedContent: {fileID: 1833996162}
   BehaviourObject: {fileID: 1285601076}
   IsDocked: 0
+--- !u!114 &535910308 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1885954438308246090, guid: 8da417dd504640c48b8424f16aa337ad, type: 3}
+  m_PrefabInstance: {fileID: 378297659}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16094f4189ba90046b4a4f138db9b9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &561945683
 GameObject:
   m_ObjectHideFlags: 0
@@ -2047,6 +2058,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &755417384 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1885954438308246090, guid: 8da417dd504640c48b8424f16aa337ad, type: 3}
+  m_PrefabInstance: {fileID: 9079028352152905673}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16094f4189ba90046b4a4f138db9b9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &769977669
 GameObject:
   m_ObjectHideFlags: 0
@@ -2158,8 +2180,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1568935293312099289, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
       propertyPath: remoteIp
-      value: 10.92.13.255
+      value: 192.168.0.6
       objectReference: {fileID: 0}
+    - target: {fileID: 1568935293312099289, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: verboseLogs
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568935293312099289, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: redShipController
+      value: 
+      objectReference: {fileID: 755417384}
+    - target: {fileID: 1568935293312099289, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
+      propertyPath: blueShipController
+      value: 
+      objectReference: {fileID: 535910308}
     - target: {fileID: 3248567367277631004, guid: e53bb2acd30192840842ebcc1f67e0d3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 100
@@ -2585,7 +2619,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ac983529a3b8ae4bb7f42687642856d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listenPort: 8888
+  listenPort: 9999
   redShip: {fileID: 0}
   blueShip: {fileID: 0}
   logMessages: 1
@@ -4336,6 +4370,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1286009476270911610, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: TcpPort
+      value: 20004
+      objectReference: {fileID: 0}
+    - target: {fileID: 1286009476270911610, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
+      propertyPath: UdpPort
+      value: 20003
+      objectReference: {fileID: 0}
     - target: {fileID: 3203751690721125800, guid: 3b1d0bf695bc04a4f85143f86e719ea8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
