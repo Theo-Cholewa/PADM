@@ -35,6 +35,11 @@ public class Battle : MonoBehaviour
         {
             mesh.text = TextRemainingTime;
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            RemainingTime -= 10;
+        }
     }
 
     IEnumerator SyncTime()

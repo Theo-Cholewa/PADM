@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,9 +24,17 @@ public class TeamGUI : MonoBehaviour
     public GameObject GoldIcon;
     public Jauge Health;
 
+    public UDictionary<RessourceType,IconTarget> IconTargets;
+    public IconSender iconSender;
+
 
     private int currentHealth=100;
     private int currentMoney=0;
+
+    void Awake()
+    {
+        foreach(var iconTarget in IconTargets) iconTarget.Value.Sender = iconSender;
+    }
 
 
     void Start()

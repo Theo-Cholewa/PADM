@@ -62,6 +62,7 @@ public class ChickenNetJoystick : MonoBehaviour, IslandBehaviour
 
                 if (linkedShip != null)
                 {
+                    RessourceClient.current.Get(linkedShip.team).SendIcon(linkedShip.transform.position, RessourceType.Chicken);
                     RessourceClient.current.Get(linkedShip.team).Add(RessourceType.Chicken,1);
                     Debug.Log($"🐔 {linkedShip.team} a capturé un poulet — nourriture totale");
                 }

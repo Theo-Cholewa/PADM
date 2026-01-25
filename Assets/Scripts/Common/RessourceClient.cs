@@ -28,6 +28,7 @@ public class RessourceClient : MonoBehaviour
     {
         if(Teams!=null) foreach(var manager in Teams.Values) manager.Dispose();
         if(GameStats!=null) GameStats.Dispose();
+        if(current == this) current = null;
     }
 
 
@@ -39,7 +40,7 @@ public class RessourceClient : MonoBehaviour
         if(Teams.TryGetValue(team, out var manager)) return manager;
         else
         {
-            var man = new TeamClient(team);
+            var man = new TeamClient(team,this);
             Teams[team] = man;
             return man;
         }
@@ -49,6 +50,7 @@ public class RessourceClient : MonoBehaviour
     {
         public Team team;
         public PartyTools.ValueClient<RessourceData> client;
+        public RessourceClient root;
 
         public readonly UnityEvent onChange = new UnityEvent();
 
@@ -61,9 +63,10 @@ public class RessourceClient : MonoBehaviour
         }
 
 
-        public TeamClient(Team team)
+        public TeamClient(Team team, RessourceClient root)
         {
             this.team = team;
+            this.root = root;
 
             client = new (
                 Party.current,
@@ -77,6 +80,11 @@ public class RessourceClient : MonoBehaviour
         public Task Add(RessourceType type, int amount)
         {
             return Party.current.SendMessageToAll($"store;add;{team.id};{amount};{type}");
+        }
+
+        public void SendIcon(Vector3 From, RessourceType type, bool isReversed=false)
+        {
+            IconSender.current?.SpawnIcon(type.ToString(), IconSender.current.SceneToWorld(From), $"{type}_{team.id}", isReversed);
         }
 
         public Task AskForFight()
