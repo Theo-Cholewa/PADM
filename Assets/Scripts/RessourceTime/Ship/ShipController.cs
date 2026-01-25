@@ -25,7 +25,10 @@ public class ShipController : MonoBehaviour
     private bool anchorDropped = false;
 
     [Header("Contrôle réseau")]
+    [Tooltip("Si true, le steer réseau peut être utilisé (si aucun input clavier prioritaire).")]
     public bool useNetworkSteering = false;
+
+    [Tooltip("Si true, le throttle réseau peut être utilisé (si aucun input clavier prioritaire).")]
     public bool useNetworkThrottle = false;
 
     [Range(-1f, 1f)]
@@ -33,6 +36,10 @@ public class ShipController : MonoBehaviour
 
     [Range(0f, 1f)]
     public float networkThrottleInput = 0f;
+
+    [Header("Priorités d'input")]
+    [Tooltip("Si activé, le clavier override le réseau/legacy quand une touche est pressée.")]
+    public bool keyboardOverridesNetwork = true;
 
     [Header("Debug")]
     public bool verboseLogs = true;
@@ -92,7 +99,7 @@ public class ShipController : MonoBehaviour
     private static Dictionary<Team, SavedShipData> SAVED = new();
 
     [Header("Legacy wheel (directionClient)")]
-    [Tooltip("Objet optionnel (ancien système). Si présent et compatible, il fournit steer/throttle agrégés. Sinon fallback UDP/clavier.")]
+    [Tooltip("Objet optionnel (ancien système). Si présent et compatible, il fournit steer/throttle agrégés. Sinon fallback réseau/clavier.")]
     public UnityEngine.Object directionClient;
 
     void Start()
@@ -157,12 +164,35 @@ public class ShipController : MonoBehaviour
 
         if (anchorDropped) return;
 
+        // =========================
+        // INPUT SELECTION
+        // =========================
+        bool kbForward = Input.GetKey(moveForward);
+        bool kbLeft = Input.GetKey(turnLeft);
+        bool kbRight = Input.GetKey(turnRight);
+
+        bool kbHasThrottle = kbForward;
+        bool kbHasSteer = kbLeft || kbRight;
+
         // ========== THROTTLE ==========
         float throttle = 0f;
 
-        if (useNetworkThrottle) throttle = networkThrottleInput;
-        else if (hasLegacy) throttle = legacyThrottle;
-        else if (Input.GetKey(moveForward)) throttle = 1f;
+        if (keyboardOverridesNetwork && kbHasThrottle)
+        {
+            throttle = 1f;
+        }
+        else if (useNetworkThrottle)
+        {
+            throttle = networkThrottleInput;
+        }
+        else if (hasLegacy)
+        {
+            throttle = legacyThrottle;
+        }
+        else if (kbHasThrottle)
+        {
+            throttle = 1f;
+        }
 
         currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
         currentSpeed -= deceleration * shipLevel * Time.deltaTime;
@@ -171,15 +201,26 @@ public class ShipController : MonoBehaviour
         // ========== STEER ==========
         float steer = 0f;
 
-        if (useNetworkSteering) steer = networkSteerInput;
-        else if (hasLegacy) steer = legacySteer;
+        if (keyboardOverridesNetwork && kbHasSteer)
+        {
+            if (kbLeft) steer -= 1f;
+            if (kbRight) steer += 1f;
+        }
+        else if (useNetworkSteering)
+        {
+            steer = networkSteerInput;
+        }
+        else if (hasLegacy)
+        {
+            steer = legacySteer;
+        }
         else
         {
-            if (Input.GetKey(turnLeft)) steer -= 1f;
-            if (Input.GetKey(turnRight)) steer += 1f;
+            if (kbLeft) steer -= 1f;
+            if (kbRight) steer += 1f;
         }
 
-        // ✅ Rotation pilotable : vitesse cible (deg/s), plus d’accumulation infinie
+        // Rotation pilotable : vitesse cible (deg/s)
         float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
 
         // lissage
@@ -193,7 +234,7 @@ public class ShipController : MonoBehaviour
 
         Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
-        
+
         if (Mathf.Abs(currentRotationSpeed) > 0.01f)
         {
             Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
