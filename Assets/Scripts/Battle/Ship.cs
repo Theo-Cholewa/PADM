@@ -1,52 +1,46 @@
-using System;
+using System.Linq;
 using UnityEngine;
 public class Ship : MonoBehaviour
 {
     public TeamEnum TeamId;
-    public float speed = 0f;
-    private float waterLevel = 0f;
     public new Renderer renderer;
 
     public RessourceClient.TeamClient ressources;
     
 
+    void Awake()
+    {
+        foreach(var level in GetComponentsInChildren<LevelDependant>()) level.TeamId = TeamId;
+
+        foreach(var flag in GetComponentsInChildren<Flag>()) flag.TeamId = TeamId;
+
+        foreach(var canon in GetComponentsInChildren<Canon>()) canon.team = TeamId;
+
+        foreach(var box in GetComponentsInChildren<Box>()) box.TeamId = TeamId;
+    }
+
     void Start()
     {
         ressources = RessourceClient.current.Get(Team.Of(TeamId));
+        ressources.onChange.AddListener(OnHealthChange);
     }
 
-    private int DamageCounter = 0;
+    void OnDestroy()
+    {
+        ressources.onChange.RemoveListener(OnHealthChange);
+    }
 
     public void ChangeHealth(int offset)
     {
         ressources.Add(RessourceType.Health, offset);
     }
 
-    void FixedUpdate()
+    void OnHealthChange()
     {
-        if (speed > 0f) waterLevel += speed / 10000f;
-        else waterLevel -= 4f / 10000f;
-
-        if (waterLevel < 0f) waterLevel = 0f;
-
+        var values = ressources.client.GetValues().ToList();
+        var health = values.Count>0 ? values[0].Value.health : 100;
         Color c = renderer.material.color;
-        c.a = 1f - waterLevel;
+        c.a = health/100f;
         renderer.material.color = c;
-
-        // Diminue les vies si le bâteau est en train de couler.
-        if (waterLevel > 0f)
-        {
-            DamageCounter++;
-            if (DamageCounter > 50)
-            {
-                DamageCounter = 0;
-                var damageDone = Math.Max(1,(int)(waterLevel*10));
-                ressources.Add(RessourceType.Health,-damageDone);
-            }
-        }
-        else
-        {
-            DamageCounter=0;
-        }
     }
 }

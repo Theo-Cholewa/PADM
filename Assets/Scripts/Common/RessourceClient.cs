@@ -52,9 +52,12 @@ public class RessourceClient : MonoBehaviour
 
         public readonly UnityEvent onChange = new UnityEvent();
 
-        public RessourceData value
+        public RessourceData? value
         {
-            get => client.GetValues().FirstOrDefault().Value;
+            get{
+                var values = client.GetValues();
+                return values.Count==0 ? null : values.First().Value;
+            }
         }
 
 
@@ -110,6 +113,8 @@ public class RessourceClient : MonoBehaviour
     /// </summary>
     public void GoToGoodScene()
     {
+        if(GameStats.GetValues().Count == 0) return;
+        
         var stats = GameStats.FirstOrDefault();
         if (stats.IsInFight)
         {
@@ -120,7 +125,7 @@ public class RessourceClient : MonoBehaviour
         }
         else
         {
-            if (stats.Winner==null)
+            if (!stats.HasWinner)
             {
                 if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "RessourceTime")
                 {
@@ -131,7 +136,7 @@ public class RessourceClient : MonoBehaviour
             {
                 if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Sea")
                 {
-                    Sea.Team = stats.Winner.HasValue ? Team.Of(stats.Winner.Value) : null;
+                    Sea.Team = stats.HasWinner ? Team.Of(stats.Winner) : null;
                     UnityEngine.SceneManagement.SceneManager.LoadScene("Sea");
                 }
             }

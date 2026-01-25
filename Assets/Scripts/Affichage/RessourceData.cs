@@ -21,7 +21,7 @@ public struct RessourceData
             case RessourceType.Health: return health;
 
             case RessourceType.Wood: return wood;
-            case RessourceType.Rock: return rock;
+            case RessourceType.Stone: return rock;
             case RessourceType.Chicken: return chicken;
 
             case RessourceType.Cannon: return cannonLevel;
@@ -41,7 +41,7 @@ public struct RessourceData
             case RessourceType.Health: health = value; break;
 
             case RessourceType.Wood: wood = value; break;
-            case RessourceType.Rock: rock = value; break;
+            case RessourceType.Stone: rock = value; break;
             case RessourceType.Chicken: chicken = value; break;
 
             case RessourceType.Cannon: cannonLevel = value; break;

@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 
+[Serializable]
 public enum TeamEnum
 {
     RED, BLUE, GREEN,

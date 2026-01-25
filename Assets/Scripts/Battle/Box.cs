@@ -43,7 +43,7 @@ public class Box : MonoBehaviour
         content.GetComponent<Pullable>().onTake = () =>
         {
             // Check if has enougth ressources
-            var count = ressources.value.Get(Material)/Cost;
+            var count = (ressources.value?.Get(Material)??100)/Cost;
 
             if (count <= 0)
             {
@@ -76,7 +76,7 @@ public class Box : MonoBehaviour
 
     public void RecalculateCount()
     {
-        var count = ressources.value.Get(Material)/Cost;
+        var count = (ressources.value?.Get(Material)??100)/Cost;
         CountDisplay.text = count.ToString();
     }
 }

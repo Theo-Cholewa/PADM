@@ -214,8 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onSpawn: 0
-  onDestroy: 5
-  ship: {fileID: 0}
+  onDestroy: 3
 --- !u!1 &9126334609645219834
 GameObject:
   m_ObjectHideFlags: 0

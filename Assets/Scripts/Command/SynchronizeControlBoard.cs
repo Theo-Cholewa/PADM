@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -25,8 +26,9 @@ public class SynchronizeControlBoard : MonoBehaviour
     {
         while (true)
         {
-            if(server!=null)server.SetValue((helm.rotation, lever.signal));
-            Debug.Log($"Sending data: rotation={helm.rotation}, speed={lever.signal}");
+            var rotation = Math.Clamp(helm.rotation/180f, -1f, 1f);
+            if(server!=null)server.SetValue((rotation, lever.signal));
+            Debug.Log($"Sending data: rotation={rotation}, speed={lever.signal}");
             yield return new WaitForSeconds(0.1f);
         }
     }

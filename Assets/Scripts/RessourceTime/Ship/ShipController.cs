@@ -126,8 +126,11 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
-        var data = ressources.value;
+        var data = ressources.value ?? new();
         float shipLevel = Mathf.Max(1, data.shipLevel);
+        var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
+        var volantCount = directionClient?.GetValues()?.Count ?? 1;
+        if (volantCount == 0) volantCount = 1;
 
         if (verboseLogs && Time.time >= nextDebugTime)
         {
@@ -183,7 +186,7 @@ public class ShipController : MonoBehaviour
 
         Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
-
+        
         if (Mathf.Abs(currentRotationSpeed) > 0.01f)
         {
             Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
@@ -239,10 +242,10 @@ public class ShipController : MonoBehaviour
 
             if (CurrentDockedIsland != null)
             {
+                var leftName = CurrentDockedIsland.Name;
+
                 CurrentDockedIsland.SetDocked(false);
                 CurrentDockedIsland.Behaviour?.Undock(this);
-
-                var leftName = CurrentDockedIsland.Name;
                 CurrentDockedIsland = null;
 
                 Debug.Log($"🏝️ {team} quitte l’île {leftName}, retour à l’état initial.");
@@ -252,9 +255,9 @@ public class ShipController : MonoBehaviour
 
     void UpdateResourceBars()
     {
-        UpdateResourceImageHeight(foodImage, ressources.value.chicken);
-        UpdateResourceImageHeight(woodImage, ressources.value.wood);
-        UpdateResourceImageHeight(stoneImage, ressources.value.rock);
+        UpdateResourceImageHeight(foodImage, ressources.value?.chicken ?? 0);
+        UpdateResourceImageHeight(woodImage, ressources.value?.wood ?? 0);
+        UpdateResourceImageHeight(stoneImage, ressources.value?.rock ?? 0);
     }
 
     void UpdateResourceImageHeight(RawImage image, int amount)
