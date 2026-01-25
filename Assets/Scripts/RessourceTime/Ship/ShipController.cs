@@ -127,10 +127,10 @@ public class ShipController : MonoBehaviour
     void Update()
     {
         var data = ressources.value ?? new();
-        float shipLevel = Mathf.Max(1, data.shipLevel);
+        float shipLevel = Mathf.Max(1, data.shipLevel);/*
         var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
         var volantCount = directionClient?.GetValues()?.Count ?? 1;
-        if (volantCount == 0) volantCount = 1;
+        if (volantCount == 0) volantCount = 1;*/
 
         if (verboseLogs && Time.time >= nextDebugTime)
         {
