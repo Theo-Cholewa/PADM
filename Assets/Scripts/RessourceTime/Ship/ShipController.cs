@@ -25,33 +25,34 @@ public class ShipController : MonoBehaviour
     private bool anchorDropped = false;
 
     [Header("Contrôle réseau")]
-    [Tooltip("Si activé, la rotation vient du mobile plutôt que du clavier.")]
     public bool useNetworkSteering = false;
-
-    [Tooltip("Si activé, l'accélération vient du mobile plutôt que du clavier.")]
     public bool useNetworkThrottle = false;
 
-    [Tooltip("Entrée réseau normalisée [-1,1] (mise à jour par TcpReceiver).")]
     [Range(-1f, 1f)]
     public float networkSteerInput = 0f;
 
-    [Tooltip("Entrée de throttle réseau [0,1] (0 = coupé, 1 = bouton appuyé).")]
     [Range(0f, 1f)]
     public float networkThrottleInput = 0f;
+
+    [Header("Debug")]
+    public bool verboseLogs = true;
+    private float nextDebugTime = 0f;
 
     public void SetNetworkSteer(float value)
     {
         networkSteerInput = Mathf.Clamp(value, -1f, 1f);
+        if (verboseLogs) Debug.Log($"[SHIP:{team}] SetNetworkSteer -> {networkSteerInput:F2}");
     }
 
     public void SetNetworkThrottle(float value)
     {
         networkThrottleInput = Mathf.Clamp01(value);
+        if (verboseLogs) Debug.Log($"[SHIP:{team}] SetNetworkThrottle -> {networkThrottleInput:F2}");
     }
 
-    // 🔹 Appelé par TcpReceiver quand il reçoit ANCHOR:TOGGLE
     public void ToggleAnchorFromNetwork()
     {
+        if (verboseLogs) Debug.Log($"[SHIP:{team}] ToggleAnchorFromNetwork()");
         ToggleAnchor();
     }
 
@@ -72,34 +73,34 @@ public class ShipController : MonoBehaviour
     public float deceleration = 1f;
     public float TimeBeforeFight = 120f;
 
-    [Header("Rotation inertielle")]
-    public float rotationAcceleration = 20f;
-    public float rotationDeceleration = 20f;
+    [Header("Rotation")]
+    [Tooltip("Vitesse max de rotation (deg/s).")]
     public float maxRotationSpeed = 30f;
 
+    [Tooltip("Temps de lissage vers la rotation cible (0.05–0.2 bien).")]
+    public float rotationSmoothing = 0.12f;
+
     private float currentSpeed = 0f;
-    private float currentRotationSpeed = 0f;
+    private float currentRotationSpeed = 0f; // deg/s
     private float fightTimer = 120f;
 
-    // 🔹 île actuellement accostée
     private Island CurrentDockedIsland = null;
-
-    private PartyTools.ValueClient<(float, float)> directionClient;
 
     [HideInInspector]
     public RessourceClient.TeamClient ressources;
 
+    private static Dictionary<Team, SavedShipData> SAVED = new();
+
     void Start()
     {
-        directionClient = new(
-            Party.current,
-            $"direction_{team.id}",
-            v => JsonUtility.FromJson<(float, float)>(v)
-        );
-
         ressources = RessourceClient.current.Get(team);
-
         rb = GetComponent<Rigidbody>();
+
+        if (verboseLogs)
+        {
+            Debug.Log($"[SHIP:{team}] Start | obj={gameObject.name} rb={(rb != null ? "OK" : "NULL")} " +
+                      $"kinematic={(rb != null && rb.isKinematic)} active={gameObject.activeInHierarchy} enabled={enabled}");
+        }
 
         ressources.onChange.AddListener(UpdateResourceBars);
         UpdateResourceBars();
@@ -117,7 +118,8 @@ public class ShipController : MonoBehaviour
 
     void OnDestroy()
     {
-        ressources.onChange.RemoveListener(UpdateResourceBars);
+        if (ressources != null)
+            ressources.onChange.RemoveListener(UpdateResourceBars);
 
         OnDestroySave();
     }
@@ -125,100 +127,86 @@ public class ShipController : MonoBehaviour
     void Update()
     {
         var data = ressources.value ?? new();
+        float shipLevel = Mathf.Max(1, data.shipLevel);
         var volantData = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f)) ?? (0f, 0f);
         var volantCount = directionClient?.GetValues()?.Count ?? 1;
         if (volantCount == 0) volantCount = 1;
 
-        // --- Gestion de la baguarre
-        fightTimer -= Time.deltaTime;
-        if (fightTimer < 0)
+        if (verboseLogs && Time.time >= nextDebugTime)
         {
-            fightImage.enabled = true;
+            nextDebugTime = Time.time + 1f;
+            Debug.Log($"[SHIP:{team}] state anchor={anchorDropped} speed={currentSpeed:F2} rot={currentRotationSpeed:F2} " +
+                      $"useNetThr={useNetworkThrottle} thr={networkThrottleInput:F2} useNetSteer={useNetworkSteering} steer={networkSteerInput:F2}");
         }
 
-        // --- Gestion de l’ancre (clavier) ---
+        // Fight
+        fightTimer -= Time.deltaTime;
+        if (fightTimer < 0 && fightImage != null) fightImage.enabled = true;
+
+        // Anchor clavier
         if (Input.GetKeyDown(anchorKey))
         {
+            if (verboseLogs) Debug.Log($"[SHIP:{team}] Anchor key pressed ({anchorKey})");
             ToggleAnchor();
         }
 
-        // Si l’ancre est posée, le bateau ne bouge plus
         if (anchorDropped) return;
 
-        var speed = data.shipLevel;
-        if (speed <= 0) speed = 1;
+        // ========== THROTTLE ==========
+        float throttle = 0f;
 
-        // --- Mouvement avant/arrière ---
-        var addedSpeed = 0f;
+        if (useNetworkThrottle) throttle = networkThrottleInput;
+        else if (Input.GetKey(moveForward)) throttle = 1f;
 
-        // Network 
-        if (useNetworkThrottle)
-        {
-            if (networkThrottleInput > 0.5f) addedSpeed += acceleration;
-        }
+        currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
+        currentSpeed -= deceleration * shipLevel * Time.deltaTime;
+        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * shipLevel);
 
-        // Contrôle clavier classique
-        if (Input.GetKey(moveForward)) addedSpeed += acceleration;
+        // ========== STEER ==========
+        float steer = 0f;
 
-        // Party
-        addedSpeed += volantData.Item2 / volantCount * acceleration;
-
-        if (addedSpeed > 0f) currentSpeed += addedSpeed * speed * Time.deltaTime;
-        else currentSpeed -= deceleration * speed * Time.deltaTime;
-
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * speed);
-
-
-        // --- Rotation ---
-        var addedRotationSpeed = 0f;
-
-        // Network
-        if (useNetworkSteering)
-        {
-            float steer = networkSteerInput;      // -1 à 1
-            addedRotationSpeed += steer;
-        }
-
-        // Keyboard
-        if (Input.GetKey(turnLeft))
-            addedRotationSpeed += -1f;
-        else if (Input.GetKey(turnRight))
-            addedRotationSpeed += 1f;
-
-        // Party
-        addedRotationSpeed -= volantData.Item1 / volantCount;
-
-        if (Math.Abs(addedRotationSpeed) > 0.01f)
-        {
-            currentRotationSpeed += addedRotationSpeed * Time.deltaTime * speed * rotationAcceleration;
-        }
+        if (useNetworkSteering) steer = networkSteerInput;
         else
         {
-            if (currentRotationSpeed > 0)
-                currentRotationSpeed -= rotationDeceleration * Time.deltaTime * speed;
-            else if (currentRotationSpeed < 0)
-                currentRotationSpeed += rotationDeceleration * Time.deltaTime * speed;
-
-            if (Mathf.Abs(currentRotationSpeed) < 0.5f)
-                currentRotationSpeed = 0;
+            if (Input.GetKey(turnLeft)) steer -= 1f;
+            if (Input.GetKey(turnRight)) steer += 1f;
         }
 
-        var maxRotatSpeed = Math.Abs(addedRotationSpeed)*maxRotationSpeed*speed;
+        // ✅ Rotation pilotable : vitesse cible (deg/s), plus d’accumulation infinie
+        float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
 
-        currentRotationSpeed = Mathf.Clamp(currentRotationSpeed, -maxRotatSpeed, maxRotatSpeed);
+        // lissage
+        float smooth = Mathf.Max(0.001f, rotationSmoothing);
+        currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, targetRotSpeed, Time.deltaTime / smooth);
     }
 
-    // 🔹 Toute la logique ancre regroupée ici
+    void FixedUpdate()
+    {
+        if (anchorDropped || rb == null) return;
+
+        Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+        
+        if (Mathf.Abs(currentRotationSpeed) > 0.01f)
+        {
+            Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
+            rb.MoveRotation(rb.rotation * delta);
+        }
+    }
+
     private void ToggleAnchor()
     {
         anchorDropped = !anchorDropped;
 
+        if (verboseLogs)
+            Debug.Log($"[SHIP:{team}] ToggleAnchor -> anchorDropped={anchorDropped}");
+
         if (anchorDropped)
         {
-            // Pose de l’ancre
             currentSpeed = 0f;
             currentRotationSpeed = 0f;
-            rb.velocity = Vector3.zero;
+            if (rb != null) rb.velocity = Vector3.zero;
+
             Debug.Log($"{team} pose l’ancre ⚓");
 
             if (stopImage != null) stopImage.enabled = true;
@@ -226,7 +214,6 @@ public class ShipController : MonoBehaviour
             if (foodImage != null) foodImage.enabled = true;
             if (stoneImage != null) stoneImage.enabled = true;
 
-            // 🔹 Recherche d’île proche
             float detectionRadius = 20f;
             Island[] allIslands = FindObjectsOfType<Island>();
             CurrentDockedIsland = null;
@@ -246,7 +233,6 @@ public class ShipController : MonoBehaviour
         }
         else
         {
-            // Lève l’ancre
             Debug.Log($"{team} relève l’ancre ⚓");
 
             if (stopImage != null) stopImage.enabled = false;
@@ -256,29 +242,17 @@ public class ShipController : MonoBehaviour
 
             if (CurrentDockedIsland != null)
             {
-                Debug.Log($"🏝️ {team} quitte l’île {CurrentDockedIsland.Name}, retour à l’état initial.");
+                var leftName = CurrentDockedIsland.Name;
+
                 CurrentDockedIsland.SetDocked(false);
                 CurrentDockedIsland.Behaviour?.Undock(this);
                 CurrentDockedIsland = null;
+
+                Debug.Log($"🏝️ {team} quitte l’île {leftName}, retour à l’état initial.");
             }
         }
     }
 
-    void FixedUpdate()
-    {
-        if (anchorDropped) return;
-
-        Vector3 move = transform.forward * currentSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + move);
-
-        if (Mathf.Abs(currentRotationSpeed) > 0.01f)
-        {
-            Quaternion delta = Quaternion.Euler(0f, currentRotationSpeed * Time.fixedDeltaTime, 0f);
-            rb.MoveRotation(rb.rotation * delta);
-        }
-    }
-
-    // 🔹 Met à jour la hauteur des barres selon les quantités actuelles
     void UpdateResourceBars()
     {
         UpdateResourceImageHeight(foodImage, ressources.value?.chicken ?? 0);
@@ -286,7 +260,6 @@ public class ShipController : MonoBehaviour
         UpdateResourceImageHeight(stoneImage, ressources.value?.rock ?? 0);
     }
 
-    // 🔹 Hauteur = 100 à 10 ressources, 0 à 0 ressource
     void UpdateResourceImageHeight(RawImage image, int amount)
     {
         if (image == null) return;
@@ -294,14 +267,12 @@ public class ShipController : MonoBehaviour
         RectTransform rt = image.rectTransform;
         Vector2 size = rt.sizeDelta;
 
-        // 0 ressource → 0 px ; 10 ressources → resourceMaxSize px
         float t = Mathf.Clamp01(amount / 10f);
         size.y = Mathf.Lerp(0f, resourceMaxSize, t);
 
         rt.sizeDelta = size;
     }
 
-    // FIGHT //
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.TryGetComponent<ShipController>(out var otherShip))
@@ -312,9 +283,6 @@ public class ShipController : MonoBehaviour
             }
         }
     }
-
-    // DATA SAVING //
-    private static Dictionary<Team, SavedShipData> SAVED = new();
 
     void StartSave()
     {
@@ -327,10 +295,10 @@ public class ShipController : MonoBehaviour
 
     void OnDestroySave()
     {
-        SAVED.Add(team, new SavedShipData
+        SAVED[team] = new SavedShipData
         {
             position = rb.position,
             rotation = rb.rotation
-        });
+        };
     }
 }
