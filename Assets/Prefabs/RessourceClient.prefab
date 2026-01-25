@@ -13,7 +13,7 @@ GameObject:
   m_Layer: 0
   m_Name: RessourceClient
   m_TagString: Untagged
-  m_Icon: {fileID: 2800000, guid: 7c88b621f50edbb46bd3688515457aec, type: 3}
+  m_Icon: {fileID: 2800000, guid: 1334a15fabfb7b842a3287611ed659f3, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -44,4 +44,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 421250100e0172b4ba2ac5c273d5bc5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sender: {fileID: 0}
