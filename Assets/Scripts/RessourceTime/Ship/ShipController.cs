@@ -138,6 +138,8 @@ public class ShipController : MonoBehaviour
         OnDestroySave();
     }
 
+    bool keyboardAnchor = false;
+
     void Update()
     {
         var data = ressources.value ?? new();
@@ -197,10 +199,10 @@ public class ShipController : MonoBehaviour
         if (Input.GetKeyDown(anchorKey))
         {
             if (verboseLogs) Debug.Log($"[SHIP:{team}] Anchor key pressed ({anchorKey})");
-            ToggleAnchor();
+            keyboardAnchor = !keyboardAnchor;
         }
         {
-            var shouldAnchor = networkValues.Item3 > .5f;
+            var shouldAnchor = (networkValues.Item3 > .5f)||keyboardAnchor;
             if(shouldAnchor!=anchorDropped) ToggleAnchor();
         }
 
