@@ -12,7 +12,7 @@ public class SynchronizeControlBoard : MonoBehaviour
     void Start()
     {
         var party = Party.current;
-        server = new(party,$"direction_{Team.currentTeam.id}", (0f, 0f), v=>JsonUtility.ToJson(v));
+        server = new(party, $"direction_{Team.currentTeam.id}", (0f, 0f), v=>JsonUtility.ToJson(v));
         StartCoroutine(SendData());
     }
 

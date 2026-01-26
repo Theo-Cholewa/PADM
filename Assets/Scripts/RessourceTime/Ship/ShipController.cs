@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -101,12 +102,11 @@ public class ShipController : MonoBehaviour
 
     [Header("Legacy wheel (directionClient)")]
     [Tooltip("Objet optionnel (ancien système). Si présent et compatible, il fournit steer/throttle agrégés. Sinon fallback réseau/clavier.")]
-    private PartyTools.ValueClient<(float,float)> directionClient;
+    private PartyTools.ValueClient<(float,float,float)> directionClient;
 
     void Start()
     {
-        directionClient = new(Party.current, $"direction_{Team.currentTeam.id}", it=>JsonUtility.FromJson<(float,float)>(it));
-
+        directionClient = new(Party.current, $"direction_{Team.currentTeam.id}", it=>JsonUtility.FromJson<(float,float,float)>(it));
         ressources = RessourceClient.current.Get(team);
         rb = GetComponent<Rigidbody>();
 
@@ -143,15 +143,16 @@ public class ShipController : MonoBehaviour
         var data = ressources.value ?? new();
         float shipLevel = Mathf.Max(1, data.shipLevel);
 
-        // 🔁 Legacy directionClient (si présent et compatible)
-        bool hasLegacy = TryGetDirectionClientInputs(out float legacySteer, out float legacyThrottle, out int legacyCount);
-
-        if (verboseLogs && Time.time >= nextDebugTime)
+        // Network controls
+        var networkRead = directionClient.GetValues().Values;
+        var networkValues = networkRead.Aggregate(
+            (0f, 0f, 0f),
+            (a, b) => (a.Item1 + b.Item1, a.Item2 + b.Item2, Math.Min(a.Item3,b.Item3))
+        );
+        if (networkRead.Count != 0)
         {
-            nextDebugTime = Time.time + 1f;
-            Debug.Log($"[SHIP:{team}] state anchor={anchorDropped} speed={currentSpeed:F2} rot={currentRotationSpeed:F2} " +
-                      $"useNetThr={useNetworkThrottle} thr={networkThrottleInput:F2} useNetSteer={useNetworkSteering} steer={networkSteerInput:F2} " +
-                      $"legacy={(hasLegacy ? $"ON count={legacyCount} steer={legacySteer:F2} thr={legacyThrottle:F2}" : "OFF")}");
+            networkValues.Item1 = Mathf.Clamp(networkValues.Item1 / networkRead.Count, -1f, 1f);
+            networkValues.Item2 = Mathf.Clamp01(networkValues.Item2 / networkRead.Count);
         }
 
         // Fight
@@ -160,13 +161,6 @@ public class ShipController : MonoBehaviour
         {
             fightImage.enabled = true;
             World.ReadyToFightCount++;
-        }
-
-        // Anchor clavier
-        if (Input.GetKeyDown(anchorKey))
-        {
-            if (verboseLogs) Debug.Log($"[SHIP:{team}] Anchor key pressed ({anchorKey})");
-            ToggleAnchor();
         }
 
         if (anchorDropped) return;
@@ -184,22 +178,8 @@ public class ShipController : MonoBehaviour
         // ========== THROTTLE ==========
         float throttle = 0f;
 
-        if (keyboardOverridesNetwork && kbHasThrottle)
-        {
-            throttle = 1f;
-        }
-        else if (useNetworkThrottle)
-        {
-            throttle = networkThrottleInput;
-        }
-        else if (hasLegacy)
-        {
-            throttle = legacyThrottle;
-        }
-        else if (kbHasThrottle)
-        {
-            throttle = 1f;
-        }
+        throttle += kbHasThrottle ? 1f : 0f;
+        throttle += networkValues.Item2;
 
         currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
         currentSpeed -= deceleration * shipLevel * Time.deltaTime;
@@ -208,24 +188,22 @@ public class ShipController : MonoBehaviour
         // ========== STEER ==========
         float steer = 0f;
 
-        if (keyboardOverridesNetwork && kbHasSteer)
+        steer += kbLeft ? -1f : 0f;
+        steer += kbRight ? 1f : 0f;
+
+        steer += networkValues.Item1;
+
+        // ========= ANCHOR =========
+        if (Input.GetKeyDown(anchorKey))
         {
-            if (kbLeft) steer -= 1f;
-            if (kbRight) steer += 1f;
+            if (verboseLogs) Debug.Log($"[SHIP:{team}] Anchor key pressed ({anchorKey})");
+            ToggleAnchor();
         }
-        else if (useNetworkSteering)
         {
-            steer = networkSteerInput;
+            var shouldAnchor = networkValues.Item3 > .5f;
+            if(shouldAnchor!=anchorDropped) ToggleAnchor();
         }
-        else if (hasLegacy)
-        {
-            steer = legacySteer;
-        }
-        else
-        {
-            if (kbLeft) steer -= 1f;
-            if (kbRight) steer += 1f;
-        }
+
 
         // Rotation pilotable : vitesse cible (deg/s)
         float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
@@ -378,125 +356,5 @@ public class ShipController : MonoBehaviour
             position = rb.position,
             rotation = rb.rotation
         };
-    }
-
-    // =========================================================
-    // Legacy directionClient compatibility layer (safe)
-    // =========================================================
-
-    private bool TryGetDirectionClientInputs(out float steerAvg, out float throttleAvg, out int count)
-    {
-        steerAvg = 0f;
-        throttleAvg = 0f;
-        count = 0;
-
-        if (directionClient == null) return false;
-
-        try
-        {
-            // directionClient.GetValues()?.Count
-            var values = directionClient.GetValues();
-            if (values is System.Collections.ICollection coll)
-                count = coll.Count;
-            else if (values is System.Collections.IEnumerable enumerable)
-            {
-                int c = 0;
-                foreach (var _ in enumerable) c++;
-                count = c;
-            }
-
-            if (count <= 0) count = 1;
-
-            // Try to read aggregate without passing lambdas (safe / reflection-only).
-            var agg = directionClient?.GetAggregate((a, b, c) => (a.Item1 + b.Item1, a.Item2 + b.Item2), (0f, 0f));
-
-            if (agg != null)
-            {
-                if (TryReadTuple2(agg, out float a, out float b))
-                {
-                    steerAvg = Mathf.Clamp(a / count, -1f, 1f);
-                    throttleAvg = Mathf.Clamp01(b / count);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        catch (Exception e)
-        {
-            if (verboseLogs)
-                Debug.LogWarning($"[SHIP:{team}] directionClient incompatible/failed: {e.Message}");
-            return false;
-        }
-    }
-
-    private static object InvokeMethod(UnityEngine.Object obj, string methodName)
-    {
-        if (obj == null) return null;
-        var t = obj.GetType();
-        var m = t.GetMethod(methodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-        if (m == null) return null;
-
-        // For safety: only call parameterless methods.
-        if (m.GetParameters().Length != 0) return null;
-
-        return m.Invoke(obj, null);
-    }
-
-    private static object GetMemberValue(UnityEngine.Object obj, string memberName)
-    {
-        if (obj == null) return null;
-        var t = obj.GetType();
-
-        var p = t.GetProperty(memberName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-        if (p != null && p.GetIndexParameters().Length == 0) return p.GetValue(obj);
-
-        var f = t.GetField(memberName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-        if (f != null) return f.GetValue(obj);
-
-        return null;
-    }
-
-    private static bool TryReadTuple2(object tuple, out float item1, out float item2)
-    {
-        item1 = 0f;
-        item2 = 0f;
-        if (tuple == null) return false;
-
-        var t = tuple.GetType();
-
-        // fields Item1/Item2
-        var f1 = t.GetField("Item1");
-        var f2 = t.GetField("Item2");
-        if (f1 != null && f2 != null)
-        {
-            object a = f1.GetValue(tuple);
-            object b = f2.GetValue(tuple);
-
-            if (a is float af && b is float bf)
-            {
-                item1 = af;
-                item2 = bf;
-                return true;
-            }
-        }
-
-        // properties Item1/Item2
-        var p1 = t.GetProperty("Item1");
-        var p2 = t.GetProperty("Item2");
-        if (p1 != null && p2 != null)
-        {
-            object a = p1.GetValue(tuple);
-            object b = p2.GetValue(tuple);
-
-            if (a is float af && b is float bf)
-            {
-                item1 = af;
-                item2 = bf;
-                return true;
-            }
-        }
-
-        return false;
     }
 }
