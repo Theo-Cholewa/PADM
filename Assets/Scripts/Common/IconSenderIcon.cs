@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class IconSenderIcon : MonoBehaviour
 {
-    public static float ICON_MOVE_SPEED = 0.01f;
+    public static float ICON_MOVE_SPEED = 0.02f;
 
     public GameObject Display;
 

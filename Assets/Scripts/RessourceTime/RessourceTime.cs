@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class RessourceTime : MonoBehaviour
 {
+    public AudioSource SeaSounds;
+    public AudioSource BattleSounds;
+
+    [HideInInspector] public int ReadyToFightCount=0;
 
     PartyTools.UniqueRole Role;
 
@@ -26,6 +30,10 @@ public class RessourceTime : MonoBehaviour
         {
             Debug.Log("ASk for fight");
             RessourceClient.current.Get(Team.RED).AskForFight();
+        }
+        if(ReadyToFightCount>0 && BattleSounds.mute)
+        {
+            BattleSounds.mute = false;
         }
     }
 }

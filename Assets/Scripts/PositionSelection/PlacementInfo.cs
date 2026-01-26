@@ -19,7 +19,7 @@ public class PlacementInfo : MonoBehaviour
 
         current = this;
 
-        server = new(Party.current, "placement", new Vector2Int(0,0), it=>JsonUtility.ToJson(it));
+        server = new(Party.current, "placement", new Vector2Int(1,1), it=>JsonUtility.ToJson(it));
     }
 
     void OnDestroy()

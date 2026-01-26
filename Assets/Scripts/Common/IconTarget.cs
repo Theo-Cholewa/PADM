@@ -28,11 +28,12 @@ public class IconTarget : MonoBehaviour
         var msg = packet.message;
         if (msg.StartsWith("icon_sender_propose;"))
         {
-            var parsed = JsonUtility.FromJson<(string,Vector2,string)>(msg.Substring("icon_sender_propose;".Length));
-            var (id,from,name) = parsed;
+            var parsed = JsonUtility.FromJson<(string,Vector2,string,bool)>(msg.Substring("icon_sender_propose;".Length));
+            var (id,from,name,isReversed) = parsed;
             if (Name == name)
             {
-                Sender.SpawnIcon(id, from, GetWorldPosition());
+                if(isReversed) Sender.SpawnIcon(id, GetWorldPosition(), from);
+                else Sender.SpawnIcon(id, from, GetWorldPosition());
             }
         }
     }
