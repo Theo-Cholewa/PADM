@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -106,7 +107,7 @@ public class ShipController : MonoBehaviour
 
     void Start()
     {
-        directionClient = new(Party.current, $"direction_{Team.currentTeam.id}", it=>JsonUtility.FromJson<(float,float,float)>(it));
+        directionClient = new(Party.current, $"direction_{team.id}", it=>JsonUtility.FromJson<(float,float,float)>(it));
         ressources = RessourceClient.current.Get(team);
         rb = GetComponent<Rigidbody>();
 
@@ -149,13 +150,13 @@ public class ShipController : MonoBehaviour
         var networkRead = directionClient.GetValues().Values;
         var networkValues = networkRead.Aggregate(
             (0f, 0f, 0f),
-            (a, b) => (a.Item1 + b.Item1, a.Item2 + b.Item2, Math.Min(a.Item3,b.Item3))
+            (a, b) => (a.Item1 + b.Item1, a.Item2 + b.Item2, Math.Max(a.Item3,b.Item3))
         );
-        if (networkRead.Count != 0)
-        {
-            networkValues.Item1 = Mathf.Clamp(networkValues.Item1 / networkRead.Count, -1f, 1f);
-            networkValues.Item2 = Mathf.Clamp01(networkValues.Item2 / networkRead.Count);
-        }
+        var networkCount = networkRead.Count>0 ? networkRead.Count : 1;
+        networkValues.Item1 = Mathf.Clamp(networkValues.Item1 / networkCount, -1f, 1f);
+        networkValues.Item2 = Mathf.Clamp01(networkValues.Item2 / networkCount);
+
+        Debug.Log(JsonUtility.ToJson(networkValues));
 
         // Fight
         fightTimer -= Time.deltaTime;
@@ -164,8 +165,6 @@ public class ShipController : MonoBehaviour
             fightImage.enabled = true;
             World.ReadyToFightCount++;
         }
-
-        if (anchorDropped) return;
 
         // =========================
         // INPUT SELECTION
@@ -183,9 +182,13 @@ public class ShipController : MonoBehaviour
         throttle += kbHasThrottle ? 1f : 0f;
         throttle += networkValues.Item2;
 
-        currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
-        currentSpeed -= deceleration * shipLevel * Time.deltaTime;
-        currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * shipLevel);
+
+        if (!anchorDropped)
+        {
+            currentSpeed += throttle * acceleration * shipLevel * Time.deltaTime;
+            currentSpeed -= deceleration * shipLevel * Time.deltaTime;
+            currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed * shipLevel);
+        }
 
         // ========== STEER ==========
         float steer = 0f;
@@ -193,7 +196,7 @@ public class ShipController : MonoBehaviour
         steer += kbLeft ? -1f : 0f;
         steer += kbRight ? 1f : 0f;
 
-        steer += networkValues.Item1;
+        steer += -networkValues.Item1;
 
         // ========= ANCHOR =========
         if (Input.GetKeyDown(anchorKey))
@@ -202,17 +205,21 @@ public class ShipController : MonoBehaviour
             keyboardAnchor = !keyboardAnchor;
         }
         {
-            var shouldAnchor = (networkValues.Item3 > .5f)||keyboardAnchor;
+            Debug.Log($"Anchor {networkValues.Item3} || {keyboardAnchor}");
+            var shouldAnchor = (networkValues.Item3 > .5f) || keyboardAnchor;
             if(shouldAnchor!=anchorDropped) ToggleAnchor();
         }
 
 
-        // Rotation pilotable : vitesse cible (deg/s)
-        float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
+        if (!anchorDropped)
+        {
+            // Rotation pilotable : vitesse cible (deg/s)
+            float targetRotSpeed = steer * maxRotationSpeed * shipLevel;
 
-        // lissage
-        float smooth = Mathf.Max(0.001f, rotationSmoothing);
-        currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, targetRotSpeed, Time.deltaTime / smooth);
+            // lissage
+            float smooth = Mathf.Max(0.001f, rotationSmoothing);
+            currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, targetRotSpeed, Time.deltaTime / smooth);
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
