@@ -14,7 +14,7 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
     [Header("Objets à desactiver quand les deux joueurs sont prêts")]
     public GameObject[] triggerObjects;
 
-    [Header("Prefab à masquer quand on appuie sur ESPACE")]
+    [Header("Prefab à gérer à la fin (on ne veut jamais tout faire disparaître)")]
     public GameObject prefabToHide;
 
     [Header("🔹 Référence au bateau accosté")]
@@ -27,77 +27,40 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
         // Si rien n’est assigné manuellement, on récupère automatiquement les enfants
         if (indicators == null || indicators.Length == 0)
             indicators = GetComponentsInChildren<TouchIndicatorWaveMulti>();
-        /*
-        if (firstIndicators != null)
-        {
-            // Désactive tous les premiers indicateurs au départ
-            foreach (var indicator in firstIndicators)
-            {
-                indicator?.SetActive(false);
-            }
-        }*/
 
+        // Désactive tous les objets de récolte au départ
         if (harvestObjects != null)
         {
-            // Désactive tous les objets de récolte au départ
             foreach (var obj in harvestObjects)
-            {
                 obj?.SetActive(false);
-            }
         }
-        
+
+        // Active tous les objets de trigger au départ
         if (triggerObjects != null)
         {
-            // Active tous les objets de trigger au départ
             foreach (var obj in triggerObjects)
-            {
                 obj?.SetActive(true);
-            }
         }
     }
 
     void Update()
     {
+        // Debug reset indicateurs
         if (Input.GetKeyDown(KeyCode.R))
         {
-            foreach (var indicator in firstIndicators)
-            {
-                if (indicator == null) continue;
-
-                indicator.SetActive(true);
-
-                var cg = indicator.GetComponent<CanvasGroup>();
-                if (cg != null)
-                {
-                    cg.alpha = 1;
-                    cg.interactable = true;
-                    cg.blocksRaycasts = true;
-                }
-            }
-
+            ResetFirstIndicators();
             Debug.Log("🔄 Réinitialisation des indicateurs de récolte.");
             return;
         }
 
+        // Debug : permet de simuler la fin d'animation au clavier
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ActivateHarvestObjects(false);
-            ActivateTriggerObjects(false);
-            prefabToHide?.SetActive(false);
-
-            if (linkedShip != null)
-            {
-                Debug.Log($"🌲 {linkedShip.team} a récolté du bois");
-                RessourceClient.current.Get(linkedShip.team).SendIcon(transform.position, RessourceType.Wood);
-                RessourceClient.current.Get(linkedShip.team).Add(RessourceType.Wood, 3);
-            }
-            else
-            {
-                Debug.LogWarning("⚠ Aucun bateau lié pour recevoir le bois !");
-            }
+            Debug.Log("🧪 DEBUG: Space -> CompleteHarvest()");
+            CompleteHarvest();
             return;
         }
-        
+
         if (indicators == null || indicators.Length == 0)
             return;
 
@@ -113,7 +76,7 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
             }
         }
 
-        // Si tous sont activés et que ce n’était pas encore le cas → message console
+        // Tous activés -> récolte possible
         if (everyoneActive && !allActivated)
         {
             allActivated = true;
@@ -121,7 +84,7 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
             ActivateTriggerObjects(false);
         }
 
-        // Si un se relâche, on peut repasser à false (facultatif)
+        // Un relâche -> on revient à l'état initial
         if (!everyoneActive && allActivated)
         {
             allActivated = false;
@@ -130,14 +93,58 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
         }
     }
 
+    // ✅ A appeler à la FIN de l'animation (Animation Event / Timeline)
+    public void CompleteHarvest()
+    {
+        Debug.Log($"✅ CompleteHarvest called | allActivated={allActivated} linkedShip={(linkedShip != null ? linkedShip.team.ToString() : "NULL")}");
+
+        // Reset visuel, mais on garde toujours quelque chose visible
+        ActivateHarvestObjects(false);
+        ActivateTriggerObjects(true);
+        if (prefabToHide != null) prefabToHide.SetActive(true);
+
+        // Don de ressource + envoi icône (à chaque fin d'animation)
+        if (linkedShip != null)
+        {
+            Debug.Log($"🌲 {linkedShip.team} a récolté du bois");
+            RessourceClient.current.Get(linkedShip.team).SendIcon(transform.position, RessourceType.Wood);
+            RessourceClient.current.Get(linkedShip.team).Add(RessourceType.Wood, 3);
+        }
+        else
+        {
+            Debug.LogWarning("⚠ CompleteHarvest: Aucun bateau lié (linkedShip=NULL) -> pas de récompense");
+        }
+
+        // Réarmement pour la prochaine boucle
+        allActivated = false;
+    }
+
+    private void ResetFirstIndicators()
+    {
+        if (firstIndicators == null) return;
+
+        foreach (var indicator in firstIndicators)
+        {
+            if (indicator == null) continue;
+
+            indicator.SetActive(true);
+
+            var cg = indicator.GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                cg.alpha = 1;
+                cg.interactable = true;
+                cg.blocksRaycasts = true;
+            }
+        }
+    }
+
     void ActivateHarvestObjects(bool state)
     {
         if (harvestObjects == null) return;
 
         foreach (var obj in harvestObjects)
-        {
             obj?.SetActive(state);
-        }
 
         if (state)
             Debug.Log("🌲 Récolte possible — objets activés !");
@@ -150,9 +157,7 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
         if (triggerObjects == null) return;
 
         foreach (var obj in triggerObjects)
-        {
             obj?.SetActive(state);
-        }
 
         if (state)
             Debug.Log("🔔 Triggers activés.");
@@ -164,12 +169,38 @@ public class WoodHarvestController : MonoBehaviour, IslandBehaviour
     public void Dock(ShipController ship)
     {
         linkedShip = ship;
+
+        // ✅ reset complet à chaque arrivée
+        allActivated = false;
+        ActivateHarvestObjects(false);
+        ActivateTriggerObjects(true);
+        if (prefabToHide != null) prefabToHide.SetActive(true);
+
+        ResetFirstIndicators();
+
         gameObject.SetActive(true);
+
+        Debug.Log($"🟢 Dock OK: linkedShip={(linkedShip != null ? linkedShip.team.ToString() : "NULL")}");
     }
 
     public void Undock(ShipController ship)
     {
+        // ✅ Important : ignore si ce n'est pas le même bateau que celui lié
+        if (linkedShip != null && ship != null && linkedShip != ship)
+        {
+            Debug.Log($"🟡 Undock ignoré: demandé par {ship.team} mais linkedShip={linkedShip.team}");
+            return;
+        }
+
+        // ✅ Reset visuel, mais on ne désactive jamais l'île
+        allActivated = false;
+        ActivateHarvestObjects(false);
+        ActivateTriggerObjects(true);
+        if (prefabToHide != null) prefabToHide.SetActive(true);
+
+        // on unlink seulement si c'est bien ce bateau
         linkedShip = null;
-        gameObject.SetActive(false);
+
+        Debug.Log("🔴 Undock OK (reset + unlink, île reste active)");
     }
 }
